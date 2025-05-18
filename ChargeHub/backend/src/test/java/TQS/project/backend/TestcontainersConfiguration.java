@@ -1,18 +1,32 @@
 package TQS.project.backend;
 
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.context.annotation.Bean;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.utility.DockerImageName;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@TestConfiguration(proxyBeanMethods = false)
-class TestcontainersConfiguration {
+@Testcontainers
+@TestConfiguration
+public class TestcontainersConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-	@Bean
-	@ServiceConnection
-	PostgreSQLContainer<?> postgresContainer() {
-		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
+	@Container
+	public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0")
+			.withDatabaseName("testdb")
+			.withUsername("test")
+			.withPassword("test");
+
+	@Override
+	public void initialize(ConfigurableApplicationContext context) {
+		mysqlContainer.start();
+
+		TestPropertyValues.of(
+				"spring.datasource.url=" + mysqlContainer.getJdbcUrl(),
+				"spring.datasource.username=" + mysqlContainer.getUsername(),
+				"spring.datasource.password=" + mysqlContainer.getPassword(),
+				"spring.datasource.driver-class-name=" + mysqlContainer.getDriverClassName())
+				.applyTo(context.getEnvironment());
 	}
-
 }

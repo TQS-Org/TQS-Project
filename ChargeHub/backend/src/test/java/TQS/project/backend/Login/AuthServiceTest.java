@@ -1,0 +1,105 @@
+package TQS.project.backend.Login;
+
+import TQS.project.backend.controller.AuthController;
+import TQS.project.backend.entity.Client;
+import TQS.project.backend.entity.Staff;
+import TQS.project.backend.entity.Role;
+import TQS.project.backend.dto.LoginRequest;
+import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.repository.ClientRepository;
+import TQS.project.backend.repository.StaffRepository;
+import TQS.project.backend.service.JwtProvider;
+import TQS.project.backend.service.AuthService;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class AuthServiceTest {
+
+    @Mock
+    private ClientRepository clientRepo;
+
+    @Mock
+    private StaffRepository staffRepo;
+
+    @Mock
+    private JwtProvider jwtProvider;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private AuthService authService;
+
+    @Test
+    void loginAsClient_withValidPassword_returnsTokenAndEvDriverRole() {
+        Client client = new Client();
+        client.setMail("driver@mail.com");
+        client.setPassword("hashed-password");
+
+        when(clientRepo.findByMail("driver@mail.com")).thenReturn(Optional.of(client));
+        when(passwordEncoder.matches("raw-password", "hashed-password")).thenReturn(true);
+        when(jwtProvider.generateToken("driver@mail.com", "EV_DRIVER")).thenReturn("mocked-token");
+
+        LoginRequest request = new LoginRequest("driver@mail.com", "raw-password");
+        LoginResponse response = authService.login(request);
+
+        assertEquals("mocked-token", response.getToken());
+        assertEquals("EV_DRIVER", response.getRole());
+    }
+
+    @Test
+    void loginAsStaff_withValidPassword_returnsTokenAndStaffRole() {
+        Staff staff = new Staff();
+        staff.setMail("operator@mail.com");
+        staff.setPassword("hashed");
+        staff.setRole(Role.OPERATOR);
+
+        when(staffRepo.findByMail("operator@mail.com")).thenReturn(Optional.of(staff));
+        when(passwordEncoder.matches("raw", "hashed")).thenReturn(true);
+        when(jwtProvider.generateToken("operator@mail.com", "OPERATOR")).thenReturn("token-op");
+
+        LoginRequest request = new LoginRequest("operator@mail.com", "raw");
+        LoginResponse response = authService.login(request);
+
+        assertEquals("token-op", response.getToken());
+        assertEquals("OPERATOR", response.getRole());
+    }
+
+    @Test
+    void login_withInvalidPassword_throwsException() {
+        Client client = new Client();
+        client.setMail("fail@mail.com");
+        client.setPassword("hashed");
+
+        when(clientRepo.findByMail("fail@mail.com")).thenReturn(Optional.of(client));
+        when(passwordEncoder.matches("wrong", "hashed")).thenReturn(false);
+
+        LoginRequest request = new LoginRequest("fail@mail.com", "wrong");
+
+        assertThrows(RuntimeException.class, () -> authService.login(request));
+    }
+
+    @Test
+    void login_withUnknownEmail_throwsException() {
+        when(clientRepo.findByMail("ghost@mail.com")).thenReturn(Optional.empty());
+        when(staffRepo.findByMail("ghost@mail.com")).thenReturn(Optional.empty());
+
+        LoginRequest request = new LoginRequest("ghost@mail.com", "any");
+
+        assertThrows(RuntimeException.class, () -> authService.login(request));
+    }
+}
