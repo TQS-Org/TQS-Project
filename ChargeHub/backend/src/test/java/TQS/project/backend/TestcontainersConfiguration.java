@@ -14,9 +14,9 @@ public class TestcontainersConfiguration implements ApplicationContextInitialize
 
 	@Container
 	public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0")
-			.withDatabaseName("testdb")
-			.withUsername("test")
-			.withPassword("test");
+			.withDatabaseName("tqs_db")
+			.withUsername("admin")
+			.withPassword("admin");
 
 	@Override
 	public void initialize(ConfigurableApplicationContext context) {

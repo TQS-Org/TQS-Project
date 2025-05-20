@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/validate").permitAll() // Add any other public endpoints here
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
