@@ -1,6 +1,5 @@
-package TQS.project.backend.service;
+package TQS.project.backend.security;
 
-import TQS.project.backend.service.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

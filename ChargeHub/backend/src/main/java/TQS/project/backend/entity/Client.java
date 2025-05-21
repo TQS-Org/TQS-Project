@@ -1,7 +1,6 @@
 package TQS.project.backend.entity;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 public class Client {
@@ -15,13 +14,6 @@ public class Client {
     private int age;
     private String mail;
     private String number;
-
-    // @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval =
-    // true)
-    // private List<Vehicle> vehicles;
-
-    // @OneToOne
-    // private Vehicle activeVehicle;
 
     public Client(String name, String password, int age, String mail, String number) {
         this.name = name;
@@ -86,7 +78,5 @@ public class Client {
     public void setNumber(String number) {
         this.number = number;
     }
-
-    // Getters and setters
 
 }

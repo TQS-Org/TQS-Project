@@ -130,6 +130,4 @@ public class Staff {
         this.assignedStation = assignedStation;
     }
 
-    // Getters and setters
-
 }

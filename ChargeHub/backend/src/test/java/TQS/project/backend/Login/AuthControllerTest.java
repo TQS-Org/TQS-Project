@@ -3,9 +3,9 @@ package TQS.project.backend.Login;
 import TQS.project.backend.controller.AuthController;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.security.JwtAuthFilter;
+import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.AuthService;
-import TQS.project.backend.service.JwtProvider;
-import TQS.project.backend.service.JwtAuthFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -53,5 +55,26 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("mocked-jwt"))
                 .andExpect(jsonPath("$.role").value("EV_DRIVER"));
+    }
+
+    @Test
+    void validateToken_withValidToken_returnsRole() throws Exception {
+        String token = "valid-jwt-token";
+        String role = "EV_DRIVER";
+
+        // Mock the JwtProvider to return the expected role
+        when(jwtProvider.getRoleFromToken(token)).thenReturn(role);
+
+        // Perform the GET request with Authorization header
+        mockMvc.perform(get("/api/auth/validate")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.role").value(role));
+    }
+
+    @Test
+    void validateToken_withMissingAuthorizationHeader_returnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/auth/validate"))
+                .andExpect(status().isUnauthorized());
     }
 }

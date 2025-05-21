@@ -2,6 +2,7 @@ package TQS.project.backend.controller;
 
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import TQS.project.backend.service.JwtProvider;
+
 import java.util.Map;
 
 @RestController

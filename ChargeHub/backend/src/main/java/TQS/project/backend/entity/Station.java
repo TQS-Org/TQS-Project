@@ -21,7 +21,6 @@ public class Station {
     @OneToMany(mappedBy = "assignedStation")
     private List<Staff> assignedStaff;
 
-    // Getters, Setters, Constructors
     public Station(double latitude, double longitude, String address, int numberOfChargers, String openingHours,
             List<Staff> assignedStaff) {
         this.latitude = latitude;

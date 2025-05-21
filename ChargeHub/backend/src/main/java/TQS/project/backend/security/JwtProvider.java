@@ -1,4 +1,4 @@
-package TQS.project.backend.service;
+package TQS.project.backend.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

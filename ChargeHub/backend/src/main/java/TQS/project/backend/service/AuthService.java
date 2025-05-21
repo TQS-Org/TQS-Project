@@ -2,10 +2,10 @@ package TQS.project.backend.service;
 
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
-import TQS.project.backend.entity.Client;
-import TQS.project.backend.entity.Staff;
 import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.StaffRepository;
+import TQS.project.backend.security.JwtProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

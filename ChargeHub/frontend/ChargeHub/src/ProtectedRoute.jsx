@@ -10,6 +10,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
     const check = async () => {
       const role = await getUserRoleFromToken();
       if (!role) {
+        alert("You can't go there");
         setAuthorized(false);
       } else {
         setAuthorized(role === requiredRole);
@@ -19,7 +20,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
   }, [requiredRole]);
 
   if (authorized === null) return <div>Loading...</div>;
-  if (!authorized) return <Navigate to="/unauthorized" />;
+  if (!authorized) return <Navigate to="/" />;
 
   return children;
 }

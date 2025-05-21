@@ -1,6 +1,5 @@
 package TQS.project.backend.Login;
 
-import TQS.project.backend.controller.AuthController;
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.entity.Role;
@@ -8,7 +7,7 @@ import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
 import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.StaffRepository;
-import TQS.project.backend.service.JwtProvider;
+import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.AuthService;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
