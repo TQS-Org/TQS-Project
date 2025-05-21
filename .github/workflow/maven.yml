@@ -14,62 +14,103 @@ name: CI with Maven and SonarCloud
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      # don't run this workflow when the are pushes, and there are only changes for this directories:
+      - ".github/**"
+      - "minutes/**"
+      - "presentations/**"
+      - "reports/**"
+      # don't run this workflow when the are pushes and there are only changes for the following files:
+      - "**.md"
+      - "**.gitignore"
+      
   pull_request:
-    branches: [ "main" ]
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      # don't run this workflow when the are pushes, and there are only changes for this directories:
+      - ".github/**"
+      - "minutes/**"
+      - "presentations/**"
+      - "reports/**"
+      # don't run this workflow when the are pushes and there are only changes for the following files:
+      - "**.md"
+      - "**.gitignore"
+
   workflow_dispatch:
 
 jobs:
   build:
+    name: Build and Test Backend
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '17', '21' ]
+        java: [ '21' ]
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0    
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
 
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        java-version: ${{ matrix.java }}
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: maven
 
-    - name: Build and run unit tests
-      run: mvn -B package --file pom.xml
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
-    - name: Run integration tests
-      run: mvn -B integration-test verify --file pom.xml
+      - name: Clean package of backend without tests
+        working-directory: ./backend
+        run: mvn clean package -DskipTests
 
-    - name: SonarCloud Scan
-      if: matrix.java == '17' # typically run only once, not for every JDK version
-      uses: SonarSource/sonarcloud-github-action@v2.2.0
-      with:
-        projectBaseDir: .
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and run unit tests
+        run: mvn -B package --file pom.xml
 
-    - name: Add code coverage information to PR
-      id: jacoco-pr
-      uses: madrapps/jacoco-report@v1.7.1
-      if: github.event_name == 'pull_request'
-      with:
-        paths: |
-          ${{ github.workspace }}/**/target/site/jacoco-merged-test-coverage-report/jacoco.xml 
-        token: ${{ secrets.GITHUB_TOKEN }}
-        min-coverage-overall: 80
-        min-coverage-changed-files: 80
+      - name: Run integration tests
+        run: mvn -B integration-test verify --file pom.xml
 
-    - name: Push results to Xray on Jira Cloud
-      if: always()
-      env:
-        XRAYCLOUD_CLIENT_ID: ${{ secrets.XRAYCLOUD_CLIENT_ID }}
-        XRAYCLOUD_CLIENT_SECRET: ${{ secrets.XRAYCLOUD_CLIENT_SECRET }}
-        XRAYCLOUD_TEST_PLAN_KEY: ${{ vars.XRAYCLOUD_TEST_PLAN_KEY }}
-        REVISON: ${{ github.ref_name }}
-        TEST_ENVIRONMENT: java${{ matrix.java }}
-      run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} -Dxray.testPlanKey=${{ env.XRAYCLOUD_TEST_PLAN_KEY }} -Dxray.revision=${{ env.REVISON }} xray:import-results
+      - name: Run SonarQube analysis
+        working-directory: ./ChargeHub/backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=TQS-Org_TQS-Project \
+            -Dsonar.organization=tqs-org \
+            -Dsonar.login=SONAR_TOKEN
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+      - name: Add code coverage information to PR
+        id: jacoco-pr
+        uses: madrapps/jacoco-report@v1.7.1
+        if: github.event_name == 'pull_request'
+        with:
+          paths: |
+            ${{ github.workspace }}/**/target/site/jacoco-merged-test-coverage-report/jacoco.xml 
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+
+      - name: Push results to Xray on Jira Cloud
+        if: always()
+        env:
+          XRAYCLOUD_CLIENT_ID: ${{ secrets.XRAYCLOUD_CLIENT_ID }}
+          XRAYCLOUD_CLIENT_SECRET: ${{ secrets.XRAYCLOUD_CLIENT_SECRET }}
+          REVISON: ${{ github.ref_name }}
+          TEST_ENVIRONMENT: java${{ matrix.java }}
+        run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \ 
+            -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
+            -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} \ 
+            -Dxray.revision=${{ env.REVISON }} \
+            -Dxray.projectKey=SCRUM \
+            -Dxray.reportFormat=junit \
+            -Dxray.reportFile=target/TEST-junit-jupiter.xml \ 
+            app.getxray:xray-maven-plugin:import-results
