@@ -44,11 +44,12 @@ public class JwtProvider {
   }
 
   public String getRoleFromToken(String token) {
-    return (String) Jwts.parserBuilder()
-        .setSigningKey(jwtSecret)
-        .build()
-        .parseClaimsJws(token)
-        .getBody()
-        .get("role");
+    return (String)
+        Jwts.parserBuilder()
+            .setSigningKey(jwtSecret)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("role");
   }
 }
