@@ -52,5 +52,5 @@ public class SecurityConfig {
  * .requestMatchers("/api/driver/**").hasRole("EV_DRIVER")
  * .requestMatchers("/api/operator/**").hasRole("OPERATOR")
  * .requestMatchers("/api/admin/**").hasRole("ADMIN")
- * 
+ *
  */
