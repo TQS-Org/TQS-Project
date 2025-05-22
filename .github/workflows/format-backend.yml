@@ -1,0 +1,65 @@
+# This workflow is triggered on push to the main branch and on pull request events.
+name: Enforce Coding Styling For Backend
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      # don't run this workflow when the are pushes, and there are only changes for this directories:
+      - ".github/**"
+      - "minutes/**"
+      - "presentations/**"
+      - "reports/**"
+      # don't run this workflow when the are pushes and there are only changes for the following files:
+      - "**.md"
+      - "**.gitignore"
+      
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      # don't run this workflow when the are pushes, and there are only changes for this directories:
+      - ".github/**"
+      - "minutes/**"
+      - "presentations/**"
+      - "reports/**"
+      # don't run this workflow when the are pushes and there are only changes for the following files:
+      - "**.md"
+      - "**.gitignore" 
+
+jobs:
+  format-backend:
+    name: Format Backend Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Google Java Format
+        uses: axel-op/googlejavaformat-action@v4
+        with:
+          args: "--skip-sorting-imports --replace"
+          skip-commit: true
+
+      - name: Show git diff
+        run: git --no-pager diff
+
+      - name: Commit and push changes if needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          branch_name="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "Apply Google Java Format"
+            git push origin HEAD:$branch_name
+          else
+            echo "No formatting changes to commit."
+          fi

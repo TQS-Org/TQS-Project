@@ -2,6 +2,7 @@ package TQS.project.backend.Login;
 
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.repository.ClientRepository;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import TQS.project.backend.TestcontainersConfiguration;
 import TQS.project.backend.dto.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,7 @@ public class AuthIT {
     }
 
     @Test
+    @Requirement("SCRUM-41")
     void testLoginSuccess() {
         var loginPayload = new LoginRequest("alice@example.com", "plainpass"); // password depends on your encoder
 

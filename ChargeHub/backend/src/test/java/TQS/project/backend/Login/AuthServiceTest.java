@@ -9,6 +9,7 @@ import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.StaffRepository;
 import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.AuthService;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +44,7 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Test
+    @Requirement("SCRUM-41")
     void loginAsClient_withValidPassword_returnsTokenAndEvDriverRole() {
         Client client = new Client();
         client.setMail("driver@mail.com");
@@ -60,6 +62,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @Requirement("SCRUM-41")
     void loginAsStaff_withValidPassword_returnsTokenAndStaffRole() {
         Staff staff = new Staff();
         staff.setMail("operator@mail.com");
@@ -78,6 +81,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @Requirement("SCRUM-41")
     void login_withInvalidPassword_throwsException() {
         Client client = new Client();
         client.setMail("fail@mail.com");
@@ -92,6 +96,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @Requirement("SCRUM-41")
     void login_withUnknownEmail_throwsException() {
         when(clientRepo.findByMail("ghost@mail.com")).thenReturn(Optional.empty());
         when(staffRepo.findByMail("ghost@mail.com")).thenReturn(Optional.empty());

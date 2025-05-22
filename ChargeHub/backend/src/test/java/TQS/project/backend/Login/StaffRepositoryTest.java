@@ -2,6 +2,8 @@ package TQS.project.backend.Login;
 
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.repository.StaffRepository;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -17,6 +19,7 @@ class StaffRepositoryTest {
     private StaffRepository staffRepository;
 
     @Test
+    @Requirement("SCRUM-41")
     void whenFindByMail_thenReturnStaff() {
         Staff staff = new Staff();
         staff.setMail("admin@example.com");
@@ -31,6 +34,7 @@ class StaffRepositoryTest {
     }
 
     @Test
+    @Requirement("SCRUM-41")
     void whenFindByMail_notFound_thenEmptyOptional() {
         Optional<Staff> found = staffRepository.findByMail("nonexistent@example.com");
         assertTrue(found.isEmpty());

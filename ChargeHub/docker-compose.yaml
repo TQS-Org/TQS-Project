@@ -41,8 +41,9 @@ services:
               "spring.datasource.password" : "$MYSQLDB_PASSWORD",
               "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQLDialect",
               "spring.jpa.hibernate.ddl-auto" : "update",
-              "springdoc.api-docs.path" : "/api/docs",
-              "springdoc.swagger-ui.path" : "/api/docs"
+              "management.endpoints.web.exposure.include" : "health",
+              "management.endpoint.health.show-details" : "always",
+              "management.endpoint.health.enabled"  : "true"
             }'
     volumes:
       - ./backend:/app

@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -43,6 +44,7 @@ class AuthControllerTest {
     private AuthService authService;
 
     @Test
+    @Requirement("SCRUM-41")
     void loginAsEvDriver_returnsTokenAndEvDriverRole() throws Exception {
         LoginRequest request = new LoginRequest("driver@mail.com", "password");
         LoginResponse response = new LoginResponse("mocked-jwt", "EV_DRIVER");
@@ -58,6 +60,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @Requirement("SCRUM-41")
     void validateToken_withValidToken_returnsRole() throws Exception {
         String token = "valid-jwt-token";
         String role = "EV_DRIVER";
@@ -73,6 +76,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @Requirement("SCRUM-41")
     void validateToken_withMissingAuthorizationHeader_returnsUnauthorized() throws Exception {
         mockMvc.perform(get("/api/auth/validate"))
                 .andExpect(status().isUnauthorized());

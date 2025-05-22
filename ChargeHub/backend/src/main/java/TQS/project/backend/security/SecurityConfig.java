@@ -23,8 +23,14 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/auth/validate").permitAll() // Add any other public endpoints here
+                .requestMatchers(
+                        "/api/auth/login",
+                        "/api/auth/validate",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/api-docs/**")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
