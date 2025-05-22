@@ -12,16 +12,14 @@ import TQS.project.backend.repository.StaffRepository;
 @SpringBootTest
 class BackendApplicationTests {
 
-	@SuppressWarnings("removal")
-	@MockBean
-	private ClientRepository clientRepository;
+  @SuppressWarnings("removal")
+  @MockBean
+  private ClientRepository clientRepository;
 
-	@SuppressWarnings("removal")
-	@MockBean
-	private StaffRepository staffRepository;
+  @SuppressWarnings("removal")
+  @MockBean
+  private StaffRepository staffRepository;
 
-	@Test
-	void contextLoads() {
-	}
-
+  @Test
+  void contextLoads() {}
 }

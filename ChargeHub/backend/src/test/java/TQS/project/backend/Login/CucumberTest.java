@@ -12,5 +12,4 @@ import static io.cucumber.junit.platform.engine.Constants.*;
 @SelectClasspathResource("TQS/project/backend/Login")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "TQS.project.backend.Login")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
-public class CucumberTest {
-}
+public class CucumberTest {}
