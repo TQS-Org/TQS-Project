@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<webdrivermanager.version>5.9.3</webdrivermanager.version>
 		<sonar.organization>tqs-org</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io/</sonar.host.url>
 		<maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
@@ -36,6 +37,66 @@
         <cucumber.version>7.21.1</cucumber.version>
         <surefire.jacoco.args>${argLine}</surefire.jacoco.args>
 	</properties>
+
+	<profiles>
+        <profile>
+            <id>unit-tests</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven-surefire-plugin.version}</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>Login/CucumberTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>cucumber-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven-surefire-plugin.version}</version>
+                        <configuration>
+                            <includes>
+                                <include>Login/CucumberTest.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+	<dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.12.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-bom</artifactId>
+                <version>7.21.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -98,14 +159,12 @@
 		<dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
-            <version>7.14.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit-platform-engine</artifactId>
-            <version>7.14.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -113,17 +172,12 @@
             <artifactId>junit-platform-suite</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>10.14.0</version>
-        </dependency>
 
 		<!-- Selenium Java -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.20.0</version>
+            <version>4.29.0</version>
             <scope>test</scope>
         </dependency>
         
@@ -131,7 +185,7 @@
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>6.1.0</version>
+            <version>${webdrivermanager.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -152,10 +206,16 @@
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId> 
+            <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+        <!--Swagger-->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -245,7 +305,8 @@
                         </goals>
                         <configuration>
                             <excludes>
-                                <exclude>TQS/project/backend/entity/**</exclude> 
+                                <exclude>TQS/project/backend/entity/**</exclude>
+								<exclude>TQS/project/backend/dto/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -257,34 +318,24 @@
                         </goals>
                         <configuration>
                             <excludes>
-                                <exclude>TQS/project/backend/entity/**</exclude> 
+                                <exclude>TQS/project/backend/entity/**</exclude>
+								<exclude>TQS/project/backend/dto/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <plugin>
+			<plugin>
                 <groupId>app.getxray</groupId>
                 <artifactId>xray-maven-plugin</artifactId>
                 <version>${xray-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                    <id>import-xray-results</id>
-                    <phase>verify</phase>
-                    <goals>
-                        <goal>import-results</goal>
-                    </goals>
-                    <configuration>
-                        <cloud>true</cloud>
-                        <clientId>${xray.clientId}</clientId>
-                        <clientSecret>${xray.clientSecret}</clientSecret>
-                        <projectKey>SCRUM</projectKey>
-                        <reportFormat>junit</reportFormat>
-                        <reportFile>target/surefire-reports/TEST-*.xml</reportFile>
-                    </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <cloud>true</cloud>
+                    <projectKey>SCRUM</projectKey>
+                    <reportFormat>junit</reportFormat>
+                    <reportFile>target/surefire-reports/TEST-*.xml</reportFile>
+                </configuration>
             </plugin>
         </plugins>
 	</build>
