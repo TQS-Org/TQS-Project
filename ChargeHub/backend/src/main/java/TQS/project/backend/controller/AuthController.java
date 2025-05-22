@@ -20,29 +20,28 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    private final JwtProvider jwtProvider;
+  private final JwtProvider jwtProvider;
 
-    public AuthController(AuthService authService, JwtProvider jwtProvider) {
-        this.authService = authService;
-        this.jwtProvider = jwtProvider;
+  public AuthController(AuthService authService, JwtProvider jwtProvider) {
+    this.authService = authService;
+    this.jwtProvider = jwtProvider;
+  }
+
+  @PostMapping("/login")
+  public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    return ResponseEntity.ok(authService.login(request));
+  }
+
+  @GetMapping("/validate")
+  public ResponseEntity<Map<String, String>> validateToken(HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      String token = authHeader.substring(7);
+      String role = jwtProvider.getRoleFromToken(token);
+      return ResponseEntity.ok(Map.of("role", role));
     }
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
-    }
-
-    @GetMapping("/validate")
-    public ResponseEntity<Map<String, String>> validateToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            String role = jwtProvider.getRoleFromToken(token);
-            return ResponseEntity.ok(Map.of("role", role));
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  }
 }

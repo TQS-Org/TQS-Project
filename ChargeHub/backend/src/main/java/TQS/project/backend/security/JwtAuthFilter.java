@@ -17,45 +17,43 @@ import java.util.List;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtProvider jwtProvider;
+  @Autowired private JwtProvider jwtProvider;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
-        if (request.getServletPath().matches("/api/auth/login/?")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        if (request.getServletPath().matches("/api/auth/validate/?")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        if (request.getServletPath().matches("/swagger-ui/index.html")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    if (request.getServletPath().matches("/api/auth/login/?")) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+    if (request.getServletPath().matches("/api/auth/validate/?")) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+    if (request.getServletPath().matches("/swagger-ui/index.html")) {
+      filterChain.doFilter(request, response);
+      return;
+    }
 
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            try {
-                String email = jwtProvider.getEmailFromToken(token);
-                String role = jwtProvider.getRoleFromToken(token); // e.g., EV_DRIVER
+    String header = request.getHeader("Authorization");
+    if (header != null && header.startsWith("Bearer ")) {
+      String token = header.substring(7);
+      try {
+        String email = jwtProvider.getEmailFromToken(token);
+        String role = jwtProvider.getRoleFromToken(token); // e.g., EV_DRIVER
 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        email,
-                        null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + role)) // must be prefixed
+        UsernamePasswordAuthenticationToken auth =
+            new UsernamePasswordAuthenticationToken(
+                email, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)) // must be prefixed
                 );
 
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            } catch (Exception e) {
-                // Log or ignore
-            }
-        }
-        filterChain.doFilter(request, response);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+      } catch (Exception e) {
+        // Log or ignore
+      }
     }
+    filterChain.doFilter(request, response);
+  }
 }

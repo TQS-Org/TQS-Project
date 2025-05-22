@@ -28,57 +28,57 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc(addFilters = false)
 class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private JwtProvider jwtProvider;
+  @SuppressWarnings("removal")
+  @MockBean
+  private JwtProvider jwtProvider;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+  @SuppressWarnings("removal")
+  @MockBean
+  private JwtAuthFilter jwtAuthFilter;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private AuthService authService;
+  @SuppressWarnings("removal")
+  @MockBean
+  private AuthService authService;
 
-    @Test
-    @Requirement("SCRUM-41")
-    void loginAsEvDriver_returnsTokenAndEvDriverRole() throws Exception {
-        LoginRequest request = new LoginRequest("driver@mail.com", "password");
-        LoginResponse response = new LoginResponse("mocked-jwt", "EV_DRIVER");
+  @Test
+  @Requirement("SCRUM-41")
+  void loginAsEvDriver_returnsTokenAndEvDriverRole() throws Exception {
+    LoginRequest request = new LoginRequest("driver@mail.com", "password");
+    LoginResponse response = new LoginResponse("mocked-jwt", "EV_DRIVER");
 
-        when(authService.login(any())).thenReturn(response);
+    when(authService.login(any())).thenReturn(response);
 
-        mockMvc.perform(post("/api/auth/login")
+    mockMvc
+        .perform(
+            post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("mocked-jwt"))
-                .andExpect(jsonPath("$.role").value("EV_DRIVER"));
-    }
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.token").value("mocked-jwt"))
+        .andExpect(jsonPath("$.role").value("EV_DRIVER"));
+  }
 
-    @Test
-    @Requirement("SCRUM-41")
-    void validateToken_withValidToken_returnsRole() throws Exception {
-        String token = "valid-jwt-token";
-        String role = "EV_DRIVER";
+  @Test
+  @Requirement("SCRUM-41")
+  void validateToken_withValidToken_returnsRole() throws Exception {
+    String token = "valid-jwt-token";
+    String role = "EV_DRIVER";
 
-        // Mock the JwtProvider to return the expected role
-        when(jwtProvider.getRoleFromToken(token)).thenReturn(role);
+    // Mock the JwtProvider to return the expected role
+    when(jwtProvider.getRoleFromToken(token)).thenReturn(role);
 
-        // Perform the GET request with Authorization header
-        mockMvc.perform(get("/api/auth/validate")
-                .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.role").value(role));
-    }
+    // Perform the GET request with Authorization header
+    mockMvc
+        .perform(get("/api/auth/validate").header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.role").value(role));
+  }
 
-    @Test
-    @Requirement("SCRUM-41")
-    void validateToken_withMissingAuthorizationHeader_returnsUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/auth/validate"))
-                .andExpect(status().isUnauthorized());
-    }
+  @Test
+  @Requirement("SCRUM-41")
+  void validateToken_withMissingAuthorizationHeader_returnsUnauthorized() throws Exception {
+    mockMvc.perform(get("/api/auth/validate")).andExpect(status().isUnauthorized());
+  }
 }
