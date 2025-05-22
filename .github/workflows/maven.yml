@@ -115,6 +115,7 @@ jobs:
             -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
             -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} \
             -Dxray.revision=${{ env.REVISON }} \
+            -Dxray.cloud=true \
             -Dxray.projectKey=SCRUM \
             -Dxray.reportFormat=junit \
             -Dxray.reportFile=target/surefire-reports/TEST-*.xml \
