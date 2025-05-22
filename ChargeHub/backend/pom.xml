@@ -220,6 +220,11 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>TQS/project/backend/entity/**</exclude> 
+                            </excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>post-unit-test</id>
@@ -227,6 +232,34 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>TQS/project/backend/entity/**</exclude> 
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>app.getxray</groupId>
+                <artifactId>xray-maven-plugin</artifactId>
+                <version>${xray-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                    <id>import-xray-results</id>
+                    <phase>verify</phase>
+                    <goals>
+                        <goal>import-results</goal>
+                    </goals>
+                    <configuration>
+                        <cloud>true</cloud>
+                        <clientId>${xray.clientId}</clientId>
+                        <clientSecret>${xray.clientSecret}</clientSecret>
+                        <projectKey>SCRUM</projectKey>
+                        <reportFormat>junit</reportFormat>
+                        <reportFile>target/surefire-reports/TEST-*.xml</reportFile>
+                    </configuration>
                     </execution>
                 </executions>
             </plugin>
