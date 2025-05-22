@@ -22,7 +22,7 @@ public class JwtProvider {
   // key)
   private final Key jwtSecret = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretBase64));
 
-  private final long jwtExpirationMs = 3600000; // 1 hour
+  private final long jwtExpirationMs = 3600000; // 1 hour in milliseconds
 
   public String generateToken(String email, String role) {
     return Jwts.builder()
