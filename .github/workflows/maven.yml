@@ -71,9 +71,11 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Build and run unit tests
+        working-directory: ./ChargeHub/backend
         run: mvn -B package --file pom.xml
 
       - name: Run integration tests
+        working-directory: ./ChargeHub/backend
         run: mvn -B integration-test verify --file pom.xml
 
       - name: Run SonarQube analysis
@@ -84,7 +86,7 @@ jobs:
           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=TQS-Org_TQS-Project \
             -Dsonar.organization=tqs-org \
-            -Dsonar.token=SONAR_TOKEN
+            -Dsonar.token=${{ env.SONAR_TOKEN }} \
             -Dsonar.java.binaries=target/classes \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
@@ -108,11 +110,12 @@ jobs:
           REVISON: ${{ github.ref_name }}
           TEST_ENVIRONMENT: java${{ matrix.java }}
         run: |
-          mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \ 
+          mvn \
+            -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \
             -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
-            -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} \ 
+            -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} \
             -Dxray.revision=${{ env.REVISON }} \
             -Dxray.projectKey=SCRUM \
             -Dxray.reportFormat=junit \
-            -Dxray.reportFile=target/TEST-junit-jupiter.xml \ 
+            -Dxray.reportFile=target/TEST-junit-jupiter.xml \
             app.getxray:xray-maven-plugin:import-results
