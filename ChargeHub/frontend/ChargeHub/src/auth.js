@@ -12,6 +12,7 @@ export async function getUserRoleFromToken() {
     console.log("Role response:", res.data);
     return res.data.role;
   } catch (err) {
+    console.error(err);
     return null; // Token invalid or expired
   }
 }
