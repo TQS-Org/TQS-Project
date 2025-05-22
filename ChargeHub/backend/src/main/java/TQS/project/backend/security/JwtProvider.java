@@ -16,11 +16,11 @@ public class JwtProvider {
 
   // Replace this with your own Base64-encoded 512-bit (64-byte) secret key!
   @Value("${jwt.secret}")
-  private static final String SECRET_BASE64 = "wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232";
+  private String secretBase64;
 
   // Decode the base64 secret into a Key instance (HMAC SHA-512 requires 512 bits
   // key)
-  private final Key jwtSecret = Keys.hmacShaKeyFor(Base64.getDecoder().decode(SECRET_BASE64));
+  private final Key jwtSecret = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretBase64));
 
   private final long jwtExpirationMs = 3600000; // 1 hour
 
