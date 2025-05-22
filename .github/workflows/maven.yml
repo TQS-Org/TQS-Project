@@ -135,8 +135,8 @@ jobs:
           XRAYCLOUD_CLIENT_SECRET: ${{ secrets.XRAYCLOUD_CLIENT_SECRET }}
         run: |
           mvn \
-            -Dxray.clientId=${{ env.XRAY_CLIENT_ID }} \
-            -Dxray.clientSecret=${{ env.XRAY_CLIENT_SECRET }} \
+            -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \
+            -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
             -Dxray.projectKey=SCRUM \
             -Dxray.reportFormat=junit \
             -Dxray.reportFile=target/TEST-junit-jupiter.xml \
