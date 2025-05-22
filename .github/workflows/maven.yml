@@ -67,7 +67,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Clean package of backend without tests
-        working-directory: ./backend
+        working-directory: ./ChargeHub/backend
         run: mvn clean package -DskipTests
 
       - name: Build and run unit tests
@@ -100,13 +100,15 @@ jobs:
           min-coverage-changed-files: 80
 
       - name: Push results to Xray on Jira Cloud
+        working-directory: ./ChargeHub/backend
         if: always()
         env:
           XRAYCLOUD_CLIENT_ID: ${{ secrets.XRAYCLOUD_CLIENT_ID }}
           XRAYCLOUD_CLIENT_SECRET: ${{ secrets.XRAYCLOUD_CLIENT_SECRET }}
           REVISON: ${{ github.ref_name }}
           TEST_ENVIRONMENT: java${{ matrix.java }}
-        run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \ 
+        run: |
+          mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \ 
             -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
             -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} \ 
             -Dxray.revision=${{ env.REVISON }} \
