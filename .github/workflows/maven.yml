@@ -83,7 +83,7 @@ jobs:
           jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
           EOF
 
-      - name: Write test application.properties
+      - name: Write main application.properties
         run: |
           mkdir -p ./ChargeHub/backend/src/main/resources
           cat <<EOF > ./ChargeHub/backend/src/main/resources/application.properties
