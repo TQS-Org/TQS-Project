@@ -334,7 +334,7 @@
                     <cloud>true</cloud>
                     <projectKey>SCRUM</projectKey>
                     <reportFormat>junit</reportFormat>
-                    <reportFile>target/surefire-reports/TEST-TQS.project-backend*.xml</reportFile>
+                    <reportFile>target/surefire-reports/TEST-*.xml</reportFile>
                 </configuration>
             </plugin>
         </plugins>
