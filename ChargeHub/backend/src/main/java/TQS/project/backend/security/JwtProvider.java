@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -14,8 +15,8 @@ import java.util.Base64;
 public class JwtProvider {
 
   // Replace this with your own Base64-encoded 512-bit (64-byte) secret key!
-  private static final String SECRET_BASE64 =
-      "wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232";
+  @Value("${jwt.secret}")
+  private static final String SECRET_BASE64 = "wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232";
 
   // Decode the base64 secret into a Key instance (HMAC SHA-512 requires 512 bits
   // key)
@@ -43,12 +44,11 @@ public class JwtProvider {
   }
 
   public String getRoleFromToken(String token) {
-    return (String)
-        Jwts.parserBuilder()
-            .setSigningKey(jwtSecret)
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .get("role");
+    return (String) Jwts.parserBuilder()
+        .setSigningKey(jwtSecret)
+        .build()
+        .parseClaimsJws(token)
+        .getBody()
+        .get("role");
   }
 }
