@@ -110,12 +110,14 @@ jobs:
           REVISON: ${{ github.ref_name }}
           TEST_ENVIRONMENT: java${{ matrix.java }}
         run: |
+          REV=$(git rev-parse --abbrev-ref HEAD | sed 's/\//-/g')
           mvn \
-            -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \
-            -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
-            -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} \
-            -Dxray.cloud=true \
+            -Dxray.clientId=${{ secrets.XRAY_CLIENT_ID }} \
+            -Dxray.clientSecret=${{ secrets.XRAY_CLIENT_SECRET }} \
             -Dxray.projectKey=SCRUM \
             -Dxray.reportFormat=junit \
             -Dxray.reportFile=target/surefire-reports/TEST-*.xml \
+            -Dxray.testEnvironments=java21 \
+            -Dxray.revision=$REV \
             app.getxray:xray-maven-plugin:import-results
+
