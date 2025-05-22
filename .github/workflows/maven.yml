@@ -70,6 +70,32 @@ jobs:
         working-directory: ./ChargeHub/backend
         run: mvn clean package -DskipTests
 
+      - name: Write test application.properties
+        run: |
+          mkdir -p ./ChargeHub/backend/src/test/resources
+          cat <<EOF > ./ChargeHub/backend/src/test/resources/application.properties
+          spring.application.name=backend
+          management.endpoints.web.exposure.include=health
+          management.endpoint.health.show-details=always
+          management.endpoint.health.enabled=true
+          springdoc.swagger-ui.path=/swagger-ui-custom.html
+          springdoc.api-docs.path=/api-docs
+          jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
+          EOF
+
+      - name: Write main application.properties
+        run: |
+          mkdir -p ./ChargeHub/backend/src/main/resources
+          cat <<EOF > ./ChargeHub/backend/src/main/resources/application.properties
+          spring.application.name=backend
+          management.endpoints.web.exposure.include=health
+          management.endpoint.health.show-details=always
+          management.endpoint.health.enabled=true
+          springdoc.swagger-ui.path=/swagger-ui-custom.html
+          springdoc.api-docs.path=/api-docs
+          jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
+          EOF
+
       - name: Build and run unit tests
         working-directory: ./ChargeHub/backend
         run: mvn -B package --file pom.xml
@@ -107,15 +133,11 @@ jobs:
         env:
           XRAYCLOUD_CLIENT_ID: ${{ secrets.XRAYCLOUD_CLIENT_ID }}
           XRAYCLOUD_CLIENT_SECRET: ${{ secrets.XRAYCLOUD_CLIENT_SECRET }}
-          REVISON: ${{ github.ref_name }}
-          TEST_ENVIRONMENT: java${{ matrix.java }}
         run: |
           mvn \
             -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \
             -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
-            -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} \
-            -Dxray.revision=${{ env.REVISON }} \
             -Dxray.projectKey=SCRUM \
             -Dxray.reportFormat=junit \
-            -Dxray.reportFile=target/surefire-reports/TEST-*.xml \
+            -Dxray.reportFile=target/TEST-junit-jupiter.xml \
             app.getxray:xray-maven-plugin:import-results
