@@ -141,3 +141,4 @@ jobs:
             -Dxray.reportFormat=junit \
             -Dxray.reportFile=target/TEST-junit-jupiter.xml \
             app.getxray:xray-maven-plugin:import-results
+
