@@ -49,6 +49,7 @@ jobs:
           cache: maven
 
       - name: Write .env file
+        working-directory: ./ChargeHub
         run: |
           cat <<EOF > .env
           MYSQL_PASSWORD=admin
