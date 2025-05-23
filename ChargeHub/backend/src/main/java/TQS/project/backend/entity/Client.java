@@ -12,7 +12,10 @@ public class Client {
   private String name;
   private String password;
   private int age;
+
+  @Column(unique = true)
   private String mail;
+
   private String number;
 
   public Client(String name, String password, int age, String mail, String number) {

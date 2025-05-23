@@ -1,8 +1,9 @@
-package TQS.project.backend.Login;
+package TQS.project.backend;
 
 import TQS.project.backend.controller.AuthController;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.dto.RegisterRequest;
 import TQS.project.backend.security.JwtAuthFilter;
 import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.AuthService;
@@ -80,5 +81,29 @@ class AuthControllerTest {
   @Requirement("SCRUM-41")
   void validateToken_withMissingAuthorizationHeader_returnsUnauthorized() throws Exception {
     mockMvc.perform(get("/api/auth/validate")).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @Requirement("SCRUM-147")
+  void registerAsEvDriver_returnsTokenAndEvDriverRole() throws Exception {
+    RegisterRequest request = new RegisterRequest();
+    request.setName("New Driver");
+    request.setPassword("newpass123");
+    request.setAge(28);
+    request.setMail("newdriver@mail.com");
+    request.setNumber("911222333");
+
+    LoginResponse mockResponse = new LoginResponse("new-token", "EV_DRIVER");
+
+    when(authService.register(any())).thenReturn(mockResponse);
+
+    mockMvc
+        .perform(
+            post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.token").value("new-token"))
+        .andExpect(jsonPath("$.role").value("EV_DRIVER"));
   }
 }

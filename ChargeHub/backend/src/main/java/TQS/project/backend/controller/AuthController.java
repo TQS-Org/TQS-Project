@@ -2,9 +2,11 @@ package TQS.project.backend.controller;
 
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.dto.RegisterRequest;
 import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +45,10 @@ public class AuthController {
       return ResponseEntity.ok(Map.of("role", role));
     }
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  }
+
+  @PostMapping("/register")
+  public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
+    return ResponseEntity.ok(authService.register(request));
   }
 }

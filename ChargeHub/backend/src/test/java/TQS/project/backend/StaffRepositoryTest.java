@@ -1,4 +1,4 @@
-package TQS.project.backend.Login;
+package TQS.project.backend;
 
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.repository.StaffRepository;

@@ -2,6 +2,7 @@ package TQS.project.backend.service;
 
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.dto.RegisterRequest;
 import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.StaffRepository;
 import TQS.project.backend.security.JwtProvider;
@@ -9,6 +10,7 @@ import TQS.project.backend.security.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import TQS.project.backend.entity.Client;
 
 @Service
 public class AuthService {
@@ -44,5 +46,24 @@ public class AuthService {
                           return new LoginResponse(jwtProvider.generateToken(email, role), role);
                         })
                     .orElseThrow(() -> new RuntimeException("Invalid email or password")));
+  }
+
+  public LoginResponse register(RegisterRequest request) {
+    if (clientRepo.findByMail(request.getMail()).isPresent()) {
+      throw new RuntimeException("Email already in use");
+    }
+
+    Client newClient = new Client();
+    newClient.setName(request.getName());
+    newClient.setPassword(passwordEncoder.encode(request.getPassword()));
+    newClient.setAge(request.getAge());
+    newClient.setMail(request.getMail());
+    newClient.setNumber(request.getNumber());
+
+    clientRepo.save(newClient);
+
+    String token = jwtProvider.generateToken(newClient.getMail(), "EV_DRIVER");
+
+    return new LoginResponse(token, "EV_DRIVER");
   }
 }

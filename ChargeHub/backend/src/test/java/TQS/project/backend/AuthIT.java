@@ -1,9 +1,8 @@
-package TQS.project.backend.Login;
+package TQS.project.backend;
 
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.repository.ClientRepository;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
-import TQS.project.backend.TestcontainersConfiguration;
 import TQS.project.backend.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +27,7 @@ public class AuthIT {
 
   @BeforeEach
   void setup() {
+    clientRepository.deleteAll();
     Client client = new Client();
     client.setName("Alice");
     client.setMail("alice@example.com");
@@ -51,5 +51,32 @@ public class AuthIT {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).contains("token");
+  }
+
+  @Test
+  @Requirement("SCRUM-147")
+  void testRegisterNewClient_returnsTokenAndPersists() {
+    RegisterRequest request = new RegisterRequest();
+    request.setName("Bob");
+    request.setPassword("bobpass123");
+    request.setAge(35);
+    request.setMail("bob@mail.com");
+    request.setNumber("919191919");
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<RegisterRequest> entity = new HttpEntity<>(request, headers);
+
+    ResponseEntity<LoginResponse> response =
+        restTemplate.postForEntity("/api/auth/register", entity, LoginResponse.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getToken()).isNotBlank();
+    assertThat(response.getBody().getRole()).isEqualTo("EV_DRIVER");
+
+    // Check that the client is persisted
+    assertThat(clientRepository.findByMail("bob@mail.com")).isPresent();
   }
 }

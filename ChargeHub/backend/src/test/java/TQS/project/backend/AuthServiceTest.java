@@ -1,10 +1,11 @@
-package TQS.project.backend.Login;
+package TQS.project.backend;
 
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.entity.Role;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.dto.RegisterRequest;
 import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.StaffRepository;
 import TQS.project.backend.security.JwtProvider;
@@ -99,5 +100,39 @@ class AuthServiceTest {
     LoginRequest request = new LoginRequest("ghost@mail.com", "any");
 
     assertThrows(RuntimeException.class, () -> authService.login(request));
+  }
+
+  @Test
+  @Requirement("SCRUM-147")
+  void register_withValidInput_returnsToken() {
+    RegisterRequest req = new RegisterRequest();
+    req.setName("New Driver");
+    req.setPassword("rawpass123");
+    req.setAge(30);
+    req.setMail("driver@mail.com");
+    req.setNumber("912345678");
+
+    when(clientRepo.findByMail("driver@mail.com")).thenReturn(Optional.empty());
+    when(passwordEncoder.encode("rawpass123")).thenReturn("hashedpass");
+    when(jwtProvider.generateToken("driver@mail.com", "EV_DRIVER")).thenReturn("mocked-jwt");
+
+    LoginResponse response = authService.register(req);
+
+    assertEquals("mocked-jwt", response.getToken());
+    assertEquals("EV_DRIVER", response.getRole());
+  }
+
+  @Test
+  @Requirement("SCRUM-147")
+  void register_withExistingEmail_throwsException() {
+    Client existing = new Client();
+    existing.setMail("existing@mail.com");
+
+    when(clientRepo.findByMail("existing@mail.com")).thenReturn(Optional.of(existing));
+
+    RegisterRequest req = new RegisterRequest();
+    req.setMail("existing@mail.com");
+
+    assertThrows(RuntimeException.class, () -> authService.register(req));
   }
 }
