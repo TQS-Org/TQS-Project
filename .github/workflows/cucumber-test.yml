@@ -113,7 +113,9 @@ jobs:
 
       - name: Build backend
         working-directory: ./ChargeHub/backend
-        run: mvn clean package -DskipTests
+        run: |
+          mvn clean install -U -DskipTests
+          mvn clean package -DskipTests
 
       - name: Start containers
         working-directory: ./ChargeHub
