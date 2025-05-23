@@ -101,7 +101,7 @@ jobs:
 
       - name: Start containers
         working-directory: ./ChargeHub
-        run: docker compose -f docker-compose.yml up -d --build
+        run: docker compose -f docker-compose.yaml up -d --build
 
       - name: Wait for frontend to be healthy
         run: |
@@ -144,4 +144,4 @@ jobs:
 
       - name: Stop containers
         working-directory: ./ChargeHub
-        run: docker compose -f docker-compose.yml down -v
+        run: docker compose -f docker-compose.yaml down -v
