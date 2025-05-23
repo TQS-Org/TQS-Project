@@ -113,27 +113,30 @@ jobs:
 
       - name: Build backend
         working-directory: ./ChargeHub/backend
-        run: mvn clean package -DskipTests
+        run: |
+          mvn clean install -U -DskipTests
+          mvn clean package -DskipTests
 
       - name: Start containers
         working-directory: ./ChargeHub
-        run: docker compose -f docker-compose.yaml up -d --build
+        run: docker compose -f docker-compose.ci.yaml up -d --build
 
       - name: Wait for frontend to be healthy
         run: |
-          echo "Waiting for frontend to respond..."
-          for i in {1..30}; do
+          for i in {1..30}; do  # wait up to 2 minutes
             if curl -sSf http://localhost:3000 > /dev/null; then
               echo "Frontend is up."
-              break
+              exit 0
             fi
-            echo "Waiting..."
+            echo "Waiting for frontend..."
             sleep 2
           done
+          echo "Frontend did not start in time." >&2
+          exit 1
 
       - name: Run functional tests (Chrome)
         working-directory: ./ChargeHub/backend
-        run: mvn test -Dcucumber.filter.tags="@chrome" 
+        run: mvn test -P cucumber-tests 
 
       - name: Debug test report
         working-directory: ./ChargeHub/backend
@@ -149,13 +152,15 @@ jobs:
         env:
           XRAYCLOUD_CLIENT_ID: ${{ secrets.XRAYCLOUD_CLIENT_ID }}
           XRAYCLOUD_CLIENT_SECRET: ${{ secrets.XRAYCLOUD_CLIENT_SECRET }}
+          XRAYCLOUD_TEST_PLAN_KEY: ${{ secrets.XRAYCLOUD_TEST_PLAN_KEY }}
         run: |
           mvn \
             -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \
             -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
+            -Dxray.testPlanKey=${{ env.XRAYCLOUD_TEST_PLAN_KEY }} \
             -Dxray.projectKey=SCRUM \
             -Dxray.reportFormat=junit \
-            -Dxray.reportFile=target/TEST-junit-jupiter.xml \
+            -Dxray.reportFile=target/surefire-reports/TEST-TQS.project.backend.CucumberTest.xml \
             app.getxray:xray-maven-plugin:import-results
 
       - name: Stop containers
