@@ -2,7 +2,6 @@ package TQS.project.backend.steps;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -16,9 +15,10 @@ public class WebDriverSingleton {
   public static void initialize() {
     if (driver == null) {
       WebDriverManager.chromedriver().setup();
-            
+
       ChromeOptions options = new ChromeOptions();
-      options.addArguments("--headless=new"); // Use "--headless=new" for better support in newer Chrome
+      options.addArguments(
+          "--headless=new"); // Use "--headless=new" for better support in newer Chrome
       options.addArguments("--no-sandbox");
       options.addArguments("--disable-dev-shm-usage");
       options.addArguments("--disable-gpu");
