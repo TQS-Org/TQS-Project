@@ -121,7 +121,7 @@ jobs:
 
       - name: Wait for frontend to be healthy
         run: |
-          for i in {1..60}; do  # wait up to 2 minutes
+          for i in {1..30}; do  # wait up to 2 minutes
             if curl -sSf http://localhost:3000 > /dev/null; then
               echo "Frontend is up."
               exit 0
@@ -131,6 +131,10 @@ jobs:
           done
           echo "Frontend did not start in time." >&2
           exit 1
+
+      - name: logs frontend
+        working-directory: ./ChargeHub
+        run: docker logs -f frontend
 
       - name: Run functional tests (Chrome)
         working-directory: ./ChargeHub/backend
