@@ -37,8 +37,8 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/signup" element={<SignupPage />} />
+      
+      <Route path="/signup" element={<SignupPage />} />
     </Routes>
   );
 }

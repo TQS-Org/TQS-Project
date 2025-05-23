@@ -52,7 +52,7 @@
                         <version>${maven-surefire-plugin.version}</version>
                         <configuration>
                             <excludes>
-                                <exclude>Login/CucumberTest.java</exclude>
+                                <exclude>CucumberTest.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -70,7 +70,7 @@
                         <version>${maven-surefire-plugin.version}</version>
                         <configuration>
                             <includes>
-                                <include>Login/CucumberTest.java</include>
+                                <include>CucumberTest.java</include>
                             </includes>
                         </configuration>
                     </plugin>
