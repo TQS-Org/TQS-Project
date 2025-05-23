@@ -59,6 +59,12 @@ export default function LoginPage() {
             Login
           </button>
         </div>
+        <p className="signup-text">
+          Don’t have an account?{' '}
+          <span id="CreateAccount" className="signup-link" onClick={() => navigate('/signup')}>
+            Create Account
+          </span>
+        </p>
       </div>
     </div>
   );

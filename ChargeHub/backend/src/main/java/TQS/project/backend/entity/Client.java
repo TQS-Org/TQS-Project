@@ -12,6 +12,7 @@ public class Client {
   private String name;
   private String password;
   private int age;
+  @Column(unique = true)
   private String mail;
   private String number;
 
@@ -23,7 +24,8 @@ public class Client {
     this.number = number;
   }
 
-  public Client() {}
+  public Client() {
+  }
 
   public Client(String password, String mail) {
     this.password = password;
