@@ -24,7 +24,9 @@ services:
       - chargehub-network
 
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.ci
     image: backend
     container_name: backend
     restart: on-failure
