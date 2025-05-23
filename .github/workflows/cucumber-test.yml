@@ -246,6 +246,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Start containers
+        working-directory: ./ChargeHub
         run: docker compose -f docker-compose.yml up -d --build
 
       - name: Wait for frontend to be healthy
@@ -288,4 +289,5 @@ jobs:
             app.getxray:xray-maven-plugin:import-results
 
       - name: Stop containers
+        working-directory: ./ChargeHub
         run: docker compose -f docker-compose.yml down -v
