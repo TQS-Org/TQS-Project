@@ -15,17 +15,13 @@ import TQS.project.backend.entity.Client;
 @Service
 public class AuthService {
 
-  @Autowired
-  private ClientRepository clientRepo;
+  @Autowired private ClientRepository clientRepo;
 
-  @Autowired
-  private StaffRepository staffRepo;
+  @Autowired private StaffRepository staffRepo;
 
-  @Autowired
-  private JwtProvider jwtProvider;
+  @Autowired private JwtProvider jwtProvider;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  @Autowired private PasswordEncoder passwordEncoder;
 
   public LoginResponse login(LoginRequest request) {
     String email = request.getEmail();
@@ -40,15 +36,16 @@ public class AuthService {
 
         // If not a client, try Staff login
         .orElseGet(
-            () -> staffRepo
-                .findByMail(email)
-                .filter(staff -> passwordEncoder.matches(rawPassword, staff.getPassword()))
-                .map(
-                    staff -> {
-                      String role = staff.getRole().name();
-                      return new LoginResponse(jwtProvider.generateToken(email, role), role);
-                    })
-                .orElseThrow(() -> new RuntimeException("Invalid email or password")));
+            () ->
+                staffRepo
+                    .findByMail(email)
+                    .filter(staff -> passwordEncoder.matches(rawPassword, staff.getPassword()))
+                    .map(
+                        staff -> {
+                          String role = staff.getRole().name();
+                          return new LoginResponse(jwtProvider.generateToken(email, role), role);
+                        })
+                    .orElseThrow(() -> new RuntimeException("Invalid email or password")));
   }
 
   public LoginResponse register(RegisterRequest request) {

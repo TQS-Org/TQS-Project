@@ -9,31 +9,31 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
 public class WebDriverSingleton {
-    private static WebDriver driver;
-    private static WebDriverWait wait;
+  private static WebDriver driver;
+  private static WebDriverWait wait;
 
-    public static void initialize() {
-        if (driver == null) {
-            WebDriverManager.chromedriver().setup();
-            driver = new ChromeDriver();
-            wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            driver.manage().window().setSize(new Dimension(1200, 800));
-        }
+  public static void initialize() {
+    if (driver == null) {
+      WebDriverManager.chromedriver().setup();
+      driver = new ChromeDriver();
+      wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+      driver.manage().window().setSize(new Dimension(1200, 800));
     }
+  }
 
-    public static WebDriver getDriver() {
-        return driver;
-    }
+  public static WebDriver getDriver() {
+    return driver;
+  }
 
-    public static WebDriverWait getWait() {
-        return wait;
-    }
+  public static WebDriverWait getWait() {
+    return wait;
+  }
 
-    public static void quit() {
-        if (driver != null) {
-            driver.quit();
-            driver = null;
-            wait = null;
-        }
+  public static void quit() {
+    if (driver != null) {
+      driver.quit();
+      driver = null;
+      wait = null;
     }
+  }
 }
