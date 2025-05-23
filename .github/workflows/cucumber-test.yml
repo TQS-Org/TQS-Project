@@ -100,6 +100,152 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Start containers
+        working-directory: ./ChargeHub
+        run: docker compose -f docker-compose.yml up -d --build
+
+      - name: Wait for frontend to be healthy
+        run: |
+          echo "Waiting for frontend to respond..."
+          for i in {1..30}; do
+            if curl -sSf http://localhost:3000 > /dev/null; then
+              echo "Frontend is up."
+              break
+            fi
+            echo "Waiting..."
+            sleep 2
+          done
+
+      - name: Run functional tests (Chrome)
+        working-directory: ./ChargeHub/backend
+        run: mvn test -Dcucumber.filter.tags="@chrome" 
+
+      - name: Debug test report
+        working-directory: ./ChargeHub/backend
+        run: |
+          echo "Listing test output:"
+          ls -l target/
+          echo "Showing contents:"
+          head -n 20 target/TEST-junit-jupiter.xml || echo "Report not found!"
+        
+      - name: Push results to Xray on Jira Cloud
+        working-directory: ./ChargeHub/backend
+        if: always()
+        env:
+          XRAYCLOUD_CLIENT_ID: ${{ secrets.XRAYCLOUD_CLIENT_ID }}
+          XRAYCLOUD_CLIENT_SECRET: ${{ secrets.XRAYCLOUD_CLIENT_SECRET }}
+        run: |
+          mvn \
+            -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} \
+            -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} \
+            -Dxray.projectKey=SCRUM \
+            -Dxray.reportFormat=junit \
+            -Dxray.reportFile=target/TEST-junit-jupiter.xml \
+            app.getxray:xray-maven-plugin:import-results
+
+      - name: Stop containers
+        run: docker compose -f docker-compose.yml down -v
+name: Run Selenium Tests with Chrome
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      # don't run this workflow when the are pushes, and there are only changes for this directories:
+      - ".github/**"
+      - "minutes/**"
+      - "presentations/**"
+      - "reports/**"
+      # don't run this workflow when the are pushes and there are only changes for the following files:
+      - "**.md"
+      - "**.gitignore"
+      
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      # don't run this workflow when the are pushes, and there are only changes for this directories:
+      - ".github/**"
+      - "minutes/**"
+      - "presentations/**"
+      - "reports/**"
+      # don't run this workflow when the are pushes and there are only changes for the following files:
+      - "**.md"
+      - "**.gitignore"
+
+  workflow_dispatch:
+
+jobs:
+  selenium-chrome-tests:
+    name: Run Functional Tests (Chrome)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '21' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Write test application.properties
+        run: |
+          mkdir -p ./ChargeHub/backend/src/test/resources
+          cat <<EOF > ./ChargeHub/backend/src/test/resources/application.properties
+          spring.application.name=backend
+          management.endpoints.web.exposure.include=health
+          management.endpoint.health.show-details=always
+          management.endpoint.health.enabled=true
+          springdoc.swagger-ui.path=/swagger-ui-custom.html
+          springdoc.api-docs.path=/api-docs
+          jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
+          EOF
+
+      - name: Write main application.properties
+        run: |
+          mkdir -p ./ChargeHub/backend/src/main/resources
+          cat <<EOF > ./ChargeHub/backend/src/main/resources/application.properties
+          spring.application.name=backend
+          management.endpoints.web.exposure.include=health
+          management.endpoint.health.show-details=always
+          management.endpoint.health.enabled=true
+          springdoc.swagger-ui.path=/swagger-ui-custom.html
+          springdoc.api-docs.path=/api-docs
+          jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
+          EOF
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Install Google Chrome and ChromeDriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip gnupg2
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
+          unzip /tmp/chromedriver.zip -d /tmp
+          sudo mv /tmp/chromedriver /usr/local/bin/chromedriver
+          sudo chmod +x /usr/local/bin/chromedriver
+
+      - name: Build backend
+        working-directory: ./ChargeHub/backend
+        run: mvn clean package -DskipTests
+
+      - name: Start containers
         run: docker compose -f docker-compose.yml up -d --build
 
       - name: Wait for frontend to be healthy
