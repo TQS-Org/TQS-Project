@@ -4,6 +4,7 @@ import DriverPage from './DriverPage';
 import OperatorPage from './OperatorPage';
 import AdminPage from './AdminPage';
 import ProtectedRoute from './ProtectedRoute';
+import SignupPage from './SignUpPage';
 
 export default function App() {
   return (
@@ -36,6 +37,8 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/signup" element={<SignupPage />} />
     </Routes>
   );
 }
