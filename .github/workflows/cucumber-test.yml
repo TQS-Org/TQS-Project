@@ -134,10 +134,6 @@ jobs:
           echo "Frontend did not start in time." >&2
           exit 1
 
-      - name: logs backend
-        working-directory: ./ChargeHub
-        run: docker logs -f backend
-
       - name: Run functional tests (Chrome)
         working-directory: ./ChargeHub/backend
         run: mvn test -P cucumber-tests 
