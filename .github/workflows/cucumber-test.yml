@@ -117,13 +117,20 @@ jobs:
 
       - name: Start containers
         working-directory: ./ChargeHub
-        run: docker compose -f docker-compose.yaml up -d --build
+        run: docker compose -f docker-compose.ci.yaml up -d --build
 
-      - name: logs frontend
-        working-directory: ./ChargeHub
+      - name: Wait for frontend to be healthy
         run: |
-          sleep 20
-          docker logs -f frontend
+          for i in {1..30}; do  # wait up to 2 minutes
+            if curl -sSf http://localhost:3000 > /dev/null; then
+              echo "Frontend is up."
+              exit 0
+            fi
+            echo "Waiting for frontend..."
+            sleep 2
+          done
+          echo "Frontend did not start in time." >&2
+          exit 1
 
       - name: Run functional tests (Chrome)
         working-directory: ./ChargeHub/backend
