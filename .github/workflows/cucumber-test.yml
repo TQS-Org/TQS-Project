@@ -75,6 +75,8 @@ jobs:
           springdoc.swagger-ui.path=/swagger-ui-custom.html
           springdoc.api-docs.path=/api-docs
           jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
+          spring.flyway.enabled=true
+          spring.flyway.locations=classpath:db/migration
           EOF
 
       - name: Write main application.properties
@@ -88,6 +90,8 @@ jobs:
           springdoc.swagger-ui.path=/swagger-ui-custom.html
           springdoc.api-docs.path=/api-docs
           jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
+          spring.flyway.enabled=true
+          spring.flyway.locations=classpath:db/migration
           EOF
 
       - name: Cache Maven packages

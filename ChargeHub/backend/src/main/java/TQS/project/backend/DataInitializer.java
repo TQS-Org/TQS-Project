@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@Profile("!test") // <--- prevents loading in test environments
+@Profile("never")
 public class DataInitializer {
 
   @Bean
