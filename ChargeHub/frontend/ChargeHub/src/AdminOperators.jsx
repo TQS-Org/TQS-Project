@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./AdminOperators.css";
 
 export default function AdminOperators() {
   const [operators, setOperators] = useState([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("az");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
