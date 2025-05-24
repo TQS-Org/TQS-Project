@@ -7,7 +7,7 @@ Feature: Role-based dashboard redirection after login
     Then I should be redirected to the "<dashboard>" page
 
     Examples:
-      | email             | password    | dashboard |
-      | driver@mail.com   | driverpass  | /driver   |
-      | operator@mail.com | operatorpass| /operator |
-      | admin@mail.com    | adminpass   | /admin    |
+      | email              | password    | dashboard |
+      | driver@mail.com    | driverpass  | /driver   |
+      | operator1@mail.com | operatorpass| /operator |
+      | admin@mail.com     | adminpass   | /admin    |

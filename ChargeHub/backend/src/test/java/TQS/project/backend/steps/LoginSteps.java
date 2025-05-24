@@ -20,11 +20,6 @@ public class LoginSteps {
     wait = WebDriverSingleton.getWait();
   }
 
-  @After
-  public void cleanUp() {
-    WebDriverSingleton.quit();
-  }
-
   @Given("I am on the login page")
   public void iAmOnTheLoginPage() {
     driver.get("http://localhost:3000/");
@@ -41,8 +36,7 @@ public class LoginSteps {
 
   @And("I click the login button")
   public void iClickLoginButton() {
-    WebElement loginButton =
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".login-button")));
+    WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".login-button")));
     loginButton.click();
   }
 
@@ -53,6 +47,5 @@ public class LoginSteps {
     assertTrue(
         currentUrl.contains(expectedPath),
         "Expected to be on: " + expectedPath + " but was: " + currentUrl);
-    driver.quit();
   }
 }
