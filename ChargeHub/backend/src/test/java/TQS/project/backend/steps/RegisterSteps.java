@@ -1,7 +1,6 @@
 package TQS.project.backend.steps;
 
 import io.cucumber.java.Before;
-import io.cucumber.java.After;
 import io.cucumber.java.en.*;
 
 import org.openqa.selenium.*;
@@ -21,11 +20,6 @@ public class RegisterSteps {
     WebDriverSingleton.initialize();
     driver = WebDriverSingleton.getDriver();
     wait = WebDriverSingleton.getWait();
-  }
-
-  @After
-  public void cleanUp() {
-    WebDriverSingleton.quit();
   }
 
   @When("I click on {string}")
