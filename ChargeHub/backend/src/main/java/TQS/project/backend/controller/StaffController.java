@@ -1,7 +1,6 @@
 package TQS.project.backend.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,22 +19,21 @@ import java.util.List;
 @RequestMapping("/api/staff")
 public class StaffController {
 
-    @Autowired
-    private StaffService staffService;
+  @Autowired private StaffService staffService;
 
-    @PostMapping("/operator")
-    public ResponseEntity<?> createOperator(@Valid @RequestBody CreateStaffDTO dto) {
-        try {
-            staffService.createOperator(dto);
-            return ResponseEntity.ok("Operator account created successfully.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+  @PostMapping("/operator")
+  public ResponseEntity<?> createOperator(@Valid @RequestBody CreateStaffDTO dto) {
+    try {
+      staffService.createOperator(dto);
+      return ResponseEntity.ok("Operator account created successfully.");
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
     }
+  }
 
-    @GetMapping("/operators")
-    public ResponseEntity<List<Staff>> getAllOperators() {
-        List<Staff> operators = staffService.getAllOperators();
-        return ResponseEntity.ok(operators);
-    }
+  @GetMapping("/operators")
+  public ResponseEntity<List<Staff>> getAllOperators() {
+    List<Staff> operators = staffService.getAllOperators();
+    return ResponseEntity.ok(operators);
+  }
 }

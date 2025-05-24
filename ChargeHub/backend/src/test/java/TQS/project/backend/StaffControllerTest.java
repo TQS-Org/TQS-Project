@@ -34,88 +34,90 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 public class StaffControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private StaffService staffService;
+  @SuppressWarnings("removal")
+  @MockBean
+  private StaffService staffService;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private JwtProvider jwtProvider;
+  @SuppressWarnings("removal")
+  @MockBean
+  private JwtProvider jwtProvider;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+  @SuppressWarnings("removal")
+  @MockBean
+  private JwtAuthFilter jwtAuthFilter;
 
-    @Test
-    @Requirement("SCRUM-35")
-    void testCreateOperator_success() throws Exception {
-        CreateStaffDTO dto = new CreateStaffDTO();
-        dto.setName("New Operator");
-        dto.setMail("newoperator@mail.com");
-        dto.setPassword("secure123");
-        dto.setAge(30);
-        dto.setNumber("912888777");
-        dto.setAddress("Setúbal");
+  @Test
+  @Requirement("SCRUM-35")
+  void testCreateOperator_success() throws Exception {
+    CreateStaffDTO dto = new CreateStaffDTO();
+    dto.setName("New Operator");
+    dto.setMail("newoperator@mail.com");
+    dto.setPassword("secure123");
+    dto.setAge(30);
+    dto.setNumber("912888777");
+    dto.setAddress("Setúbal");
 
-        doNothing().when(staffService).createOperator(dto);
+    doNothing().when(staffService).createOperator(dto);
 
-        mockMvc.perform(post("/api/staff/operator")
+    mockMvc
+        .perform(
+            post("/api/staff/operator")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Operator account created successfully."));
-    }
+        .andExpect(status().isOk())
+        .andExpect(content().string("Operator account created successfully."));
+  }
 
-    @Test
-    @Requirement("SCRUM-35")
-    void testCreateOperator_duplicateEmail() throws Exception {
-        CreateStaffDTO dto = new CreateStaffDTO();
-        dto.setName("Duplicate");
-        dto.setMail("existing@mail.com");
-        dto.setPassword("securepass123");
-        dto.setAge(25);
-        dto.setNumber("912456789");
-        dto.setAddress("Lisbon");
+  @Test
+  @Requirement("SCRUM-35")
+  void testCreateOperator_duplicateEmail() throws Exception {
+    CreateStaffDTO dto = new CreateStaffDTO();
+    dto.setName("Duplicate");
+    dto.setMail("existing@mail.com");
+    dto.setPassword("securepass123");
+    dto.setAge(25);
+    dto.setNumber("912456789");
+    dto.setAddress("Lisbon");
 
-        doThrow(new IllegalArgumentException("Email already in use"))
-                .when(staffService)
-                .createOperator(any(CreateStaffDTO.class));
+    doThrow(new IllegalArgumentException("Email already in use"))
+        .when(staffService)
+        .createOperator(any(CreateStaffDTO.class));
 
-        mockMvc.perform(post("/api/staff/operator")
+    mockMvc
+        .perform(
+            post("/api/staff/operator")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Email already in use"));
-    }
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Email already in use"));
+  }
 
-    @Test
-    @Requirement("SCRUM-35")
-    void testGetAllOperators_returnsList() throws Exception {
-        Staff s1 = new Staff();
-        s1.setId(1L);
-        s1.setName("Operator One");
-        s1.setMail("op1@mail.com");
-        s1.setRole(Role.OPERATOR);
+  @Test
+  @Requirement("SCRUM-35")
+  void testGetAllOperators_returnsList() throws Exception {
+    Staff s1 = new Staff();
+    s1.setId(1L);
+    s1.setName("Operator One");
+    s1.setMail("op1@mail.com");
+    s1.setRole(Role.OPERATOR);
 
-        Staff s2 = new Staff();
-        s2.setId(2L);
-        s2.setName("Operator Two");
-        s2.setMail("op2@mail.com");
-        s2.setRole(Role.OPERATOR);
+    Staff s2 = new Staff();
+    s2.setId(2L);
+    s2.setName("Operator Two");
+    s2.setMail("op2@mail.com");
+    s2.setRole(Role.OPERATOR);
 
-        when(staffService.getAllOperators()).thenReturn(List.of(s1, s2));
+    when(staffService.getAllOperators()).thenReturn(List.of(s1, s2));
 
-        mockMvc.perform(get("/api/staff/operators"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name").value("Operator One"))
-                .andExpect(jsonPath("$[1].mail").value("op2@mail.com"));
-    }
-
+    mockMvc
+        .perform(get("/api/staff/operators"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].name").value("Operator One"))
+        .andExpect(jsonPath("$[1].mail").value("op2@mail.com"));
+  }
 }
