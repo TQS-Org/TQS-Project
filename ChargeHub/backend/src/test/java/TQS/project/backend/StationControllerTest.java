@@ -30,77 +30,86 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 public class StationControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private StationService stationService;
+  @SuppressWarnings("removal")
+  @MockBean
+  private StationService stationService;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private JwtProvider jwtProvider;
+  @SuppressWarnings("removal")
+  @MockBean
+  private JwtProvider jwtProvider;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+  @SuppressWarnings("removal")
+  @MockBean
+  private JwtAuthFilter jwtAuthFilter;
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testGetAllStations() throws Exception {
-        Station station1 = new Station();
-        station1.setId(1L);
-        station1.setName("Station One");
+  @Test
+  @Requirement("SCRUM-16")
+  void testGetAllStations() throws Exception {
+    Station station1 = new Station();
+    station1.setId(1L);
+    station1.setName("Station One");
 
-        Station station2 = new Station();
-        station2.setId(2L);
-        station2.setName("Station Two");
+    Station station2 = new Station();
+    station2.setId(2L);
+    station2.setName("Station Two");
 
-        when(stationService.getAllStations()).thenReturn(List.of(station1, station2));
+    when(stationService.getAllStations()).thenReturn(List.of(station1, station2));
 
-        mockMvc.perform(get("/api/stations"))
-                .andDo(result -> System.out.println("RESPONSE: " + result.getResponse().getContentAsString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name").value("Station One"))
-                .andExpect(jsonPath("$[1].name").value("Station Two"));
-    }
+    mockMvc
+        .perform(get("/api/stations"))
+        .andDo(
+            result -> System.out.println("RESPONSE: " + result.getResponse().getContentAsString()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].name").value("Station One"))
+        .andExpect(jsonPath("$[1].name").value("Station Two"));
+  }
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testGetStationById_found() throws Exception {
-        Station station = new Station();
-        station.setId(1L);
-        station.setName("Test Station");
+  @Test
+  @Requirement("SCRUM-16")
+  void testGetStationById_found() throws Exception {
+    Station station = new Station();
+    station.setId(1L);
+    station.setName("Test Station");
 
-        when(stationService.getStationById(1L)).thenReturn(Optional.of(station));
+    when(stationService.getStationById(1L)).thenReturn(Optional.of(station));
 
-        mockMvc.perform(get("/api/stations/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Test Station"));
-    }
+    mockMvc
+        .perform(get("/api/stations/1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Test Station"));
+  }
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testGetStationById_notFound() throws Exception {
-        when(stationService.getStationById(999L)).thenReturn(Optional.empty());
+  @Test
+  @Requirement("SCRUM-16")
+  void testGetStationById_notFound() throws Exception {
+    when(stationService.getStationById(999L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/stations/999"))
-                .andExpect(status().isNotFound());
-    }
+    mockMvc.perform(get("/api/stations/999")).andExpect(status().isNotFound());
+  }
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testSearchStations() throws Exception {
-        Station station = new Station();
-        station.setId(1L);
-        station.setName("Cheap Fast Charger");
+  @Test
+  @Requirement("SCRUM-16")
+  void testSearchStations() throws Exception {
+    Station station = new Station();
+    station.setId(1L);
+    station.setName("Cheap Fast Charger");
 
-        when(stationService.searchStations(anyString(), anyDouble(), anyString(), anyDouble(), anyDouble(), anyString(),
-                anyBoolean()))
-                .thenReturn(List.of(station));
+    when(stationService.searchStations(
+            anyString(),
+            anyDouble(),
+            anyString(),
+            anyDouble(),
+            anyDouble(),
+            anyString(),
+            anyBoolean()))
+        .thenReturn(List.of(station));
 
-        mockMvc.perform(get("/api/stations/search")
+    mockMvc
+        .perform(
+            get("/api/stations/search")
                 .param("district", "Lisboa")
                 .param("maxPrice", "0.40")
                 .param("chargerType", "FAST")
@@ -108,8 +117,8 @@ public class StationControllerTest {
                 .param("maxPower", "150.0")
                 .param("connectorType", "CCS")
                 .param("available", "true"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name").value("Cheap Fast Charger"));
-    }
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0].name").value("Cheap Fast Charger"));
+  }
 }

@@ -21,8 +21,9 @@ public class DataInitializer {
       ClientRepository clientRepo, StaffRepository staffRepo, PasswordEncoder encoder) {
     return args -> {
       if (clientRepo.findByMail("driver@mail.com").isEmpty()) {
-        Client client = new Client(
-            "Driver One", encoder.encode("driverpass"), 30, "driver@mail.com", "123456789");
+        Client client =
+            new Client(
+                "Driver One", encoder.encode("driverpass"), 30, "driver@mail.com", "123456789");
         clientRepo.save(client);
       }
 

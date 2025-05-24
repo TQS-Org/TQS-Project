@@ -1,7 +1,6 @@
 package TQS.project.backend.steps;
 
 import io.cucumber.java.Before;
-import io.cucumber.java.After;
 import io.cucumber.java.en.*;
 
 import org.openqa.selenium.*;
@@ -36,7 +35,8 @@ public class LoginSteps {
 
   @And("I click the login button")
   public void iClickLoginButton() {
-    WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".login-button")));
+    WebElement loginButton =
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".login-button")));
     loginButton.click();
   }
 

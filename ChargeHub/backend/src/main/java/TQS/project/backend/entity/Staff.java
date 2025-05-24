@@ -32,8 +32,7 @@ public class Staff {
     this.password = password;
   }
 
-  public Staff() {
-  }
+  public Staff() {}
 
   public Long getId() {
     return id;

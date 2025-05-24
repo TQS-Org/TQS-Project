@@ -1,6 +1,5 @@
 package TQS.project.backend.entity;
 
-import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -42,8 +41,7 @@ public class Station {
     this.price = price;
   }
 
-  public Station() {
-  }
+  public Station() {}
 
   public Long getId() {
     return id;

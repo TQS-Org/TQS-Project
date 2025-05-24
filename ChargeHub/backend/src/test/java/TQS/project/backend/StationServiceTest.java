@@ -23,107 +23,106 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 public class StationServiceTest {
 
-    @Mock
-    private StationRepository stationRepository;
+  @Mock private StationRepository stationRepository;
 
-    @Mock
-    private ChargerRepository chargerRepository;
+  @Mock private ChargerRepository chargerRepository;
 
-    @InjectMocks
-    private StationService stationService;
+  @InjectMocks private StationService stationService;
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testGetAllStations() {
-        Station s1 = new Station();
-        s1.setId(1L);
-        s1.setName("Alpha");
+  @Test
+  @Requirement("SCRUM-16")
+  void testGetAllStations() {
+    Station s1 = new Station();
+    s1.setId(1L);
+    s1.setName("Alpha");
 
-        Station s2 = new Station();
-        s2.setId(2L);
-        s2.setName("Beta");
+    Station s2 = new Station();
+    s2.setId(2L);
+    s2.setName("Beta");
 
-        when(stationRepository.findAll()).thenReturn(List.of(s1, s2));
+    when(stationRepository.findAll()).thenReturn(List.of(s1, s2));
 
-        List<Station> result = stationService.getAllStations();
+    List<Station> result = stationService.getAllStations();
 
-        assertEquals(2, result.size());
-        assertEquals("Alpha", result.get(0).getName());
-    }
+    assertEquals(2, result.size());
+    assertEquals("Alpha", result.get(0).getName());
+  }
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testGetStationById_found() {
-        Station station = new Station();
-        station.setId(1L);
-        station.setName("Gamma");
+  @Test
+  @Requirement("SCRUM-16")
+  void testGetStationById_found() {
+    Station station = new Station();
+    station.setId(1L);
+    station.setName("Gamma");
 
-        when(stationRepository.findById(1L)).thenReturn(Optional.of(station));
+    when(stationRepository.findById(1L)).thenReturn(Optional.of(station));
 
-        Optional<Station> result = stationService.getStationById(1L);
+    Optional<Station> result = stationService.getStationById(1L);
 
-        assertTrue(result.isPresent());
-        assertEquals("Gamma", result.get().getName());
-    }
+    assertTrue(result.isPresent());
+    assertEquals("Gamma", result.get().getName());
+  }
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testGetStationById_notFound() {
-        when(stationRepository.findById(2L)).thenReturn(Optional.empty());
+  @Test
+  @Requirement("SCRUM-16")
+  void testGetStationById_notFound() {
+    when(stationRepository.findById(2L)).thenReturn(Optional.empty());
 
-        Optional<Station> result = stationService.getStationById(2L);
+    Optional<Station> result = stationService.getStationById(2L);
 
-        assertFalse(result.isPresent());
-    }
+    assertFalse(result.isPresent());
+  }
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testSearchStations_withMatchingChargerAndStationFilters() {
-        Station station = new Station();
-        station.setId(1L);
-        station.setName("Filtered");
-        station.setAddress("Lisboa");
-        station.setPrice(0.35);
+  @Test
+  @Requirement("SCRUM-16")
+  void testSearchStations_withMatchingChargerAndStationFilters() {
+    Station station = new Station();
+    station.setId(1L);
+    station.setName("Filtered");
+    station.setAddress("Lisboa");
+    station.setPrice(0.35);
 
-        Charger charger = new Charger();
-        charger.setId(1L);
-        charger.setType("FAST");
-        charger.setConnectorType("CCS");
-        charger.setPower(100.0);
-        charger.setAvailable(true);
-        charger.setStation(station);
+    Charger charger = new Charger();
+    charger.setId(1L);
+    charger.setType("FAST");
+    charger.setConnectorType("CCS");
+    charger.setPower(100.0);
+    charger.setAvailable(true);
+    charger.setStation(station);
 
-        when(chargerRepository.findAll()).thenReturn(List.of(charger));
-        when(stationRepository.findAll()).thenReturn(List.of(station));
+    when(chargerRepository.findAll()).thenReturn(List.of(charger));
+    when(stationRepository.findAll()).thenReturn(List.of(station));
 
-        List<Station> result = stationService.searchStations("Lisboa", 0.40, "FAST", 50.0, 150.0, "CCS", true);
+    List<Station> result =
+        stationService.searchStations("Lisboa", 0.40, "FAST", 50.0, 150.0, "CCS", true);
 
-        assertEquals(1, result.size());
-        assertEquals("Filtered", result.get(0).getName());
-    }
+    assertEquals(1, result.size());
+    assertEquals("Filtered", result.get(0).getName());
+  }
 
-    @Test
-    @Requirement("SCRUM-16")
-    void testSearchStations_noChargerMatch() {
-        Station station = new Station();
-        station.setId(1L);
-        station.setName("Filtered");
-        station.setAddress("Lisboa");
-        station.setPrice(0.35);
+  @Test
+  @Requirement("SCRUM-16")
+  void testSearchStations_noChargerMatch() {
+    Station station = new Station();
+    station.setId(1L);
+    station.setName("Filtered");
+    station.setAddress("Lisboa");
+    station.setPrice(0.35);
 
-        Charger charger = new Charger();
-        charger.setId(1L);
-        charger.setType("SLOW"); // won't match
-        charger.setConnectorType("Type2");
-        charger.setPower(22.0);
-        charger.setAvailable(true);
-        charger.setStation(station);
+    Charger charger = new Charger();
+    charger.setId(1L);
+    charger.setType("SLOW"); // won't match
+    charger.setConnectorType("Type2");
+    charger.setPower(22.0);
+    charger.setAvailable(true);
+    charger.setStation(station);
 
-        when(chargerRepository.findAll()).thenReturn(List.of(charger));
-        when(stationRepository.findAll()).thenReturn(List.of(station));
+    when(chargerRepository.findAll()).thenReturn(List.of(charger));
+    when(stationRepository.findAll()).thenReturn(List.of(station));
 
-        List<Station> result = stationService.searchStations("Lisboa", 0.40, "FAST", 50.0, 150.0, "CCS", true);
+    List<Station> result =
+        stationService.searchStations("Lisboa", 0.40, "FAST", 50.0, 150.0, "CCS", true);
 
-        assertEquals(0, result.size());
-    }
+    assertEquals(0, result.size());
+  }
 }
