@@ -5,6 +5,7 @@ import OperatorPage from './OperatorPage';
 import AdminPage from './AdminPage';
 import ProtectedRoute from './ProtectedRoute';
 import SignupPage from './SignUpPage';
+import Layout from './Layout';
 
 export default function App() {
   return (
@@ -15,7 +16,9 @@ export default function App() {
         path="/driver"
         element={
           <ProtectedRoute requiredRole="EV_DRIVER">
-            <DriverPage />
+            <Layout>
+              <DriverPage />
+            </Layout>
           </ProtectedRoute>
         }
       />
