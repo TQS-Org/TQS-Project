@@ -108,6 +108,17 @@
   color: white;
 }
 
+.modal-buttons .cancel-button {
+  background-color: #e74c3c !important;
+  color: white !important;
+}
+
+.modal-buttons .cancel-button:hover {
+  background-color: #c0392b !important;
+}
+
+
+
 .modal-buttons {
   display: flex;
   justify-content: space-between;

@@ -122,8 +122,12 @@ export default function AdminOperators() {
 
                 <div className="modal-buttons">
                 <button type="submit">Create</button>
-                <button type="button" onClick={() => setShowCreateModal(false)}>
-                    Cancel
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={() => setShowCreateModal(false)}
+                >
+                  Cancel
                 </button>
                 </div>
             </form>
@@ -157,7 +161,7 @@ export default function AdminOperators() {
               />
             </svg>
             <h3>Operator Created!</h3>
-            <button onClick={() => setShowSuccessModal(false)}>Close</button>
+            <button type="button" onClick={() => setShowSuccessModal(false)}>Close</button>
           </div>
         </div>
       )}
