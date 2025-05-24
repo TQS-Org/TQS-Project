@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StationRepository extends JpaRepository<Station, Long> {
-    // custom query methods can be added here later if needed
+  // custom query methods can be added here later if needed
 }

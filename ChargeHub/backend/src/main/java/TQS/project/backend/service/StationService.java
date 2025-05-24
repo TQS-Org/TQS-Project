@@ -11,42 +11,50 @@ import java.util.Optional;
 
 @Service
 public class StationService {
-    private final StationRepository stationRepository;
-    private final ChargerRepository chargerRepository;
+  private final StationRepository stationRepository;
+  private final ChargerRepository chargerRepository;
 
-    @Autowired
-    public StationService(StationRepository stationRepository, ChargerRepository chargerRepository) {
-        this.stationRepository = stationRepository;
-        this.chargerRepository = chargerRepository;
-    }
+  @Autowired
+  public StationService(StationRepository stationRepository, ChargerRepository chargerRepository) {
+    this.stationRepository = stationRepository;
+    this.chargerRepository = chargerRepository;
+  }
 
-    public List<Station> getAllStations() {
-        return stationRepository.findAll();
-    }
+  public List<Station> getAllStations() {
+    return stationRepository.findAll();
+  }
 
-    public Optional<Station> getStationById(Long id) {
-        return stationRepository.findById(id);
-    }
+  public Optional<Station> getStationById(Long id) {
+    return stationRepository.findById(id);
+  }
 
-    public List<Station> searchStations(String district, Double maxPrice, String chargerType,
-            Double minPower, Double maxPower, String connectorType, Boolean available) {
+  public List<Station> searchStations(
+      String district,
+      Double maxPrice,
+      String chargerType,
+      Double minPower,
+      Double maxPower,
+      String connectorType,
+      Boolean available) {
 
-        List<Long> stationIdsFromChargers = chargerRepository.findAll().stream()
-                .filter(c -> chargerType == null || chargerType.equalsIgnoreCase(c.getType()))
-                .filter(c -> minPower == null || c.getPower() >= minPower)
-                .filter(c -> maxPower == null || c.getPower() <= maxPower)
-                .filter(c -> connectorType == null || connectorType.equalsIgnoreCase(c.getConnectorType()))
-                .filter(c -> available == null || c.getAvailable() == available)
-                .map(c -> c.getStation().getId())
-                .distinct()
-                .toList();
+    List<Long> stationIdsFromChargers =
+        chargerRepository.findAll().stream()
+            .filter(c -> chargerType == null || chargerType.equalsIgnoreCase(c.getType()))
+            .filter(c -> minPower == null || c.getPower() >= minPower)
+            .filter(c -> maxPower == null || c.getPower() <= maxPower)
+            .filter(
+                c -> connectorType == null || connectorType.equalsIgnoreCase(c.getConnectorType()))
+            .filter(c -> available == null || c.getAvailable() == available)
+            .map(c -> c.getStation().getId())
+            .distinct()
+            .toList();
 
-        return stationRepository.findAll().stream()
-                .filter(s -> district == null || s.getAddress().toLowerCase().contains(district.toLowerCase()))
-                .filter(s -> maxPrice == null || s.getPrice() <= maxPrice)
-                // ✅ Only include stations that have at least one matching charger
-                .filter(s -> stationIdsFromChargers.contains(s.getId()))
-                .toList();
-
-    }
+    return stationRepository.findAll().stream()
+        .filter(
+            s -> district == null || s.getAddress().toLowerCase().contains(district.toLowerCase()))
+        .filter(s -> maxPrice == null || s.getPrice() <= maxPrice)
+        // ✅ Only include stations that have at least one matching charger
+        .filter(s -> stationIdsFromChargers.contains(s.getId()))
+        .toList();
+  }
 }

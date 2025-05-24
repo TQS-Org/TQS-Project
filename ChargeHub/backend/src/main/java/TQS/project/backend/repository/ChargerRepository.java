@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChargerRepository extends JpaRepository<Charger, Long> {
-    // You can later add a JPQL query here for better performance
+  // You can later add a JPQL query here for better performance
 }

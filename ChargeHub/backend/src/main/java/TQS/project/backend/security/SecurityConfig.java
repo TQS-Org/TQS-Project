@@ -35,7 +35,8 @@ public class SecurityConfig {
             "/api/auth/register",
             "/api/stations")
         .permitAll()
-        .requestMatchers("/api/stations/search**").hasRole("EV_DRIVER")
+        .requestMatchers("/api/stations/search**")
+        .hasRole("EV_DRIVER")
         .anyRequest()
         .authenticated()
         .and()
