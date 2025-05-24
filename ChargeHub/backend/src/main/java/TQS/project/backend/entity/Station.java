@@ -1,6 +1,5 @@
 package TQS.project.backend.entity;
 
-
 import jakarta.persistence.*;
 
 @Entity
