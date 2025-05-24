@@ -2,6 +2,7 @@ package TQS.project.backend;
 
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.service.StationService;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.repository.StationRepository;
 import TQS.project.backend.repository.ChargerRepository;
@@ -32,6 +33,7 @@ public class StationServiceTest {
     private StationService stationService;
 
     @Test
+    @Requirement("SCRUM-16")
     void testGetAllStations() {
         Station s1 = new Station();
         s1.setId(1L);
@@ -50,6 +52,7 @@ public class StationServiceTest {
     }
 
     @Test
+    @Requirement("SCRUM-16")
     void testGetStationById_found() {
         Station station = new Station();
         station.setId(1L);
@@ -64,6 +67,7 @@ public class StationServiceTest {
     }
 
     @Test
+    @Requirement("SCRUM-16")
     void testGetStationById_notFound() {
         when(stationRepository.findById(2L)).thenReturn(Optional.empty());
 
@@ -73,6 +77,7 @@ public class StationServiceTest {
     }
 
     @Test
+    @Requirement("SCRUM-16")
     void testSearchStations_withMatchingChargerAndStationFilters() {
         Station station = new Station();
         station.setId(1L);
@@ -98,6 +103,7 @@ public class StationServiceTest {
     }
 
     @Test
+    @Requirement("SCRUM-16")
     void testSearchStations_noChargerMatch() {
         Station station = new Station();
         station.setId(1L);

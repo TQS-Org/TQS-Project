@@ -6,6 +6,7 @@ import TQS.project.backend.security.JwtAuthFilter;
 import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.StationService;
 import TQS.project.backend.Config.TestSecurityConfig;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -46,6 +46,7 @@ public class StationControllerTest {
     private JwtAuthFilter jwtAuthFilter;
 
     @Test
+    @Requirement("SCRUM-16")
     void testGetAllStations() throws Exception {
         Station station1 = new Station();
         station1.setId(1L);
@@ -66,6 +67,7 @@ public class StationControllerTest {
     }
 
     @Test
+    @Requirement("SCRUM-16")
     void testGetStationById_found() throws Exception {
         Station station = new Station();
         station.setId(1L);
@@ -79,6 +81,7 @@ public class StationControllerTest {
     }
 
     @Test
+    @Requirement("SCRUM-16")
     void testGetStationById_notFound() throws Exception {
         when(stationService.getStationById(999L)).thenReturn(Optional.empty());
 
@@ -87,6 +90,7 @@ public class StationControllerTest {
     }
 
     @Test
+    @Requirement("SCRUM-16")
     void testSearchStations() throws Exception {
         Station station = new Station();
         station.setId(1L);

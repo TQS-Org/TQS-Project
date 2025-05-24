@@ -19,11 +19,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestcontainersConfiguration.class)
 public class AuthIT {
 
-  @Autowired private TestRestTemplate restTemplate;
+  @Autowired
+  private TestRestTemplate restTemplate;
 
-  @Autowired private ClientRepository clientRepository;
+  @Autowired
+  private ClientRepository clientRepository;
 
-  @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   @BeforeEach
   void setup() {
@@ -38,16 +41,14 @@ public class AuthIT {
   @Test
   @Requirement("SCRUM-41")
   void testLoginSuccess() {
-    var loginPayload =
-        new LoginRequest("alice@example.com", "plainpass"); // password depends on your encoder
+    var loginPayload = new LoginRequest("alice@example.com", "plainpass"); // password depends on your encoder
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
     HttpEntity<LoginRequest> request = new HttpEntity<>(loginPayload, headers);
 
-    ResponseEntity<String> response =
-        restTemplate.postForEntity("/api/auth/login", request, String.class);
+    ResponseEntity<String> response = restTemplate.postForEntity("/api/auth/login", request, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).contains("token");
@@ -68,8 +69,8 @@ public class AuthIT {
 
     HttpEntity<RegisterRequest> entity = new HttpEntity<>(request, headers);
 
-    ResponseEntity<LoginResponse> response =
-        restTemplate.postForEntity("/api/auth/register", entity, LoginResponse.class);
+    ResponseEntity<LoginResponse> response = restTemplate.postForEntity("/api/auth/register", entity,
+        LoginResponse.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotNull();
