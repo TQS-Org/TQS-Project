@@ -11,30 +11,24 @@ export default function DriverPage() {
     available: ""
   });
 
-  useEffect(() => {
-    fetchStations();
-  }, []);
-
-  const fetchStations = async () => {
+  const fetchStations = useCallback(async () => {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value) params.append(key, value);
     });
 
     const token = localStorage.getItem("token");
-
-    const endpoint =
-      params.toString().length > 0
-        ? `http://localhost:8080/api/stations/search?${params.toString()}`
-        : `http://localhost:8080/api/stations`;
+    const endpoint = params.toString()
+      ? `http://localhost:8080/api/stations/search?${params.toString()}`
+      : `http://localhost:8080/api/stations`;
 
     const res = await fetch(endpoint, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      credentials: "include"
+      credentials: "include",
     });
 
     if (!res.ok) {
@@ -49,7 +43,12 @@ export default function DriverPage() {
     } catch (err) {
       console.error("JSON parse error:", err);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchStations();
+  }, [fetchStations]);
+
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -112,21 +111,21 @@ export default function DriverPage() {
         </aside>
 
         <section className="card-section">
-        <div className="card-section-title">Stations</div> {/* <-- outside grid */}
+          <div className="card-section-title">Stations</div> {/* <-- outside grid */}
 
-        <div className="station-list">
-          {stations.map((station) => (
-            <div className="station-card" key={station.id}>
-              <h2>{station.name}</h2>
-              <p><strong>Brand:</strong> {station.brand}</p>
-              <p><strong>District:</strong> {station.address}</p>
-              <p><strong>Chargers:</strong> {station.numberOfChargers}</p>
-              <p><strong>Price:</strong> €{station.price.toFixed(2)}/kWh</p>
-              <p><strong>Hours:</strong> {station.openingHours} - {station.closingHours}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+          <div className="station-list">
+            {stations.map((station) => (
+              <div className="station-card" key={station.id}>
+                <h2>{station.name}</h2>
+                <p><strong>Brand:</strong> {station.brand}</p>
+                <p><strong>District:</strong> {station.address}</p>
+                <p><strong>Chargers:</strong> {station.numberOfChargers}</p>
+                <p><strong>Price:</strong> €{station.price.toFixed(2)}/kWh</p>
+                <p><strong>Hours:</strong> {station.openingHours} - {station.closingHours}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
