@@ -43,7 +43,7 @@ public class StationService {
                 .filter(c -> maxPower == null || c.getPower() <= maxPower)
                 .filter(
                         c -> connectorType == null || connectorType.equalsIgnoreCase(c.getConnectorType()))
-                .filter(c -> available == null || Boolean.valueOf(c.getAvailable()).equals(available))
+                .filter(c -> available == null || c.getAvailable().equals(available))
                 .map(c -> c.getStation().getId())
                 .distinct()
                 .toList();
@@ -52,7 +52,6 @@ public class StationService {
                 .filter(
                         s -> district == null || s.getAddress().toLowerCase().contains(district.toLowerCase()))
                 .filter(s -> maxPrice == null || s.getPrice() <= maxPrice)
-                // ✅ Only include stations that have at least one matching charger
                 .filter(s -> stationIdsFromChargers.contains(s.getId()))
                 .toList();
     }
