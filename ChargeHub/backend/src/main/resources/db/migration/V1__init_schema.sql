@@ -1,5 +1,5 @@
 -- === CLIENT ===
-CREATE TABLE client (
+CREATE TABLE IF NOT EXISTS client (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE client (
 );
 
 -- === STATION ===
-CREATE TABLE station (
+CREATE TABLE IF NOT EXISTS station (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     brand VARCHAR(255),
@@ -23,7 +23,7 @@ CREATE TABLE station (
 );
 
 -- === STAFF ===
-CREATE TABLE staff (
+CREATE TABLE IF NOT EXISTS staff (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE staff (
 );
 
 -- === CHARGER ===
-CREATE TABLE charger (
+CREATE TABLE IF NOT EXISTS charger (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     station_id BIGINT,
     type VARCHAR(50),
