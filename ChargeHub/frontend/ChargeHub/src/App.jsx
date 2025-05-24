@@ -36,12 +36,15 @@ export default function App() {
         path="/admin"
         element={
           <ProtectedRoute requiredRole="ADMIN">
-            <AdminPage />
+            <Layout>
+              <AdminPage />
+            </Layout>
           </ProtectedRoute>
         }
       />
       
       <Route path="/signup" element={<SignupPage />} />
+
     </Routes>
   );
 }
