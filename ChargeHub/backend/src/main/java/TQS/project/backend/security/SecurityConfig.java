@@ -20,7 +20,9 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf()
+    http.cors()
+        .and()
+        .csrf()
         .disable()
         .authorizeHttpRequests()
         .requestMatchers(
@@ -30,8 +32,10 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/api-docs/**",
-            "/api/auth/register")
+            "/api/auth/register",
+            "/api/stations")
         .permitAll()
+        .requestMatchers("/api/stations/search**").hasRole("EV_DRIVER")
         .anyRequest()
         .authenticated()
         .and()
