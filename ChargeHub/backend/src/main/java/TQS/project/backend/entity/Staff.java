@@ -23,7 +23,9 @@ public class Staff {
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  @ManyToOne private Station assignedStation;
+  @OneToOne
+  @JoinColumn(name = "station_id", referencedColumnName = "id")
+  private Station assignedStation;
 
   public Staff(String mail, String password) {
     this.mail = mail;

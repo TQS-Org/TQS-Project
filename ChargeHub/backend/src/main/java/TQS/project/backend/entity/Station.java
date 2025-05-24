@@ -1,6 +1,5 @@
 package TQS.project.backend.entity;
 
-import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -11,29 +10,35 @@ public class Station {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  private String name;
+  private String brand;
   private double latitude;
   private double longitude;
   private String address;
   private int numberOfChargers;
   private String openingHours;
+  private String closingHours;
   private double price;
 
-  @OneToMany(mappedBy = "assignedStation")
-  private List<Staff> assignedStaff;
-
   public Station(
+      String name,
+      String brand,
       double latitude,
       double longitude,
       String address,
       int numberOfChargers,
       String openingHours,
-      List<Staff> assignedStaff) {
+      String closingHours,
+      double price) {
+    this.name = name;
+    this.brand = brand;
     this.latitude = latitude;
     this.longitude = longitude;
     this.address = address;
     this.numberOfChargers = numberOfChargers;
     this.openingHours = openingHours;
-    this.assignedStaff = assignedStaff;
+    this.closingHours = closingHours;
+    this.price = price;
   }
 
   public Station() {}
@@ -94,11 +99,27 @@ public class Station {
     this.price = price;
   }
 
-  public List<Staff> getAssignedStaff() {
-    return assignedStaff;
+  public String getName() {
+    return name;
   }
 
-  public void setAssignedStaff(List<Staff> assignedStaff) {
-    this.assignedStaff = assignedStaff;
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getBrand() {
+    return brand;
+  }
+
+  public void setBrand(String brand) {
+    this.brand = brand;
+  }
+
+  public String getClosingHours() {
+    return closingHours;
+  }
+
+  public void setClosingHours(String closingHours) {
+    this.closingHours = closingHours;
   }
 }
