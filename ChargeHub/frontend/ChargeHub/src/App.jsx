@@ -6,7 +6,6 @@ import AdminPage from './AdminPage';
 import ProtectedRoute from './ProtectedRoute';
 import SignupPage from './SignUpPage';
 import Layout from './Layout';
-import CreateOperatorPage from './CreateOperatorPage';
 
 export default function App() {
   return (
@@ -45,17 +44,6 @@ export default function App() {
       />
       
       <Route path="/signup" element={<SignupPage />} />
-
-      <Route
-        path="/admin/create-operator"
-        element={
-          <ProtectedRoute requiredRole="ADMIN">
-            <Layout>
-              <CreateOperatorPage />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
 
     </Routes>
   );
