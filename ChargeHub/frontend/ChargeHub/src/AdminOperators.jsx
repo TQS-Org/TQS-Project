@@ -72,6 +72,14 @@ export default function AdminOperators() {
                 onSubmit={(e) => {
                 e.preventDefault();
                 const form = e.target;
+                const password = form.password.value;
+                const confirmPassword = form.confirmPassword.value;
+
+                if (password !== confirmPassword) {
+                  setErrorMsg("Passwords do not match");
+                  return;
+                }
+                setErrorMsg("");
                 const dto = {
                     name: form.name.value,
                     mail: form.mail.value,
@@ -112,11 +120,57 @@ export default function AdminOperators() {
                 }}
             >
                 <input name="name" placeholder="Name" required />
-                <input name="mail" placeholder="Email" required type="email" />
-                <input name="password" placeholder="Password" required type="password" />
-                <input name="age" placeholder="Age" required type="number" />
-                <input name="number" placeholder="Phone Number" />
-                <input name="address" placeholder="Address" />
+
+                <input
+                  name="mail"
+                  placeholder="Email"
+                  type="email"
+                  required
+                  pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                  title="Enter a valid email"
+                />
+
+                <input
+                  name="password"
+                  placeholder="Password"
+                  type="password"
+                  required
+                  pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+                  title="Password must be at least 8 characters, include letters and numbers"
+                />
+
+                <input
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  type="password"
+                  required
+                  title="Please confirm your password"
+                  onInput={() => setErrorMsg("")}
+                />
+
+                <input
+                  name="age"
+                  placeholder="Age"
+                  type="number"
+                  min="18"
+                  max="120"
+                  required
+                  title="Age must be between 18 and 120"
+                />
+
+                <input
+                  name="number"
+                  placeholder="Phone Number"
+                  pattern="^9\d{8}$"
+                  title="Phone number must start with 9 and be 9 digits"
+                  required
+                />
+
+                <input
+                  name="address"
+                  placeholder="Address"
+                  required
+                />
 
                 {errorMsg && <p className="error-msg">{errorMsg}</p>}
 
@@ -161,7 +215,13 @@ export default function AdminOperators() {
               />
             </svg>
             <h3>Operator Created!</h3>
-            <button type="button" onClick={() => setShowSuccessModal(false)}>Close</button>
+            <button
+              type="button"
+              className="close-button"
+              onClick={() => setShowSuccessModal(false)}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

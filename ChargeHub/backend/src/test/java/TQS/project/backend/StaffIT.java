@@ -70,12 +70,12 @@ public class StaffIT {
     @Requirement("SCRUM-35")
     void createOperator_asAdmin_succeeds() {
         CreateStaffDTO dto = new CreateStaffDTO();
-        dto.name = "New Operator";
-        dto.mail = "newoperator@mail.com";
-        dto.password = "securepass";
-        dto.age = 33;
-        dto.number = "123123123";
-        dto.address = "Porto";
+        dto.setName("New Operator");
+        dto.setMail("newoperator@mail.com");
+        dto.setPassword("securepass123");
+        dto.setAge(33);
+        dto.setNumber("912123123");
+        dto.setAddress("Porto");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -100,12 +100,12 @@ public class StaffIT {
     void createOperator_duplicateEmail_returns400() {
         // reuse admin's email to trigger conflict
         CreateStaffDTO dto = new CreateStaffDTO();
-        dto.name = "Duplicate";
-        dto.mail = "admin@mail.com";
-        dto.password = "pass";
-        dto.age = 40;
-        dto.number = "999999999";
-        dto.address = "Santarém";
+        dto.setName("Duplicate");
+        dto.setMail("admin@mail.com");
+        dto.setPassword("securepass123");
+        dto.setAge(40);
+        dto.setNumber("912999999");
+        dto.setAddress("Santarém");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

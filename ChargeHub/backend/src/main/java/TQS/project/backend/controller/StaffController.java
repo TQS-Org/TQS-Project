@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.service.StaffService;
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -22,7 +24,7 @@ public class StaffController {
     private StaffService staffService;
 
     @PostMapping("/operator")
-    public ResponseEntity<?> createOperator(@RequestBody CreateStaffDTO dto) {
+    public ResponseEntity<?> createOperator(@Valid @RequestBody CreateStaffDTO dto) {
         try {
             staffService.createOperator(dto);
             return ResponseEntity.ok("Operator account created successfully.");

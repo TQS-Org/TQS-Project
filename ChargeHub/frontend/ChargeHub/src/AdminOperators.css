@@ -117,6 +117,21 @@
   background-color: #c0392b !important;
 }
 
+.close-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.close-button:hover {
+  background-color: #c0392b;
+}
+
 
 
 .modal-buttons {

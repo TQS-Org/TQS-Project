@@ -56,12 +56,12 @@ public class StaffControllerTest {
     @Requirement("SCRUM-35")
     void testCreateOperator_success() throws Exception {
         CreateStaffDTO dto = new CreateStaffDTO();
-        dto.name = "New Operator";
-        dto.mail = "newoperator@mail.com";
-        dto.password = "secure123";
-        dto.age = 30;
-        dto.number = "999888777";
-        dto.address = "Setúbal";
+        dto.setName("New Operator");
+        dto.setMail("newoperator@mail.com");
+        dto.setPassword("secure123");
+        dto.setAge(30);
+        dto.setNumber("912888777");
+        dto.setAddress("Setúbal");
 
         doNothing().when(staffService).createOperator(dto);
 
@@ -76,12 +76,12 @@ public class StaffControllerTest {
     @Requirement("SCRUM-35")
     void testCreateOperator_duplicateEmail() throws Exception {
         CreateStaffDTO dto = new CreateStaffDTO();
-        dto.name = "Duplicate";
-        dto.mail = "existing@mail.com";
-        dto.password = "pass";
-        dto.age = 25;
-        dto.number = "123456789";
-        dto.address = "Lisbon";
+        dto.setName("Duplicate");
+        dto.setMail("existing@mail.com");
+        dto.setPassword("securepass123");
+        dto.setAge(25);
+        dto.setNumber("912456789");
+        dto.setAddress("Lisbon");
 
         doThrow(new IllegalArgumentException("Email already in use"))
                 .when(staffService)

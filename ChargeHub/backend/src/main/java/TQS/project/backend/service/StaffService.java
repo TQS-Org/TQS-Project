@@ -37,17 +37,17 @@ public class StaffService {
      * @throws IllegalArgumentException if the email is already in use.
      */
     public void createOperator(CreateStaffDTO dto) {
-        if (staffRepository.findByMail(dto.mail).isPresent()) {
+        if (staffRepository.findByMail(dto.getMail()).isPresent()) {
             throw new IllegalArgumentException("Email already in use");
         }
 
         Staff staff = new Staff();
-        staff.setName(dto.name);
-        staff.setMail(dto.mail);
-        staff.setPassword(passwordEncoder.encode(dto.password));
-        staff.setAge(dto.age);
-        staff.setNumber(dto.number);
-        staff.setAddress(dto.address);
+        staff.setName(dto.getName());
+        staff.setMail(dto.getMail());
+        staff.setPassword(passwordEncoder.encode(dto.getPassword()));
+        staff.setAge(dto.getAge());
+        staff.setNumber(dto.getNumber());
+        staff.setAddress(dto.getAddress());
         staff.setRole(Role.OPERATOR);
         staff.setActive(true);
         staff.setStartDate(LocalDate.now());

@@ -44,20 +44,20 @@ public class StaffServiceTest {
     @Requirement("SCRUM-35")
     void testCreateOperator_success() {
         CreateStaffDTO dto = new CreateStaffDTO();
-        dto.name = "Operator";
-        dto.mail = "operator@mail.com";
-        dto.password = "plainpass";
-        dto.age = 30;
-        dto.number = "123456789";
-        dto.address = "Lisboa";
+        dto.setName("New Operator");
+        dto.setMail("newoperator@mail.com");
+        dto.setPassword("secure123");
+        dto.setAge(30);
+        dto.setNumber("912345678");
+        dto.setAddress("Setúbal");
 
-        when(staffRepository.findByMail(dto.mail)).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(dto.password)).thenReturn("encodedpass");
+        when(staffRepository.findByMail(dto.getMail())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(dto.getPassword())).thenReturn("encodedpass");
 
         staffService.createOperator(dto);
 
-        verify(staffRepository, times(1)).save(argThat(staff -> staff.getName().equals(dto.name) &&
-                staff.getMail().equals(dto.mail) &&
+        verify(staffRepository, times(1)).save(argThat(staff -> staff.getName().equals(dto.getName()) &&
+                staff.getMail().equals(dto.getMail()) &&
                 staff.getPassword().equals("encodedpass") &&
                 staff.getRole() == Role.OPERATOR &&
                 staff.getStartDate().equals(LocalDate.now())));
@@ -67,9 +67,9 @@ public class StaffServiceTest {
     @Requirement("SCRUM-35")
     void testCreateOperator_duplicateEmail_throwsException() {
         CreateStaffDTO dto = new CreateStaffDTO();
-        dto.mail = "duplicate@mail.com";
+        dto.setMail("duplicate@mail.com");
 
-        when(staffRepository.findByMail(dto.mail)).thenReturn(Optional.of(new Staff()));
+        when(staffRepository.findByMail(dto.getMail())).thenReturn(Optional.of(new Staff()));
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             staffService.createOperator(dto);
