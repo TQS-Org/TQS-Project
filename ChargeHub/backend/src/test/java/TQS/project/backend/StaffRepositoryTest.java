@@ -16,11 +16,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@TestPropertySource(properties = { "spring.flyway.enabled=false", "spring.jpa.hibernate.ddl-auto=create-drop" })
+@TestPropertySource(
+    properties = {"spring.flyway.enabled=false", "spring.jpa.hibernate.ddl-auto=create-drop"})
 class StaffRepositoryTest {
 
-  @Autowired
-  private StaffRepository staffRepository;
+  @Autowired private StaffRepository staffRepository;
 
   @BeforeEach
   void setup() {

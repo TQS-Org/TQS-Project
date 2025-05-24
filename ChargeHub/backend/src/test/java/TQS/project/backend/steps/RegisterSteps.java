@@ -37,25 +37,33 @@ public class RegisterSteps {
       driver.findElement(By.cssSelector("input[placeholder='Age']")).sendKeys(data.get("age"));
 
     if (data.containsKey("number"))
-      driver.findElement(By.cssSelector("input[placeholder='Phone Number']")).sendKeys(data.get("number"));
+      driver
+          .findElement(By.cssSelector("input[placeholder='Phone Number']"))
+          .sendKeys(data.get("number"));
 
     if (data.containsKey("email"))
       driver.findElement(By.cssSelector("input[placeholder='Email']")).sendKeys(data.get("email"));
 
     if (data.containsKey("password"))
-      driver.findElement(By.cssSelector("input[placeholder='Password']")).sendKeys(data.get("password"));
+      driver
+          .findElement(By.cssSelector("input[placeholder='Password']"))
+          .sendKeys(data.get("password"));
 
     if (data.containsKey("confirm password"))
-      driver.findElement(By.cssSelector("input[placeholder='Confirm Password']"))
+      driver
+          .findElement(By.cssSelector("input[placeholder='Confirm Password']"))
           .sendKeys(data.get("confirm password"));
 
     if (data.containsKey("address"))
-      driver.findElement(By.cssSelector("input[placeholder='Address']")).sendKeys(data.get("address"));
+      driver
+          .findElement(By.cssSelector("input[placeholder='Address']"))
+          .sendKeys(data.get("address"));
   }
 
   @When("I click the Sign Up button")
   public void i_click_the_button() {
-    WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".signup-button")));
+    WebElement loginButton =
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".signup-button")));
     loginButton.click();
   }
 }
