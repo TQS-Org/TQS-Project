@@ -43,7 +43,7 @@ public class StationService {
                 .filter(c -> maxPower == null || c.getPower() <= maxPower)
                 .filter(
                         c -> connectorType == null || connectorType.equalsIgnoreCase(c.getConnectorType()))
-                .filter(c -> available == null || c.getAvailable().equals(available))
+                .filter(c -> available == null || c.getAvailable() == available)
                 .map(c -> c.getStation().getId())
                 .distinct()
                 .toList();
