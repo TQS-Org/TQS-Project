@@ -1,0 +1,74 @@
+on: 
+  push:
+    branches:
+      - main
+    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    name: Deploy ChargeHub
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+
+      - name: Down containers
+        working-directory: ./ChargeHub
+        run: docker compose down
+      
+      - name: Remove build caches
+        working-directory: ./ChargeHub
+        run: docker builder prune -a -f
+
+      - name: Write .env file
+        working-directory: ./ChargeHub
+        run: |
+          cat <<EOF > .env
+          MYSQL_PASSWORD=admin
+          MYSQL_USER=admin
+          MYSQLDB_USER=admin
+          MYSQLDB_ROOT_PASSWORD=admin
+          MYSQLDB_DATABASE=tqs_db
+          MYSQLDB_PASSWORD=admin
+          MYSQLDB_LOCAL_PORT=33060
+          MYSQLDB_DOCKER_PORT=3306
+          SPRING_LOCAL_PORT=8080
+          SPRING_DOCKER_PORT=8080
+          EOF
+
+      - name: Write test application.properties
+        run: |
+          mkdir -p ./ChargeHub/backend/src/test/resources
+          cat <<EOF > ./ChargeHub/backend/src/test/resources/application.properties
+          spring.application.name=backend
+          management.endpoints.web.exposure.include=health
+          management.endpoint.health.show-details=always
+          management.endpoint.health.enabled=true
+          springdoc.swagger-ui.path=/swagger-ui-custom.html
+          springdoc.api-docs.path=/api-docs
+          jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
+          spring.flyway.enabled=true
+          spring.flyway.locations=classpath:db/migration
+          EOF
+
+      - name: Write main application.properties
+        run: |
+          mkdir -p ./ChargeHub/backend/src/main/resources
+          cat <<EOF > ./ChargeHub/backend/src/main/resources/application.properties
+          spring.application.name=backend
+          management.endpoints.web.exposure.include=health
+          management.endpoint.health.show-details=always
+          management.endpoint.health.enabled=true
+          springdoc.swagger-ui.path=/swagger-ui-custom.html
+          springdoc.api-docs.path=/api-docs
+          jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
+          spring.flyway.enabled=true
+          spring.flyway.locations=classpath:db/migration
+          EOF
+
+      - name: Build and up containers
+        working-directory: ./ChargeHub 
+        run: docker compose -f docker-compose.prod.yaml up --build -d
