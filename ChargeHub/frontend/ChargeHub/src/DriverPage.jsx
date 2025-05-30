@@ -1,5 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
+import L from "leaflet";
+import { Link } from "react-router-dom";
+import "leaflet/dist/leaflet.css";
 import "./DriverPage.css";
+import personMarker from "./assets/personmarker.png";
+
 
 export default function DriverPage() {
   const [stations, setStations] = useState([]);
@@ -10,6 +15,14 @@ export default function DriverPage() {
     connectorType: "",
     available: ""
   });
+  const [showMap, setShowMap] = useState(false);
+
+  const userIcon = L.icon({
+  iconUrl: personMarker,
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32]
+    });
 
   const fetchStations = useCallback(async () => {
     const params = new URLSearchParams();
@@ -49,10 +62,49 @@ export default function DriverPage() {
     fetchStations();
   }, [fetchStations]);
 
-
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
+
+  // Setup the map after modal is shown
+    useEffect(() => {
+    if (showMap && stations.length) {
+      const map = L.map("station-map").setView([39.5, -8], 7); // Initial center
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+
+      // Station markers
+      stations.forEach(station => {
+        if (station.latitude && station.longitude) {
+          L.marker([station.latitude, station.longitude])
+            .addTo(map)
+            .bindPopup(`
+              <div style="font-size: 14px; line-height: 1.4">
+                <strong>${station.name}</strong><br/>
+                <strong>Brand:</strong> ${station.brand}<br/>
+                <strong>Address:</strong> ${station.address}<br/>
+                <strong>Chargers:</strong> ${station.numberOfChargers}<br/>
+                <strong>Price:</strong> €${station.price.toFixed(2)}/kWh<br/>
+                <strong>Hours:</strong> ${station.openingHours} - ${station.closingHours}
+              </div>
+            `);
+        }
+      });
+
+      // Hardcoded user location (Aveiro)
+      const userLat = 40.6293194;
+      const userLng = -8.6544725;
+
+      const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map).bindPopup("<strong>You are here</strong>").openPopup();
+
+      map.setView([userLat, userLng], 11); // Center on user
+
+      return () => map.remove();
+    }
+  }, [showMap, stations]);
+
 
   return (
     <div className="driver-page">
@@ -86,9 +138,7 @@ export default function DriverPage() {
 
           <select
             value={filters.connectorType}
-            onChange={(e) =>
-              handleFilterChange("connectorType", e.target.value)
-            }
+            onChange={(e) => handleFilterChange("connectorType", e.target.value)}
           >
             <option value="">All Connector Types</option>
             <option value="CCS">CCS</option>
@@ -108,25 +158,37 @@ export default function DriverPage() {
           </label>
 
           <button onClick={fetchStations}>Search</button>
+          <button onClick={() => setShowMap(true)}>Map View</button>
         </aside>
 
         <section className="card-section">
-          <div className="card-section-title">Stations</div> {/* <-- outside grid */}
+          <div className="card-section-title">Stations</div>
 
           <div className="station-list">
             {stations.map((station) => (
               <div className="station-card" key={station.id}>
-                <h2>{station.name}</h2>
-                <p><strong>Brand:</strong> {station.brand}</p>
-                <p><strong>District:</strong> {station.address}</p>
-                <p><strong>Chargers:</strong> {station.numberOfChargers}</p>
-                <p><strong>Price:</strong> €{station.price.toFixed(2)}/kWh</p>
-                <p><strong>Hours:</strong> {station.openingHours} - {station.closingHours}</p>
+                <Link to={`/stations/${station.id}`} className="station-card" key={station.id}>
+                  <h2>{station.name}</h2>
+                  <p><strong>Brand:</strong> {station.brand}</p>
+                  <p><strong>District:</strong> {station.address}</p>
+                  <p><strong>Chargers:</strong> {station.numberOfChargers}</p>
+                  <p><strong>Price:</strong> €{station.price.toFixed(2)}/kWh</p>
+                  <p><strong>Hours:</strong> {station.openingHours} - {station.closingHours}</p>
+                </Link>
               </div>
             ))}
           </div>
         </section>
       </div>
+
+      {/* Modal */}
+      {showMap && (
+        <div className="modal-overlay" onClick={() => setShowMap(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div id="station-map" className="leaflet-container" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
