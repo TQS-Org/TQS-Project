@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
 public class MapViewSteps {
 
   private WebDriver driver;
@@ -23,6 +22,5 @@ public class MapViewSteps {
   public void i_should_see_a_map_with_filtered_stations(String expectedDistrict) {
     WebElement map = driver.findElement(By.id("station-map"));
     Assertions.assertTrue(map.isDisplayed(), "Map is not visible.");
-
   }
 }
