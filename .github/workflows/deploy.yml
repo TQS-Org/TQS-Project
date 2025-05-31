@@ -18,14 +18,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.1
 
-      - name: Down containers
-        working-directory: ./ChargeHub
-        run: docker compose down
-      
-      - name: Remove build caches
-        working-directory: ./ChargeHub
-        run: docker builder prune -a -f
-
       - name: Write .env file
         working-directory: ./ChargeHub
         run: |
@@ -71,6 +63,14 @@ jobs:
           spring.flyway.enabled=true
           spring.flyway.locations=classpath:db/migration
           EOF
+
+      - name: Down containers
+        working-directory: ./ChargeHub
+        run: docker compose down -v
+      
+      - name: Remove build caches
+        working-directory: ./ChargeHub
+        run: docker builder prune -a -f
 
       - name: Package backend
         working-directory: ./ChargeHub/backend
