@@ -35,20 +35,16 @@ public class Booking {
     private LocalDateTime endTime;
 
     @Column(nullable = false)
-    private LocalDate date;
-
-    @Column(nullable = false)
     private int duration = 20; // default to 20 minutes
 
     // Constructors
     public Booking() {}
 
-    public Booking(Client user, Station station, Charger charger, LocalDateTime startTime, LocalDate date) {
+    public Booking(Client user, Station station, Charger charger, LocalDateTime startTime) {
         this.user = user;
         this.station = station;
         this.charger = charger;
         this.startTime = startTime;
-        this.date = date;
         this.duration = 20; // default duration
         this.endTime = startTime.plusMinutes(this.duration);
     }
@@ -134,14 +130,6 @@ public class Booking {
         this.endTime = endTime;
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
     public int getDuration() {
         return duration;
     }
@@ -151,5 +139,10 @@ public class Booking {
         if (this.startTime != null) {
             this.endTime = this.startTime.plusMinutes(duration); // update endTime if duration changes
         }
+    }
+
+    // Derived date from startTime
+    public LocalDate getDate() {
+        return startTime != null ? startTime.toLocalDate() : null;
     }
 }
