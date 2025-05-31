@@ -65,7 +65,7 @@ export default function StationDetailsPage() {
         .bindPopup("<strong>You are here</strong>");
 
       // Add routing control (actual driving route)
-      const routingControl = L.Routing.control({
+      L.Routing.control({
         waypoints: [
           L.latLng(userLat, userLng),
           L.latLng(station.latitude, station.longitude),
