@@ -21,7 +21,7 @@ public class NearbyStationsSteps {
     wait = WebDriverSingleton.getWait();
   }
 
-  @Then("Then I should see a different list of EV charging stations")
+  @Then("I should see a different list of EV charging stations")
   public void then_i_should_see_a_different_list_of_ev_charging_stations() {
     List<WebElement> cards = driver.findElements(By.className("station-card"));
     Assertions.assertFalse(cards.isEmpty(), "No stations found after sorting by distance.");
