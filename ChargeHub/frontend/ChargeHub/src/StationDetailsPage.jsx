@@ -14,12 +14,7 @@ export default function StationDetailsPage() {
   const navigate = useNavigate();
   const [station, setStation] = useState(null);
 
-  const userIcon = L.icon({
-  iconUrl: personMarker,
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32]
-  });
+
 
   useEffect(() => {
     const fetchStation = async () => {
@@ -44,6 +39,13 @@ export default function StationDetailsPage() {
   useEffect(() => {
     if (station) {
       const map = L.map("station-details-map").setView([userLat, userLng], 11);
+
+      const userIcon = L.icon({
+      iconUrl: personMarker,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+      });
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; OpenStreetMap contributors',

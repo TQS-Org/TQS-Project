@@ -17,12 +17,6 @@ export default function DriverPage() {
   });
   const [showMap, setShowMap] = useState(false);
 
-  const userIcon = L.icon({
-  iconUrl: personMarker,
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32]
-    });
 
   const fetchStations = useCallback(async () => {
     const params = new URLSearchParams();
@@ -71,6 +65,7 @@ export default function DriverPage() {
     if (showMap && stations.length) {
       const map = L.map("station-map").setView([39.5, -8], 7); // Initial center
 
+
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; OpenStreetMap contributors',
       }).addTo(map);
@@ -97,7 +92,15 @@ export default function DriverPage() {
       const userLat = 40.6293194;
       const userLng = -8.6544725;
 
-      const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map).bindPopup("<strong>You are here</strong>").openPopup();
+      const userIcon = L.icon({
+      iconUrl: personMarker,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+      });
+
+
+      L.marker([userLat, userLng], { icon: userIcon }).addTo(map).bindPopup("<strong>You are here</strong>").openPopup();
 
       map.setView([userLat, userLng], 11); // Center on user
 
