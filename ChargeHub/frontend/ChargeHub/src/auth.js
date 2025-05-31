@@ -1,12 +1,13 @@
 // auth.js
 import axios from 'axios';
+import CONFIG from '../config'; 
 
 export async function getUserRoleFromToken() {
   const token = localStorage.getItem('token');
   if (!token) return null;
 
   try {
-    const res = await axios.get('http://localhost:8080/api/auth/validate', {
+    const res = await axios.get(`${CONFIG.API_URL}auth/validate`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     console.log("Role response:", res.data);

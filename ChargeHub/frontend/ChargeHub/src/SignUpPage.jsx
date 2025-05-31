@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './SignupPage.css'; // Still uses a separate stylesheet
+import CONFIG from '../config'; 
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -30,7 +31,7 @@ export default function SignupPage() {
     if (!validate()) return;
 
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/register', {
+      const res = await axios.post(`${CONFIG.API_URL}auth/register`, {
         name,
         age,
         number,

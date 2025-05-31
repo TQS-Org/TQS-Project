@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import "./DriverPage.css";
+import CONFIG from "../config"; 
 
 export default function DriverPage() {
   const [stations, setStations] = useState([]);
@@ -19,8 +20,8 @@ export default function DriverPage() {
 
     const token = localStorage.getItem("token");
     const endpoint = params.toString()
-      ? `http://localhost:8080/api/stations/search?${params.toString()}`
-      : `http://localhost:8080/api/stations`;
+      ? `${CONFIG.API_URL}stations/search?${params.toString()}`
+      : `${CONFIG.API_URL}stations`;
 
     const res = await fetch(endpoint, {
       method: "GET",
