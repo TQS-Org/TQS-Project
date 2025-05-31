@@ -6,6 +6,25 @@ import "./DriverPage.css";
 import personMarker from "./assets/personmarker.png";
 
 
+function getDistance(lat1, lon1, lat2, lon2) {
+  function toRad(x) {
+    return x * Math.PI / 180;
+  }
+
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+
 export default function DriverPage() {
   const [stations, setStations] = useState([]);
   const [filters, setFilters] = useState({
@@ -15,6 +34,20 @@ export default function DriverPage() {
     connectorType: "",
     available: ""
   });
+
+  const sortByDistance = () => {
+  const userLat = 40.6293194;
+  const userLng = -8.6544725;
+
+  const sorted = [...stations].sort((a, b) => {
+    const distA = getDistance(userLat, userLng, a.latitude, a.longitude);
+    const distB = getDistance(userLat, userLng, b.latitude, b.longitude);
+    return distA - distB;
+  });
+
+  setStations(sorted);
+  };
+
   const [showMap, setShowMap] = useState(false);
 
 
@@ -161,6 +194,7 @@ export default function DriverPage() {
           </label>
 
           <button onClick={fetchStations}>Search</button>
+          <button onClick={sortByDistance}>See Nearby Stations</button>
           <button onClick={() => setShowMap(true)}>Map View</button>
         </aside>
 
@@ -177,6 +211,7 @@ export default function DriverPage() {
                   <p><strong>Chargers:</strong> {station.numberOfChargers}</p>
                   <p><strong>Price:</strong> €{station.price.toFixed(2)}/kWh</p>
                   <p><strong>Hours:</strong> {station.openingHours} - {station.closingHours}</p>
+                  
                 </Link>
               </div>
             ))}
