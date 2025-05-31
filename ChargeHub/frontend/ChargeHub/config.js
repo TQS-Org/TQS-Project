@@ -1,4 +1,4 @@
-const isDevelopment = window.location.hostname === 'localhost'; 
+const isDevelopment = window.location.hostname === 'localhost';
 
 const CONFIG = {
     API_URL: isDevelopment 
