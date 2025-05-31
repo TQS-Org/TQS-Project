@@ -20,7 +20,7 @@ jobs:
 
       - name: Down containers
         working-directory: ./ChargeHub
-        run: docker compose down -v
+        run: docker compose down
       
       - name: Remove build caches
         working-directory: ./ChargeHub
