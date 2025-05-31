@@ -14,9 +14,6 @@ public class CreateBookingDTO {
     @Email(message = "Email should be valid")
     private String mail;
 
-    @NotNull(message = "Station ID is mandatory")
-    private Long stationId;
-
     @NotNull(message = "Charger ID is mandatory")
     private Long chargerId;
 
@@ -34,14 +31,6 @@ public class CreateBookingDTO {
 
     public void setMail(String mail) {
         this.mail = mail;
-    }
-
-    public Long getStationId() {
-        return stationId;
-    }
-
-    public void setStationId(Long stationId) {
-        this.stationId = stationId;
     }
 
     public Long getChargerId() {

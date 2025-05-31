@@ -21,10 +21,6 @@ public class Booking {
     private Client user;
 
     @ManyToOne
-    @JoinColumn(name = "station_id")
-    private Station station;
-
-    @ManyToOne
     @JoinColumn(name = "charger_id")
     private Charger charger;
 
@@ -35,18 +31,18 @@ public class Booking {
     private LocalDateTime endTime;
 
     @Column(nullable = false)
-    private int duration = 20; // default to 20 minutes
+    private int duration; // default to 20 minutes
 
     // Constructors
     public Booking() {}
 
-    public Booking(Client user, Station station, Charger charger, LocalDateTime startTime) {
+    public Booking(Client user, Charger charger, LocalDateTime startTime, int duration) {
         this.user = user;
-        this.station = station;
         this.charger = charger;
         this.startTime = startTime;
-        this.duration = 20; // default duration
+        this.duration = duration;
         this.endTime = startTime.plusMinutes(this.duration);
+        this.token = generateRandomToken(duration);
     }
 
     @PrePersist
@@ -95,14 +91,6 @@ public class Booking {
 
     public void setUser(Client user) {
         this.user = user;
-    }
-
-    public Station getStation() {
-        return station;
-    }
-
-    public void setStation(Station station) {
-        this.station = station;
     }
 
     public Charger getCharger() {
