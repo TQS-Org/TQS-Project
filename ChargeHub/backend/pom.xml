@@ -216,6 +216,10 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.0.2</version>
 		</dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -335,7 +339,6 @@
                     <cloud>true</cloud>
                     <projectKey>SCRUM</projectKey>
                     <reportFormat>junit</reportFormat>
-                    <reportFile>target/TEST-junit-jupiter.xml</reportFile>
                 </configuration>
             </plugin>
         </plugins>

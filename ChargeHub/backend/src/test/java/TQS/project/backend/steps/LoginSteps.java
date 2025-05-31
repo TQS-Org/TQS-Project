@@ -1,7 +1,6 @@
 package TQS.project.backend.steps;
 
 import io.cucumber.java.Before;
-import io.cucumber.java.After;
 import io.cucumber.java.en.*;
 
 import org.openqa.selenium.*;
@@ -18,11 +17,6 @@ public class LoginSteps {
     WebDriverSingleton.initialize();
     driver = WebDriverSingleton.getDriver();
     wait = WebDriverSingleton.getWait();
-  }
-
-  @After
-  public void cleanUp() {
-    WebDriverSingleton.quit();
   }
 
   @Given("I am on the login page")
@@ -53,6 +47,5 @@ public class LoginSteps {
     assertTrue(
         currentUrl.contains(expectedPath),
         "Expected to be on: " + expectedPath + " but was: " + currentUrl);
-    driver.quit();
   }
 }
