@@ -34,9 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 public class StaffControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-  @Autowired private ObjectMapper objectMapper;
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @SuppressWarnings("removal")
   @MockBean
@@ -119,5 +121,30 @@ public class StaffControllerTest {
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0].name").value("Operator One"))
         .andExpect(jsonPath("$[1].mail").value("op2@mail.com"));
+  }
+
+  @Test
+  @Requirement("SCRUM-35")
+  void testCreateOperator_validationFails() throws Exception {
+    // Create a DTO with invalid data
+    CreateStaffDTO dto = new CreateStaffDTO();
+    dto.setName(""); // Invalid: name is blank
+    dto.setMail("invalid-email"); // Invalid email format
+    dto.setPassword("short"); // Invalid: too short, no number
+    dto.setAge(17); // Invalid: less than 18
+    dto.setNumber("12345"); // Invalid phone number
+    dto.setAddress(""); // Invalid: blank
+
+    mockMvc
+        .perform(
+            post("/api/staff/operator")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.name").value("Name is required"))
+        .andExpect(jsonPath("$.age").value("Age must be at least 18"))
+        .andExpect(jsonPath("$.number").value("Phone number must start with 9 and be exactly 9 digits"))
+        .andExpect(jsonPath("$.mail").value("Email should be valid"))
+        .andExpect(jsonPath("$.address").value("Address is required"));
   }
 }

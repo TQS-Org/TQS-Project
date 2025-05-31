@@ -1,7 +1,10 @@
 package TQS.project.backend.controller;
 
+import TQS.project.backend.dto.StationDTO;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.service.StationService;
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +19,12 @@ public class StationController {
 
   public StationController(StationService stationService) {
     this.stationService = stationService;
+  }
+
+  @PostMapping
+  public ResponseEntity<Station> createStation(@Valid @RequestBody StationDTO stationDTO) {
+    Station station = stationService.createStation(stationDTO);
+    return ResponseEntity.ok(station);
   }
 
   @GetMapping
@@ -40,9 +49,8 @@ public class StationController {
       @RequestParam(required = false) String connectorType,
       @RequestParam(required = false) Boolean available) {
 
-    List<Station> results =
-        stationService.searchStations(
-            district, maxPrice, chargerType, minPower, maxPower, connectorType, available);
+    List<Station> results = stationService.searchStations(
+        district, maxPrice, chargerType, minPower, maxPower, connectorType, available);
 
     return ResponseEntity.ok(results);
   }
