@@ -3,7 +3,39 @@ import L from "leaflet";
 import { Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import "./DriverPage.css";
+import CONFIG from "../config"; 
 import personMarker from "./assets/personmarker.png";
+
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow
+});
+
+
+function getDistance(lat1, lon1, lat2, lon2) {
+  function toRad(x) {
+    return x * Math.PI / 180;
+  }
+
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 
 export default function DriverPage() {
@@ -15,6 +47,20 @@ export default function DriverPage() {
     connectorType: "",
     available: ""
   });
+
+  const sortByDistance = () => {
+  const userLat = 40.6293194;
+  const userLng = -8.6544725;
+
+  const sorted = [...stations].sort((a, b) => {
+    const distA = getDistance(userLat, userLng, a.latitude, a.longitude);
+    const distB = getDistance(userLat, userLng, b.latitude, b.longitude);
+    return distA - distB;
+  });
+
+  setStations(sorted);
+  };
+
   const [showMap, setShowMap] = useState(false);
 
 
@@ -26,8 +72,8 @@ export default function DriverPage() {
 
     const token = localStorage.getItem("token");
     const endpoint = params.toString()
-      ? `http://localhost:8080/api/stations/search?${params.toString()}`
-      : `http://localhost:8080/api/stations`;
+      ? `${CONFIG.API_URL}stations/search?${params.toString()}`
+      : `${CONFIG.API_URL}stations`;
 
     const res = await fetch(endpoint, {
       method: "GET",
@@ -161,6 +207,7 @@ export default function DriverPage() {
           </label>
 
           <button onClick={fetchStations}>Search</button>
+          <button onClick={sortByDistance}>See Nearby Stations</button>
           <button onClick={() => setShowMap(true)}>Map View</button>
         </aside>
 
@@ -177,6 +224,7 @@ export default function DriverPage() {
                   <p><strong>Chargers:</strong> {station.numberOfChargers}</p>
                   <p><strong>Price:</strong> €{station.price.toFixed(2)}/kWh</p>
                   <p><strong>Hours:</strong> {station.openingHours} - {station.closingHours}</p>
+                  
                 </Link>
               </div>
             ))}

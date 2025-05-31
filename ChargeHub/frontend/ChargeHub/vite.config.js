@@ -6,6 +6,14 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: '0.0.0.0' 
+    host: '0.0.0.0', 
+    allowedHosts: ['deti-tqs-23.ua.pt'],
+    proxy: {
+      '/api': {
+        target: 'http://backend:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   }
 })
