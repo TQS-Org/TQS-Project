@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./StationDetailsPage.css";
 import personMarker from "./assets/personmarker.png";
+import CONFIG from '../config';
 
 
 const userLat = 40.6293194;
@@ -19,7 +20,7 @@ export default function StationDetailsPage() {
   useEffect(() => {
     const fetchStation = async () => {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:8080/api/stations/${id}`, {
+      const res = await fetch(`${CONFIG.API_URL}stations/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
