@@ -10,17 +10,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault(); // Prevent form submission from reloading the page
+
     try {
       const res = await axios.post(`${CONFIG.API_URL}auth/login`, { email, password });
       const { token } = res.data;
-  
+
       localStorage.setItem('token', token);
-  
-      // Now verify the token and get the role
+
       const role = await getUserRoleFromToken();
       console.log("Role from token:", role);
-  
+
       switch (role) {
         case 'EV_DRIVER':
           navigate('/driver');
@@ -38,28 +39,30 @@ export default function LoginPage() {
       console.error(err);
       alert('Login failed');
     }
-  };    
+  };
 
   return (
     <div className="login-wrapper">
       <div className="login-container">
-        <div className="login-box">
+        <form className="login-box" onSubmit={handleLogin}>
           <h2 className="login-title">ChargeHub</h2>
           <input
             className="login-input"
             placeholder="Email"
+            value={email}
             onChange={e => setEmail(e.target.value)}
           />
           <input
             className="login-input"
             type="password"
             placeholder="Password"
+            value={password}
             onChange={e => setPassword(e.target.value)}
           />
-          <button className="login-button" onClick={handleLogin}>
+          <button type="submit" className="login-button">
             Login
           </button>
-        </div>
+        </form>
         <p className="signup-text">
           Don’t have an account?{' '}
           <span id="CreateAccount" className="signup-link" onClick={() => navigate('/signup')}>
@@ -69,5 +72,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-  
 }

@@ -98,6 +98,7 @@
 .station-card {
   background-color: #1e1e1e;
   border-radius: 12px;
+  color: inherit;
   padding: 1.2rem;
   box-shadow: 0 0 12px rgba(0, 255, 128, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -121,4 +122,32 @@
 .station-card p {
   margin: 0.25rem 0;
   font-size: 0.95rem;
+}
+
+/* Leaflet map container */
+.leaflet-container {
+  height: 500px;
+  width: 100%;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  position: relative;
 }
