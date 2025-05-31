@@ -3,7 +3,20 @@ import L from "leaflet";
 import { Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import "./DriverPage.css";
+import CONFIG from "../config"; 
 import personMarker from "./assets/personmarker.png";
+
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow
+});
 
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -59,8 +72,8 @@ export default function DriverPage() {
 
     const token = localStorage.getItem("token");
     const endpoint = params.toString()
-      ? `http://localhost:8080/api/stations/search?${params.toString()}`
-      : `http://localhost:8080/api/stations`;
+      ? `${CONFIG.API_URL}stations/search?${params.toString()}`
+      : `${CONFIG.API_URL}stations`;
 
     const res = await fetch(endpoint, {
       method: "GET",

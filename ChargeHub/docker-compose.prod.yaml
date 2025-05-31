@@ -45,12 +45,6 @@ services:
               "management.endpoint.health.show-details" : "always",
               "management.endpoint.health.enabled"  : "true"
             }'
-    healthcheck:
-      test: curl --fail --silent localhost:8080/actuator/health || exit 1
-      interval: 2s
-      timeout: 30s
-      retries: 200
-      start_period: 10s
     volumes:
       - ./backend:/app
     networks:
@@ -66,14 +60,12 @@ services:
     env_file: ./.env
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_started
     environment:
       - VITE_HOST=deti-tqs-23.ua.pt
       - VITE_PORT=3000   
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend/ChargeHub:/app
     networks:
       - chargehub-network
 
