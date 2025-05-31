@@ -7,7 +7,6 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.List;
 
 public class StationRouteSteps {
@@ -35,7 +34,8 @@ public class StationRouteSteps {
   @And("I should see a map displaying the route from my location to the station")
   public void verifyMapRoute() {
     // Wait until the station-details-map is loaded and visible
-    WebElement map = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("station-details-map")));
+    WebElement map =
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("station-details-map")));
     Assertions.assertTrue(map.isDisplayed(), "Map is not displayed on the station details page");
   }
 }
