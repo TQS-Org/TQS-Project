@@ -17,7 +17,8 @@ import java.util.List;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-  @Autowired private JwtProvider jwtProvider;
+  @Autowired
+  private JwtProvider jwtProvider;
 
   @Override
   protected void doFilterInternal(
@@ -44,10 +45,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String email = jwtProvider.getEmailFromToken(token);
         String role = jwtProvider.getRoleFromToken(token); // e.g., EV_DRIVER
 
-        UsernamePasswordAuthenticationToken auth =
-            new UsernamePasswordAuthenticationToken(
-                email, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)) // must be prefixed
-                );
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+            email, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)) // must be prefixed
+        );
 
         SecurityContextHolder.getContext().setAuthentication(auth);
       } catch (Exception e) {

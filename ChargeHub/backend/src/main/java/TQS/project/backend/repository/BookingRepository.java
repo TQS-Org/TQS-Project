@@ -14,9 +14,10 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
   Optional<Booking> findById(long id);
+
   @Query("SELECT b FROM Booking b WHERE b.charger.station.id = :stationId")
   List<Booking> findAllBookingsByStationId(@Param("stationId") long stationId);
 
-  @Query("SELECT b FROM Booking b WHERE b.charger.station.id = :stationId AND DATE(b.startTime) = :date")
-  List<Booking> findByStationIdAndDate(@Param("stationId") long stationId, @Param("date") LocalDate date);
+  @Query("SELECT b FROM Booking b WHERE b.charger.station.id = :stationId AND FUNCTION('FORMATDATETIME', b.startTime, 'yyyy-MM-dd') = :dateStr")
+  List<Booking> findByStationIdAndDate(@Param("stationId") long stationId, @Param("dateStr") String dateStr);
 }

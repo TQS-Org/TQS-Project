@@ -5,6 +5,7 @@ import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.dto.LoginResponse;
 import TQS.project.backend.repository.ClientRepository;
+import TQS.project.backend.repository.BookingRepository;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,17 +23,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestcontainersConfiguration.class)
 public class StationIT {
 
-  @Autowired private TestRestTemplate restTemplate;
+  @Autowired
+  private TestRestTemplate restTemplate;
 
-  @Autowired private ClientRepository clientRepository;
+  @Autowired
+  private ClientRepository clientRepository;
 
-  @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired
+  private BookingRepository bookingRepository;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   private String token;
 
   @BeforeEach
   void setup() {
     // Use Flyway-seeded users or login
+    bookingRepository.deleteAll();
     clientRepository.deleteAll(); // optional, but ensures no conflicts
 
     Client client = new Client();
@@ -48,8 +56,8 @@ public class StationIT {
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<LoginRequest> request = new HttpEntity<>(login, headers);
 
-    ResponseEntity<LoginResponse> response =
-        restTemplate.postForEntity("/api/auth/login", request, LoginResponse.class);
+    ResponseEntity<LoginResponse> response = restTemplate.postForEntity("/api/auth/login", request,
+        LoginResponse.class);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotNull();
     token = response.getBody().getToken();
@@ -62,8 +70,8 @@ public class StationIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    ResponseEntity<Station[]> response =
-        restTemplate.exchange("/api/stations", HttpMethod.GET, request, Station[].class);
+    ResponseEntity<Station[]> response = restTemplate.exchange("/api/stations", HttpMethod.GET, request,
+        Station[].class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotEmpty();
@@ -78,8 +86,8 @@ public class StationIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    ResponseEntity<Station> response =
-        restTemplate.exchange("/api/stations/" + testId, HttpMethod.GET, request, Station.class);
+    ResponseEntity<Station> response = restTemplate.exchange("/api/stations/" + testId, HttpMethod.GET, request,
+        Station.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody().getId()).isEqualTo(testId);
@@ -92,11 +100,9 @@ public class StationIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    String url =
-        "/api/stations/search?district=Lisboa&maxPrice=0.35&chargerType=DC&minPower=50&maxPower=150&connectorType=CCS&available=true";
+    String url = "/api/stations/search?district=Lisboa&maxPrice=0.35&chargerType=DC&minPower=50&maxPower=150&connectorType=CCS&available=true";
 
-    ResponseEntity<Station[]> response =
-        restTemplate.exchange(url, HttpMethod.GET, request, Station[].class);
+    ResponseEntity<Station[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Station[].class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotEmpty();
@@ -110,8 +116,8 @@ public class StationIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    ResponseEntity<String> response =
-        restTemplate.exchange("/api/stations/9999", HttpMethod.GET, request, String.class);
+    ResponseEntity<String> response = restTemplate.exchange("/api/stations/9999", HttpMethod.GET, request,
+        String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
