@@ -38,6 +38,7 @@ public class BookingIT {
     @Autowired private ClientRepository clientRepository;
     @Autowired private ChargerRepository chargerRepository;
     @Autowired private BookingRepository bookingRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     private String token;
     private static Long testChargerId;
@@ -45,14 +46,28 @@ public class BookingIT {
     @BeforeEach
     void setup() {
         bookingRepository.deleteAll();
-        
+
+        clientRepository.deleteAll(); // optional, but ensures no conflicts
+
+        Client client = new Client();
+        client.setMail("driver@mail.com");
+        client.setPassword(passwordEncoder.encode("driverpass"));
+        client.setName("Driver One");
+        client.setAge(30);
+        client.setNumber("123456789");
+        clientRepository.save(client);
+
         LoginRequest login = new LoginRequest("driver@mail.com", "driverpass");
-        ResponseEntity<LoginResponse> response = restTemplate.postForEntity(
-            "/api/auth/login", 
-            new HttpEntity<>(login, createJsonHeaders()), 
-            LoginResponse.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<LoginRequest> request = new HttpEntity<>(login, headers);
+
+        ResponseEntity<LoginResponse> response =
+            restTemplate.postForEntity("/api/auth/login", request, LoginResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+
         token = response.getBody().getToken();
         
         testChargerId = chargerRepository.findAll().stream()
@@ -61,14 +76,9 @@ public class BookingIT {
             .getId();
     }
 
-    private HttpHeaders createJsonHeaders() {
+    private HttpHeaders createAuthHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return headers;
-    }
-
-    private HttpHeaders createAuthHeaders() {
-        HttpHeaders headers = createJsonHeaders();
         headers.setBearerAuth(token);
         return headers;
     }
@@ -83,10 +93,12 @@ public class BookingIT {
         bookingDTO.setStartTime(LocalDateTime.now().plusHours(10));
         bookingDTO.setDuration(30);
 
-        ResponseEntity<String> response = restTemplate.exchange(
+        HttpHeaders headers = createAuthHeaders();
+
+        HttpEntity<CreateBookingDTO> request = new HttpEntity<>(bookingDTO, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(
             "/api/booking",
-            HttpMethod.POST,
-            new HttpEntity<>(bookingDTO, createAuthHeaders()),
+            request,
             String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
