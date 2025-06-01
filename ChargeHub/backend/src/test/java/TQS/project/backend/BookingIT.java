@@ -1,13 +1,23 @@
 package TQS.project.backend;
 
+import TQS.project.backend.dto.CreateBookingDTO;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.Client;
+import TQS.project.backend.entity.Station;
+import TQS.project.backend.repository.BookingRepository;
+import TQS.project.backend.repository.ChargerRepository;
 import TQS.project.backend.repository.ClientRepository;
+import TQS.project.backend.repository.StationRepository;
+import TQS.project.backend.repository.StaffRepository;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -15,70 +25,126 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BookingIT {
 
-  @Autowired private TestRestTemplate restTemplate;
+    @Autowired private TestRestTemplate restTemplate;
+    @Autowired private ClientRepository clientRepository;
+    @Autowired private ChargerRepository chargerRepository;
+    @Autowired private BookingRepository bookingRepository;
 
-  @Autowired private ClientRepository clientRepository; 
+    private String token;
+    private static Long testChargerId;
 
-  @Autowired private PasswordEncoder passwordEncoder;
+    @BeforeEach
+    void setup() {
+        bookingRepository.deleteAll();
+        
+        LoginRequest login = new LoginRequest("driver@mail.com", "driverpass");
+        ResponseEntity<LoginResponse> response = restTemplate.postForEntity(
+            "/api/auth/login", 
+            new HttpEntity<>(login, createJsonHeaders()), 
+            LoginResponse.class);
 
-  public BookingIT(TestRestTemplate restTemplate, ClientRepository clientRepository, PasswordEncoder passwordEncoder){
-    this.passwordEncoder = passwordEncoder;
-    this.clientRepository = clientRepository;
-    this.restTemplate = restTemplate;
-  }
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        token = response.getBody().getToken();
+        
+        testChargerId = chargerRepository.findAll().stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No charger available for testing"))
+            .getId();
+    }
 
-  private String token;
+    private HttpHeaders createJsonHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
+    }
 
-  @BeforeEach
-  void setup() {
-    // Optional cleanup
-    clientRepository.deleteAll();
+    private HttpHeaders createAuthHeaders() {
+        HttpHeaders headers = createJsonHeaders();
+        headers.setBearerAuth(token);
+        return headers;
+    }
 
-    // Insert admin manually
-    Client driver = new Client();
-    driver.setMail("user1@mail.com");
-    driver.setPassword(passwordEncoder.encode("userpass"));
-    driver.setName("User 1");
-    driver.setAge(40);
-    driver.setNumber("988888888");
-    clientRepository.save(driver);
+    @Test
+    @Order(1)
+    @Requirement("SCRUM-20")
+    void createValidBooking_thenReturnSuccessMessage() {
+        CreateBookingDTO bookingDTO = new CreateBookingDTO();
+        bookingDTO.setMail("driver@mail.com");
+        bookingDTO.setChargerId(testChargerId);
+        bookingDTO.setStartTime(LocalDateTime.now().plusHours(10));
+        bookingDTO.setDuration(30);
 
-    // Login as admin
-    LoginRequest login = new LoginRequest("user1@mail.com", "userpass");
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<LoginRequest> request = new HttpEntity<>(login, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+            "/api/booking",
+            HttpMethod.POST,
+            new HttpEntity<>(bookingDTO, createAuthHeaders()),
+            String.class);
 
-    ResponseEntity<LoginResponse> response =
-        restTemplate.postForEntity("/api/auth/login", request, LoginResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(bookingRepository.count()).isEqualTo(1);
+    }
 
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getBody()).isNotNull();
+    @Test
+    @Order(2)
+    @Requirement("SCRUM-20")
+    void createInvalidBooking_thenReturnError400() {
+        CreateBookingDTO bookingDTO = new CreateBookingDTO();
+        bookingDTO.setMail("");
+        bookingDTO.setChargerId(null);
+        bookingDTO.setStartTime(null);
+        bookingDTO.setDuration(0);
 
-    token = response.getBody().getToken();
-  }
+        ResponseEntity<String> response = restTemplate.exchange(
+            "/api/booking",
+            HttpMethod.POST,
+            new HttpEntity<>(bookingDTO, createAuthHeaders()),
+            String.class);
 
-  @Test
-  @Requirement("SCRUM-20")
-  void createValidBooking_thenReturnSuccessMessage() {
-    
-  }
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotEmpty();
+    }
 
-  @Test
-  @Requirement("SCRUM-20")
-  void createInvalidBooking_thenReturnError400() {
-    
-  }
+    @Test
+    @Order(3)
+    @Requirement("SCRUM-20")
+    void createBookingOnInvalidSchedule_thenReturnError409() {
+        // First booking
+        CreateBookingDTO firstBooking = new CreateBookingDTO();
+        firstBooking.setMail("driver@mail.com");
+        firstBooking.setChargerId(testChargerId);
+        firstBooking.setStartTime(LocalDateTime.now().plusHours(10));
+        firstBooking.setDuration(60);
+        
+        ResponseEntity<String> firstResponse = restTemplate.exchange(
+            "/api/booking",
+            HttpMethod.POST,
+            new HttpEntity<>(firstBooking, createAuthHeaders()),
+            String.class);
+        
+        assertThat(firstResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-  @Test
-  @Requirement("SCRUM-20")
-  void createBookingOnInvalidSchedule_thenReturnError409() {
-    
-  }
+        // Overlapping booking
+        CreateBookingDTO overlappingBooking = new CreateBookingDTO();
+        overlappingBooking.setMail("driver@mail.com");
+        overlappingBooking.setChargerId(testChargerId);
+        overlappingBooking.setStartTime(LocalDateTime.now().plusHours(10).plusMinutes(30));
+        overlappingBooking.setDuration(60);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+            "/api/booking",
+            HttpMethod.POST,
+            new HttpEntity<>(overlappingBooking, createAuthHeaders()),
+            String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
 }

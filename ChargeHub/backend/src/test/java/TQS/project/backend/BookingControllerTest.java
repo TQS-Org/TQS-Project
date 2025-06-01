@@ -3,6 +3,7 @@ package TQS.project.backend;
 import TQS.project.backend.Config.TestSecurityConfig;
 import TQS.project.backend.controller.BookingController;
 import TQS.project.backend.dto.CreateBookingDTO;
+import TQS.project.backend.entity.Booking;
 import TQS.project.backend.security.JwtAuthFilter;
 import TQS.project.backend.service.BookingService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
@@ -18,8 +19,18 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,6 +52,8 @@ public class BookingControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private final Long stationId = 1L;
 
     @Test
     @Requirement("SCRUM-20")
@@ -66,11 +79,59 @@ public class BookingControllerTest {
         dto.setStartTime(null); // invalid
         dto.setDuration(1); // invalid
 
-        System.out.println("DTO1: "+dto);
-        System.out.println("DTO2: "+objectMapper.writeValueAsString(dto));
         mockMvc.perform(post("/api/booking")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Requirement("SCRUM-20")
+    public void testGetAllBookingsByStation_withoutDate_returnsAllBookings() throws Exception {
+        List<Booking> mockBookings = List.of(new Booking(), new Booking());
+
+        when(bookingService.getAllBookingsByStation(stationId)).thenReturn(mockBookings);
+
+        mockMvc.perform(get("/api/booking/station/{id}", stationId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+
+        verify(bookingService, times(1)).getAllBookingsByStation(stationId);
+        verify(bookingService, never()).getAllBookingsByDateAndStation(anyLong(), any());
+    }
+
+    @Test
+    @Requirement("SCRUM-20")
+    public void testGetBookingsByStation_withDate_returnsFilteredBookings() throws Exception {
+        LocalDate date = LocalDate.of(2025, 6, 1);
+        List<Booking> mockBookings = List.of(new Booking());
+
+        when(bookingService.getAllBookingsByDateAndStation(stationId, date)).thenReturn(mockBookings);
+
+        mockMvc.perform(get("/api/booking/station/{id}", stationId)
+                        .param("date", date.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+
+        verify(bookingService, times(1)).getAllBookingsByDateAndStation(stationId, date);
+        verify(bookingService, never()).getAllBookingsByStation(anyLong());
+    }
+
+    @Test
+    @Requirement("SCRUM-20")
+    public void testGetBookingsByStation_withNoResults_returnsEmptyList() throws Exception {
+        when(bookingService.getAllBookingsByStation(stationId)).thenReturn(Collections.emptyList());
+    
+        mockMvc.perform(get("/api/booking/station/{id}", stationId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+    
+    @Test
+    @Requirement("SCRUM-20")
+    public void testGetBookingsByStation_invalidDateFormat_returnsBadRequest() throws Exception {
+        mockMvc.perform(get("/api/booking/station/{id}", stationId)
+                        .param("date", "not-a-date"))
                 .andExpect(status().isBadRequest());
     }
 }

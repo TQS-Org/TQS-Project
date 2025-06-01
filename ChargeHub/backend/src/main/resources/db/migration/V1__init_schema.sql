@@ -49,3 +49,16 @@ CREATE TABLE IF NOT EXISTS charger (
     connector_type VARCHAR(50),
     CONSTRAINT fk_charger_station FOREIGN KEY (station_id) REFERENCES station(id)
 );
+
+CREATE TABLE IF NOT EXISTS booking (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    token VARCHAR(255) NOT NULL,
+    client_id BIGINT NOT NULL,
+    charger_id BIGINT NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    duration INT NOT NULL,
+    CONSTRAINT fk_booking_client FOREIGN KEY (client_id) REFERENCES client(id),
+    CONSTRAINT fk_booking_charger FOREIGN KEY (charger_id) REFERENCES charger(id),
+    CONSTRAINT uk_booking_token UNIQUE (token)
+);
