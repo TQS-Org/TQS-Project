@@ -39,7 +39,8 @@ public class SecurityConfig {
             "/api/stations/search**",
             "/api/booking",
             "/api/booking/",
-            "/api/booking/**")
+            "/api/booking/**",
+            "/api/booking/station/**")
         .hasRole("EV_DRIVER")
         .requestMatchers("/api/staff/operator", "/api/staff/operators")
         .hasRole("ADMIN")
