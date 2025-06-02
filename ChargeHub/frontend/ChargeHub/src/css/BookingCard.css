@@ -1,0 +1,29 @@
+/* BookingCard.css */
+.booking-card {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 10px;
+  background: #f1f1f1;
+  margin-bottom: 1rem;
+}
+
+/* BookingList styles (optional global or local) */
+.booking-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.calendar-filter {
+  margin: 1rem 0;
+}
+
+.book-button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
