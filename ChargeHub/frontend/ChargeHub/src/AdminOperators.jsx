@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./AdminOperators.css";
+import CONFIG from "../config"; 
 
 export default function AdminOperators() {
   const [operators, setOperators] = useState([]);
@@ -8,7 +9,7 @@ export default function AdminOperators() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:8080/api/staff/operators", {
+    fetch(`${CONFIG.API_URL}staff/operators`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -88,7 +89,7 @@ export default function AdminOperators() {
                 };
 
                 const token = localStorage.getItem("token");
-                fetch("http://localhost:8080/api/staff/operator", {
+                fetch(`${CONFIG.API_URL}staff/operator`, {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
@@ -106,7 +107,7 @@ export default function AdminOperators() {
                     setShowSuccessModal(true);
 
                     // Instead of reloading the whole page, just re-fetch operators
-                    fetch("http://localhost:8080/api/staff/operators", {
+                    fetch(`${CONFIG.API_URL}staff/operators`, {
                       headers: { Authorization: `Bearer ${token}` },
                     })
                       .then((res) => res.json())

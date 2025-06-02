@@ -1,5 +1,42 @@
 import { useEffect, useState, useCallback } from "react";
+import L from "leaflet";
+import { Link } from "react-router-dom";
+import "leaflet/dist/leaflet.css";
 import "./DriverPage.css";
+import CONFIG from "../config"; 
+import personMarker from "./assets/personmarker.png";
+
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow
+});
+
+
+function getDistance(lat1, lon1, lat2, lon2) {
+  function toRad(x) {
+    return x * Math.PI / 180;
+  }
+
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 
 export default function DriverPage() {
   const [stations, setStations] = useState([]);
@@ -11,6 +48,22 @@ export default function DriverPage() {
     available: ""
   });
 
+  const sortByDistance = () => {
+  const userLat = 40.6293194;
+  const userLng = -8.6544725;
+
+  const sorted = [...stations].sort((a, b) => {
+    const distA = getDistance(userLat, userLng, a.latitude, a.longitude);
+    const distB = getDistance(userLat, userLng, b.latitude, b.longitude);
+    return distA - distB;
+  });
+
+  setStations(sorted);
+  };
+
+  const [showMap, setShowMap] = useState(false);
+
+
   const fetchStations = useCallback(async () => {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
@@ -19,8 +72,8 @@ export default function DriverPage() {
 
     const token = localStorage.getItem("token");
     const endpoint = params.toString()
-      ? `http://localhost:8080/api/stations/search?${params.toString()}`
-      : `http://localhost:8080/api/stations`;
+      ? `${CONFIG.API_URL}stations/search?${params.toString()}`
+      : `${CONFIG.API_URL}stations`;
 
     const res = await fetch(endpoint, {
       method: "GET",
@@ -49,10 +102,58 @@ export default function DriverPage() {
     fetchStations();
   }, [fetchStations]);
 
-
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
+
+  // Setup the map after modal is shown
+    useEffect(() => {
+    if (showMap && stations.length) {
+      const map = L.map("station-map").setView([39.5, -8], 7); // Initial center
+
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+
+      // Station markers
+      stations.forEach(station => {
+        if (station.latitude && station.longitude) {
+          L.marker([station.latitude, station.longitude])
+            .addTo(map)
+            .bindPopup(`
+              <div style="font-size: 14px; line-height: 1.4">
+                <strong>${station.name}</strong><br/>
+                <strong>Brand:</strong> ${station.brand}<br/>
+                <strong>Address:</strong> ${station.address}<br/>
+                <strong>Chargers:</strong> ${station.numberOfChargers}<br/>
+                <strong>Price:</strong> €${station.price.toFixed(2)}/kWh<br/>
+                <strong>Hours:</strong> ${station.openingHours} - ${station.closingHours}
+              </div>
+            `);
+        }
+      });
+
+      // Hardcoded user location (Aveiro)
+      const userLat = 40.6293194;
+      const userLng = -8.6544725;
+
+      const userIcon = L.icon({
+      iconUrl: personMarker,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+      });
+
+
+      L.marker([userLat, userLng], { icon: userIcon }).addTo(map).bindPopup("<strong>You are here</strong>").openPopup();
+
+      map.setView([userLat, userLng], 11); // Center on user
+
+      return () => map.remove();
+    }
+  }, [showMap, stations]);
+
 
   return (
     <div className="driver-page">
@@ -86,9 +187,7 @@ export default function DriverPage() {
 
           <select
             value={filters.connectorType}
-            onChange={(e) =>
-              handleFilterChange("connectorType", e.target.value)
-            }
+            onChange={(e) => handleFilterChange("connectorType", e.target.value)}
           >
             <option value="">All Connector Types</option>
             <option value="CCS">CCS</option>
@@ -108,25 +207,39 @@ export default function DriverPage() {
           </label>
 
           <button onClick={fetchStations}>Search</button>
+          <button onClick={sortByDistance}>See Nearby Stations</button>
+          <button onClick={() => setShowMap(true)}>Map View</button>
         </aside>
 
         <section className="card-section">
-          <div className="card-section-title">Stations</div> {/* <-- outside grid */}
+          <div className="card-section-title">Stations</div>
 
           <div className="station-list">
             {stations.map((station) => (
               <div className="station-card" key={station.id}>
-                <h2>{station.name}</h2>
-                <p><strong>Brand:</strong> {station.brand}</p>
-                <p><strong>District:</strong> {station.address}</p>
-                <p><strong>Chargers:</strong> {station.numberOfChargers}</p>
-                <p><strong>Price:</strong> €{station.price.toFixed(2)}/kWh</p>
-                <p><strong>Hours:</strong> {station.openingHours} - {station.closingHours}</p>
+                <Link to={`/stations/${station.id}`} className="station-card" key={station.id}>
+                  <h2>{station.name}</h2>
+                  <p><strong>Brand:</strong> {station.brand}</p>
+                  <p><strong>District:</strong> {station.address}</p>
+                  <p><strong>Chargers:</strong> {station.numberOfChargers}</p>
+                  <p><strong>Price:</strong> €{station.price.toFixed(2)}/kWh</p>
+                  <p><strong>Hours:</strong> {station.openingHours} - {station.closingHours}</p>
+                  
+                </Link>
               </div>
             ))}
           </div>
         </section>
       </div>
+
+      {/* Modal */}
+      {showMap && (
+        <div className="modal-overlay" onClick={() => setShowMap(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div id="station-map" className="leaflet-container" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

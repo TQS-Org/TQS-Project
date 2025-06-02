@@ -51,7 +51,9 @@ services:
       - chargehub-network
 
   frontend:
-    build: ./frontend/ChargeHub
+    build:
+      context: ./frontend/ChargeHub
+      dockerfile: Dockerfile.prod
     image: frontend
     container_name: frontend
     restart: on-failure
@@ -60,15 +62,10 @@ services:
       backend:
         condition: service_started
     environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - VITE_HOST=0.0.0.0
+      - VITE_HOST=deti-tqs-23.ua.pt
       - VITE_PORT=3000   
     ports:
       - "3000:3000"
-    command: npm run dev 
-    volumes:
-      - ./frontend/ChargeHub:/app
     networks:
       - chargehub-network
 
