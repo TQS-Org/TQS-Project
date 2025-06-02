@@ -179,7 +179,7 @@ public class BookingIT {
 
     @Test
     @Requirement("SCRUM-20")
-    void getBookingsByStation_withDate_returnsFilteredBookings() {
+    void getBookingsByCharger_withDate_returnsFilteredBookings() {
         
         // Create test data
         Station station = new Station();
@@ -209,7 +209,7 @@ public class BookingIT {
 
         // Test with date filter
         ResponseEntity<Booking[]> response = restTemplate.exchange(
-            "/api/booking/station/" + station.getId() + "?date=" + today,
+            "/api/booking/charger/" + charger.getId() + "?date=" + today,
             HttpMethod.GET,
             new HttpEntity<>(createAuthHeaders()),
             Booking[].class);
@@ -223,7 +223,7 @@ public class BookingIT {
 
     @Test
     @Requirement("SCRUM-20")
-    void getBookingsByStation_withoutDate_returnsAllBookings() {
+    void getBookingsByCharger_withoutDate_returnsAllBookings() {
         // Create test data
         Station station = new Station();
         //station.setId(101L);
@@ -250,7 +250,7 @@ public class BookingIT {
 
         // Test without date filter
         ResponseEntity<Booking[]> response = restTemplate.exchange(
-            "/api/booking/station/" + station.getId(),
+            "/api/booking/charger/" + charger.getId(),
             HttpMethod.GET,
             new HttpEntity<>(createAuthHeaders()),
             Booking[].class);
@@ -264,7 +264,7 @@ public class BookingIT {
 
     @Test
     @Requirement("SCRUM-20")
-    void getBookingsByStation_noBookings_returnsEmptyList() {
+    void getBookingsByCharger_noBookings_returnsEmptyList() {
         // Create test station
         Station station = new Station();
         //station.setId(102L);
@@ -273,9 +273,13 @@ public class BookingIT {
         station.setClosingHours("20:00");
         station = stationRepository.save(station);
 
+        Charger charger = new Charger();
+        charger.setStation(station);
+        charger = chargerRepository.save(charger);
+
         // Test with no bookings
         ResponseEntity<Booking[]> response = restTemplate.exchange(
-            "/api/booking/station/" + station.getId(),
+            "/api/booking/charger/" + charger.getId(),
             HttpMethod.GET,
             new HttpEntity<>(createAuthHeaders()),
             Booking[].class);

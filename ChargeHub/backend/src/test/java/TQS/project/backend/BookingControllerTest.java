@@ -53,7 +53,7 @@ public class BookingControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final Long stationId = 1L;
+    private final Long chargerId = 1L;
 
     @Test
     @Requirement("SCRUM-20")
@@ -87,42 +87,42 @@ public class BookingControllerTest {
 
     @Test
     @Requirement("SCRUM-20")
-    public void testGetAllBookingsByStation_withoutDate_returnsAllBookings() throws Exception {
+    public void testGetAllBookingsByCharger_withoutDate_returnsAllBookings() throws Exception {
         List<Booking> mockBookings = List.of(new Booking(), new Booking());
 
-        when(bookingService.getAllBookingsByStation(stationId)).thenReturn(mockBookings);
+        when(bookingService.getAllBookingsByCharger(chargerId)).thenReturn(mockBookings);
 
-        mockMvc.perform(get("/api/booking/station/{id}", stationId))
+        mockMvc.perform(get("/api/booking/charger/{id}", chargerId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
 
-        verify(bookingService, times(1)).getAllBookingsByStation(stationId);
-        verify(bookingService, never()).getAllBookingsByDateAndStation(anyLong(), any());
+        verify(bookingService, times(1)).getAllBookingsByCharger(chargerId);
+        verify(bookingService, never()).getAllBookingsByDateAndCharger(anyLong(), any());
     }
 
     @Test
     @Requirement("SCRUM-20")
-    public void testGetBookingsByStation_withDate_returnsFilteredBookings() throws Exception {
+    public void testGetBookingsByCharger_withDate_returnsFilteredBookings() throws Exception {
         LocalDate date = LocalDate.of(2025, 6, 1);
         List<Booking> mockBookings = List.of(new Booking());
 
-        when(bookingService.getAllBookingsByDateAndStation(stationId, date)).thenReturn(mockBookings);
+        when(bookingService.getAllBookingsByDateAndCharger(chargerId, date)).thenReturn(mockBookings);
 
-        mockMvc.perform(get("/api/booking/station/{id}", stationId)
+        mockMvc.perform(get("/api/booking/charger/{id}", chargerId)
                         .param("date", date.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(bookingService, times(1)).getAllBookingsByDateAndStation(stationId, date);
-        verify(bookingService, never()).getAllBookingsByStation(anyLong());
+        verify(bookingService, times(1)).getAllBookingsByDateAndCharger(chargerId, date);
+        verify(bookingService, never()).getAllBookingsByCharger(anyLong());
     }
 
     @Test
     @Requirement("SCRUM-20")
-    public void testGetBookingsByStation_withNoResults_returnsEmptyList() throws Exception {
-        when(bookingService.getAllBookingsByStation(stationId)).thenReturn(Collections.emptyList());
+    public void testGetBookingsByCharger_withNoResults_returnsEmptyList() throws Exception {
+        when(bookingService.getAllBookingsByCharger(chargerId)).thenReturn(Collections.emptyList());
     
-        mockMvc.perform(get("/api/booking/station/{id}", stationId))
+        mockMvc.perform(get("/api/booking/charger/{id}", chargerId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
@@ -130,7 +130,7 @@ public class BookingControllerTest {
     @Test
     @Requirement("SCRUM-20")
     public void testGetBookingsByStation_invalidDateFormat_returnsBadRequest() throws Exception {
-        mockMvc.perform(get("/api/booking/station/{id}", stationId)
+        mockMvc.perform(get("/api/booking/charger/{id}", chargerId)
                         .param("date", "not-a-date"))
                 .andExpect(status().isBadRequest());
     }

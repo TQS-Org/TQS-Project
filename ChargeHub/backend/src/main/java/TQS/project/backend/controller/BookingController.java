@@ -32,18 +32,18 @@ public class BookingController {
       return ResponseEntity.ok("Booking created successfully!"); 
   }
 
-  @GetMapping("/station/{id}")
-  public ResponseEntity<List<Booking>> getBookingsByStation(
-          @PathVariable("id") long stationId,
+  @GetMapping("/charger/{id}")
+  public ResponseEntity<List<Booking>> getBookingsByCharger(
+          @PathVariable("id") long chargerId,
           @RequestParam(value = "date", required = false)
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
           
       List<Booking> bookings;
           
       if (date != null) {
-          bookings = bookingService.getAllBookingsByDateAndStation(stationId, date);
+          bookings = bookingService.getAllBookingsByDateAndCharger(chargerId, date);
       } else {
-          bookings = bookingService.getAllBookingsByStation(stationId);
+          bookings = bookingService.getAllBookingsByCharger(chargerId);
       }
     
       return ResponseEntity.ok(bookings);

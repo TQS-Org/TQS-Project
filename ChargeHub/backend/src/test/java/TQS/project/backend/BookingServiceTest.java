@@ -67,7 +67,7 @@ public class BookingServiceTest {
 
         when(clientRepository.findByMail(dto.getMail())).thenReturn(Optional.of(mockClient));
         when(chargerRepository.findById(dto.getChargerId())).thenReturn(Optional.of(mockCharger));
-        when(bookingRepository.findByStationIdAndDate(eq(mockStation.getId()),
+        when(bookingRepository.findByChargerIdAndDate(eq(mockCharger.getId()),
                 eq(dto.getStartTime().toLocalDate().toString())))
                 .thenReturn(Collections.emptyList());
 
@@ -133,7 +133,7 @@ public class BookingServiceTest {
     @Requirement("SCRUM-20")
     public void testGetAllBookingsByDate_successful() {
         // Arrange
-        long stationId = 1L;
+        long chargerId = 1L;
         LocalDate testDate = LocalDate.of(2023, 6, 1);
 
         Booking booking1 = new Booking();
@@ -144,34 +144,34 @@ public class BookingServiceTest {
 
         List<Booking> expectedBookings = Arrays.asList(booking1, booking2);
 
-        when(bookingRepository.findByStationIdAndDate(eq(stationId), eq(testDate.toString())))
+        when(bookingRepository.findByChargerIdAndDate(eq(chargerId), eq(testDate.toString())))
                 .thenReturn(expectedBookings);
 
         // Act
-        List<Booking> result = bookingService.getAllBookingsByDateAndStation(stationId, testDate);
+        List<Booking> result = bookingService.getAllBookingsByDateAndCharger(chargerId, testDate);
 
         // Assert
         assertEquals(2, result.size());
         assertEquals(expectedBookings, result);
-        verify(bookingRepository).findByStationIdAndDate(eq(stationId), eq(testDate.toString()));
+        verify(bookingRepository).findByChargerIdAndDate(eq(chargerId), eq(testDate.toString()));
     }
 
     @Test
     @Requirement("SCRUM-20")
     public void testGetAllBookingsByDate_noBookings_returnsEmptyList() {
         // Arrange
-        long stationId = 1L;
+        long chargerId = 1L;
         LocalDate testDate = LocalDate.of(2023, 6, 1);
 
-        when(bookingRepository.findByStationIdAndDate(eq(stationId), eq(testDate.toString())))
+        when(bookingRepository.findByChargerIdAndDate(eq(chargerId), eq(testDate.toString())))
                 .thenReturn(Collections.emptyList());
 
         // Act
-        List<Booking> result = bookingService.getAllBookingsByDateAndStation(stationId, testDate);
+        List<Booking> result = bookingService.getAllBookingsByDateAndCharger(chargerId, testDate);
 
         // Assert
         assertTrue(result.isEmpty());
-        verify(bookingRepository).findByStationIdAndDate(eq(stationId), eq(testDate.toString()));
+        verify(bookingRepository).findByChargerIdAndDate(eq(chargerId), eq(testDate.toString()));
     }
 
     @Test
@@ -202,7 +202,7 @@ public class BookingServiceTest {
 
         when(clientRepository.findByMail(dto.getMail())).thenReturn(Optional.of(mockedClient));
         when(chargerRepository.findById(dto.getChargerId())).thenReturn(Optional.of(charger));
-        when(bookingRepository.findByStationIdAndDate(eq(station.getId()),
+        when(bookingRepository.findByChargerIdAndDate(eq(charger.getId()),
                 eq(dto.getStartTime().toLocalDate().toString())))
                 .thenReturn(Collections.singletonList(existing));
 

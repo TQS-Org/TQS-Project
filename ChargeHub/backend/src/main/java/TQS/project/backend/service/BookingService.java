@@ -81,22 +81,20 @@ public class BookingService {
         }
     }
 
-    public List<Booking> getAllBookingsByDateAndStation(long stationId, LocalDate date) {
+    public List<Booking> getAllBookingsByDateAndCharger(long chargerId, LocalDate date) {
         String dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        return bookingRepository.findByStationIdAndDate(stationId, dateString);
+        return bookingRepository.findByChargerIdAndDate(chargerId, dateString);
     }
 
-    public List<Booking> getAllBookingsByStation(long stationId) {
-        return bookingRepository.findAllBookingsByStationId(stationId);
+    public List<Booking> getAllBookingsByCharger(long chargerId) {
+        return bookingRepository.findAllBookingsByChargerId(chargerId);
     }
 
     private void validateNoOverlappingBookings(LocalDateTime startTime, int duration, long chargerId) {
         LocalDateTime endTime = startTime.plusMinutes(duration);
         String dateString = startTime.toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        List<Booking> existingBookings = bookingRepository.findByStationIdAndDate(
-                chargerRepository.findById(chargerId).get().getStation().getId(),
-                dateString);
+        List<Booking> existingBookings = bookingRepository.findByChargerIdAndDate(chargerId, dateString);
 
         for (Booking existing : existingBookings) {
             if (existing.getCharger().getId() == chargerId &&
