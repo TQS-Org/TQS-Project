@@ -22,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
 public class StationIT {
@@ -158,5 +160,53 @@ public class StationIT {
         String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+  }
+
+  @Test
+  @Requirement("SCRUM-20")
+  void getStationChargers_returnsChargersForStation() {
+      // Create a station
+      Station station = new Station(
+          "Charger Test Station", "BrandTest", 38.80, -9.15,
+          "Rua Charger, Lisboa", 3, "07:00", "23:00", 0.28
+      );
+      station = stationRepository.save(station);
+  
+      // Create two chargers for this station
+      Charger charger1 = new Charger();
+      charger1.setStation(station);
+      charger1.setType("AC");
+      charger1.setConnectorType("Type2");
+      charger1.setPower(22.0);
+      charger1.setAvailable(true);
+  
+      Charger charger2 = new Charger();
+      charger2.setStation(station);
+      charger2.setType("DC");
+      charger2.setConnectorType("CCS");
+      charger2.setPower(50.0);
+      charger2.setAvailable(true);
+  
+      chargerRepository.saveAll(List.of(charger1, charger2));
+  
+      // Prepare headers with authentication token
+      HttpHeaders headers = new HttpHeaders();
+      headers.setBearerAuth(token);
+      HttpEntity<Void> request = new HttpEntity<>(headers);
+  
+      // Send request
+      ResponseEntity<Charger[]> response = restTemplate.exchange(
+          "/api/stations/" + station.getId() + "/chargers",
+          HttpMethod.GET,
+          request,
+          Charger[].class
+      );
+  
+      // Assert response
+      assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+      assertThat(response.getBody()).isNotNull();
+      assertThat(response.getBody().length).isEqualTo(2);
+      assertThat(response.getBody()[0].getType()).isIn("AC", "DC");
+      assertThat(response.getBody()[1].getType()).isIn("AC", "DC");
   }
 }
