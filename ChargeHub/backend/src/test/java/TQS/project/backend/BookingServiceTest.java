@@ -65,10 +65,12 @@ public class BookingServiceTest {
         mockCharger.setId(1L);
         mockCharger.setStation(mockStation);
 
+        LocalDateTime startOfDay = dto.getStartTime().toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
         when(clientRepository.findByMail(dto.getMail())).thenReturn(Optional.of(mockClient));
         when(chargerRepository.findById(dto.getChargerId())).thenReturn(Optional.of(mockCharger));
-        when(bookingRepository.findByChargerIdAndDate(eq(mockCharger.getId()),
-                eq(dto.getStartTime().toLocalDate().toString())))
+        when(bookingRepository.findByChargerIdAndDate(eq(mockCharger.getId()), eq(startOfDay), eq(endOfDay)))
                 .thenReturn(Collections.emptyList());
 
         // Act
@@ -89,7 +91,6 @@ public class BookingServiceTest {
     @Test
     @Requirement("SCRUM-20")
     public void testCreateBooking_clientNotFound_throwsException() {
-        // Arrange
         CreateBookingDTO dto = new CreateBookingDTO();
         dto.setMail("missing@example.com");
         dto.setChargerId(1L);
@@ -98,7 +99,6 @@ public class BookingServiceTest {
 
         when(clientRepository.findByMail(dto.getMail())).thenReturn(Optional.empty());
 
-        // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.createBooking(dto);
         });
@@ -110,7 +110,6 @@ public class BookingServiceTest {
     @Test
     @Requirement("SCRUM-20")
     public void testCreateBooking_chargerNotFound_throwsException() {
-        // Arrange
         CreateBookingDTO dto = new CreateBookingDTO();
         dto.setMail("test@example.com");
         dto.setChargerId(999L);
@@ -120,7 +119,6 @@ public class BookingServiceTest {
         when(clientRepository.findByMail(dto.getMail())).thenReturn(Optional.of(new Client()));
         when(chargerRepository.findById(dto.getChargerId())).thenReturn(Optional.empty());
 
-        // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.createBooking(dto);
         });
@@ -132,7 +130,6 @@ public class BookingServiceTest {
     @Test
     @Requirement("SCRUM-20")
     public void testGetAllBookingsByDate_successful() {
-        // Arrange
         long chargerId = 1L;
         LocalDate testDate = LocalDate.of(2023, 6, 1);
 
@@ -144,34 +141,35 @@ public class BookingServiceTest {
 
         List<Booking> expectedBookings = Arrays.asList(booking1, booking2);
 
-        when(bookingRepository.findByChargerIdAndDate(eq(chargerId), eq(testDate.toString())))
+        LocalDateTime startOfDay = testDate.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        when(bookingRepository.findByChargerIdAndDate(eq(chargerId), eq(startOfDay), eq(endOfDay)))
                 .thenReturn(expectedBookings);
 
-        // Act
         List<Booking> result = bookingService.getAllBookingsByDateAndCharger(chargerId, testDate);
 
-        // Assert
         assertEquals(2, result.size());
         assertEquals(expectedBookings, result);
-        verify(bookingRepository).findByChargerIdAndDate(eq(chargerId), eq(testDate.toString()));
+        verify(bookingRepository).findByChargerIdAndDate(eq(chargerId), eq(startOfDay), eq(endOfDay));
     }
 
     @Test
     @Requirement("SCRUM-20")
     public void testGetAllBookingsByDate_noBookings_returnsEmptyList() {
-        // Arrange
         long chargerId = 1L;
         LocalDate testDate = LocalDate.of(2023, 6, 1);
 
-        when(bookingRepository.findByChargerIdAndDate(eq(chargerId), eq(testDate.toString())))
+        LocalDateTime startOfDay = testDate.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        when(bookingRepository.findByChargerIdAndDate(eq(chargerId), eq(startOfDay), eq(endOfDay)))
                 .thenReturn(Collections.emptyList());
 
-        // Act
         List<Booking> result = bookingService.getAllBookingsByDateAndCharger(chargerId, testDate);
 
-        // Assert
         assertTrue(result.isEmpty());
-        verify(bookingRepository).findByChargerIdAndDate(eq(chargerId), eq(testDate.toString()));
+        verify(bookingRepository).findByChargerIdAndDate(eq(chargerId), eq(startOfDay), eq(endOfDay));
     }
 
     @Test
@@ -194,19 +192,19 @@ public class BookingServiceTest {
         dto.setStartTime(LocalDateTime.of(2023, 6, 1, 10, 30)); // 10:30 AM
         dto.setDuration(60); // Ends at 11:30 AM
 
-        // Existing booking from 10:00 AM to 11:00 AM
         Booking existing = new Booking();
         existing.setStartTime(LocalDateTime.of(2023, 6, 1, 10, 0));
         existing.setDuration(60);
         existing.setCharger(charger);
 
+        LocalDateTime startOfDay = dto.getStartTime().toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
         when(clientRepository.findByMail(dto.getMail())).thenReturn(Optional.of(mockedClient));
         when(chargerRepository.findById(dto.getChargerId())).thenReturn(Optional.of(charger));
-        when(bookingRepository.findByChargerIdAndDate(eq(charger.getId()),
-                eq(dto.getStartTime().toLocalDate().toString())))
+        when(bookingRepository.findByChargerIdAndDate(eq(charger.getId()), eq(startOfDay), eq(endOfDay)))
                 .thenReturn(Collections.singletonList(existing));
 
-        // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.createBooking(dto);
         });

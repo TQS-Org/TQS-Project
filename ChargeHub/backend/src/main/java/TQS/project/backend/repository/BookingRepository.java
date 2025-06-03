@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -19,6 +20,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
   List<Booking> findAllBookingsByChargerId(long chargerId);
 
-  @Query("SELECT b FROM Booking b WHERE b.charger.id = :chargerId AND FUNCTION('FORMATDATETIME', b.startTime, 'yyyy-MM-dd') = :dateStr")
-  List<Booking> findByChargerIdAndDate(@Param("chargerId") long chargerId, @Param("dateStr") String dateStr);
+  @Query("SELECT b FROM Booking b WHERE b.charger.id = :chargerId AND b.startTime >= :start AND b.startTime < :end")
+  List<Booking> findByChargerIdAndDate(
+      @Param("chargerId") long chargerId,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
+
 }

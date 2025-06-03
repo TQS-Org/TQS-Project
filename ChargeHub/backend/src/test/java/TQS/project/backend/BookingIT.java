@@ -132,13 +132,13 @@ public class BookingIT {
         bookingDTO.setChargerId(null);
         bookingDTO.setStartTime(null);
         bookingDTO.setDuration(0);
-        
+
         ResponseEntity<String> response = restTemplate.exchange(
-        "/api/booking",
-        HttpMethod.POST,
-        new HttpEntity<>(bookingDTO, createAuthHeaders()),
-        String.class);
-        
+                "/api/booking",
+                HttpMethod.POST,
+                new HttpEntity<>(bookingDTO, createAuthHeaders()),
+                String.class);
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotEmpty();
     }
@@ -180,10 +180,10 @@ public class BookingIT {
     @Test
     @Requirement("SCRUM-20")
     void getBookingsByCharger_withDate_returnsFilteredBookings() {
-        
+
         // Create test data
         Station station = new Station();
-        //station.setId(100L);
+        // station.setId(100L);
         station.setName("Test Station");
         station.setOpeningHours("08:00");
         station.setClosingHours("20:00");
@@ -209,16 +209,16 @@ public class BookingIT {
 
         // Test with date filter
         ResponseEntity<Booking[]> response = restTemplate.exchange(
-            "/api/booking/charger/" + charger.getId() + "?date=" + today,
-            HttpMethod.GET,
-            new HttpEntity<>(createAuthHeaders()),
-            Booking[].class);
+                "/api/booking/charger/" + charger.getId() + "?date=" + today,
+                HttpMethod.GET,
+                new HttpEntity<>(createAuthHeaders()),
+                Booking[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).hasSize(2);
         assertThat(response.getBody())
-            .extracting(Booking::getStartTime)
-            .containsExactlyInAnyOrder(time1, time2);
+                .extracting(Booking::getStartTime)
+                .containsExactlyInAnyOrder(time1, time2);
     }
 
     @Test
@@ -226,7 +226,7 @@ public class BookingIT {
     void getBookingsByCharger_withoutDate_returnsAllBookings() {
         // Create test data
         Station station = new Station();
-        //station.setId(101L);
+        // station.setId(101L);
         station.setName("Test Station");
         station.setOpeningHours("08:00");
         station.setClosingHours("20:00");
@@ -250,16 +250,16 @@ public class BookingIT {
 
         // Test without date filter
         ResponseEntity<Booking[]> response = restTemplate.exchange(
-            "/api/booking/charger/" + charger.getId(),
-            HttpMethod.GET,
-            new HttpEntity<>(createAuthHeaders()),
-            Booking[].class);
+                "/api/booking/charger/" + charger.getId(),
+                HttpMethod.GET,
+                new HttpEntity<>(createAuthHeaders()),
+                Booking[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).hasSize(2);
         assertThat(response.getBody())
-            .extracting(Booking::getStartTime)
-            .containsExactlyInAnyOrder(time1, time2);
+                .extracting(Booking::getStartTime)
+                .containsExactlyInAnyOrder(time1, time2);
     }
 
     @Test
@@ -267,7 +267,7 @@ public class BookingIT {
     void getBookingsByCharger_noBookings_returnsEmptyList() {
         // Create test station
         Station station = new Station();
-        //station.setId(102L);
+        // station.setId(102L);
         station.setName("Empty Station");
         station.setOpeningHours("08:00");
         station.setClosingHours("20:00");
@@ -279,10 +279,10 @@ public class BookingIT {
 
         // Test with no bookings
         ResponseEntity<Booking[]> response = restTemplate.exchange(
-            "/api/booking/charger/" + charger.getId(),
-            HttpMethod.GET,
-            new HttpEntity<>(createAuthHeaders()),
-            Booking[].class);
+                "/api/booking/charger/" + charger.getId(),
+                HttpMethod.GET,
+                new HttpEntity<>(createAuthHeaders()),
+                Booking[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEmpty();

@@ -1,13 +1,12 @@
-/* BookingCard.css */
 .booking-card {
   border: 1px solid #ccc;
   padding: 1rem;
   border-radius: 10px;
   background: #f1f1f1;
+  color: black;         /* 👈 Ensures text is visible */
   margin-bottom: 1rem;
 }
 
-/* BookingList styles (optional global or local) */
 .booking-list-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));

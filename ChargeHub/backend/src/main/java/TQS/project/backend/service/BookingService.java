@@ -3,14 +3,13 @@ package TQS.project.backend.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import TQS.project.backend.repository.ClientRepository;
 import jakarta.transaction.Transactional;
+
 import TQS.project.backend.dto.CreateBookingDTO;
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.entity.Charger;
@@ -18,15 +17,17 @@ import TQS.project.backend.entity.Client;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.BookingRepository;
 import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.ClientRepository;
 
 @Service
 public class BookingService {
 
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("H:mm");
+    private static final java.time.format.DateTimeFormatter TIME_FORMATTER = java.time.format.DateTimeFormatter
+            .ofPattern("H:mm");
 
-    private ClientRepository clientRepository;
-    private BookingRepository bookingRepository;
-    private ChargerRepository chargerRepository;
+    private final ClientRepository clientRepository;
+    private final BookingRepository bookingRepository;
+    private final ChargerRepository chargerRepository;
 
     @Autowired
     public BookingService(ClientRepository clientRepository, BookingRepository bookingRepository,
@@ -38,18 +39,18 @@ public class BookingService {
 
     @Transactional
     public String createBooking(CreateBookingDTO dto) {
-        // Validate client exists
+        // Validate client
         Client user = clientRepository.findByMail(dto.getMail())
                 .orElseThrow(() -> new IllegalArgumentException("This email does not exist"));
 
-        // Validate charger exists and get station info
+        // Validate charger
         Charger charger = chargerRepository.findById(dto.getChargerId())
                 .orElseThrow(() -> new IllegalArgumentException("This charger does not exist"));
 
-        // Validate booking time against station hours
+        // Validate booking time
         validateBookingTime(dto.getStartTime(), dto.getDuration(), charger.getStation());
 
-        // Check for overlapping bookings
+        // Check overlapping bookings
         validateNoOverlappingBookings(dto.getStartTime(), dto.getDuration(), charger.getId());
 
         // Create and save booking
@@ -81,9 +82,14 @@ public class BookingService {
         }
     }
 
+    /**
+     * Use LocalDateTime range comparison for compatibility with all databases
+     */
     public List<Booking> getAllBookingsByDateAndCharger(long chargerId, LocalDate date) {
-        String dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        return bookingRepository.findByChargerIdAndDate(chargerId, dateString);
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        return bookingRepository.findByChargerIdAndDate(chargerId, startOfDay, endOfDay);
     }
 
     public List<Booking> getAllBookingsByCharger(long chargerId) {
@@ -92,9 +98,11 @@ public class BookingService {
 
     private void validateNoOverlappingBookings(LocalDateTime startTime, int duration, long chargerId) {
         LocalDateTime endTime = startTime.plusMinutes(duration);
-        String dateString = startTime.toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        List<Booking> existingBookings = bookingRepository.findByChargerIdAndDate(chargerId, dateString);
+        LocalDateTime startOfDay = startTime.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        List<Booking> existingBookings = bookingRepository.findByChargerIdAndDate(chargerId, startOfDay, endOfDay);
 
         for (Booking existing : existingBookings) {
             if (existing.getCharger().getId() == chargerId &&
@@ -104,5 +112,4 @@ public class BookingService {
             }
         }
     }
-
 }
