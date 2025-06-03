@@ -10,7 +10,7 @@ export default function BookingList({ chargerId, selectedDate }) {
   useEffect(() => {
     const fetchBookings = async () => {
       const token = localStorage.getItem("token");
-      const formattedDate = selectedDate.toISOString().split("T")[0];
+      const formattedDate = selectedDate.toLocaleDateString("en-CA");
 
       try {
         const res = await fetch(

@@ -10,6 +10,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChargerRepository extends JpaRepository<Charger, Long> {
-  Optional<Charger> findById(long id);
   List<Charger> findAllByStationId(long id);
 }

@@ -3,11 +3,13 @@ package TQS.project.backend;
 import TQS.project.backend.Config.TestSecurityConfig;
 import TQS.project.backend.controller.ChargerController;
 import TQS.project.backend.entity.Charger;
+import TQS.project.backend.entity.Station;
+import TQS.project.backend.security.JwtAuthFilter;
+import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.ChargerService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.mockito.Mockito.when;
 
@@ -32,8 +34,18 @@ public class ChargerControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @SuppressWarnings("removal")
     @MockBean
     private ChargerService chargerService;
+
+    @SuppressWarnings("removal")
+    @MockBean
+    private JwtProvider jwtProvider;
+
+    @SuppressWarnings("removal")
+    @MockBean
+    private JwtAuthFilter jwtAuthFilter;
+
 
     @Test
     @Requirement("SCRUM-20")
@@ -45,7 +57,7 @@ public class ChargerControllerTest {
 
         when(chargerService.getChargerById(1L)).thenReturn(Optional.of(charger));
 
-        mockMvc.perform(get("/api/chargers/1"))
+        mockMvc.perform(get("/api/charger/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.type").value("AC"))
@@ -57,7 +69,7 @@ public class ChargerControllerTest {
     void getChargerById_nonExistingId_returns404() throws Exception {
         when(chargerService.getChargerById(99L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/chargers/99"))
+        mockMvc.perform(get("/api/charger/99"))
                 .andExpect(status().isNotFound());
     }
 }
