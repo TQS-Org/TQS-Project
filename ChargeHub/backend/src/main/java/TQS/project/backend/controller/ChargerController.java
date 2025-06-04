@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
+import TQS.project.backend.dto.ChargerTokenDTO;
+
 @RestController
 @RequestMapping("/api/charger")
 public class ChargerController {
@@ -21,4 +23,15 @@ public class ChargerController {
     Optional<Charger> charger = chargerService.getChargerById(id);
     return charger.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
+
+  @PostMapping("/{id}/session")
+  public ResponseEntity<?> createChargingSession(@PathVariable("id") long chargerId, @RequestBody ChargerTokenDTO request) {
+      try {
+          chargerService.startChargingSession(request.getChargeToken(), chargerId);
+          return ResponseEntity.ok("Charger unlocked successfully, charge session starting...");
+      } catch (IllegalArgumentException | IllegalStateException e) {
+          return ResponseEntity.badRequest().body(e.getMessage());
+      }
+  }
+
 }

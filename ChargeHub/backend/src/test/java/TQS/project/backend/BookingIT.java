@@ -288,6 +288,43 @@ public class BookingIT {
     assertThat(response.getBody()).isEmpty();
   }
 
+  @Test
+  @Requirement("SCRUM-24")
+  void findAllBookingsByUserId_returnsCorrectBookings() {
+      // Given: A client and some bookings
+      Client client = clientRepository.findByMail("driver@mail.com").get();
+
+      Station station = new Station();
+      station.setName("Repo Test Station");
+      station.setOpeningHours("08:00");
+      station.setClosingHours("22:00");
+      station = stationRepository.save(station);
+
+      Charger charger = new Charger();
+      charger.setType("AC");
+      charger.setConnectorType("Type2");
+      charger.setPower(50);
+      charger.setAvailable(true);
+      charger.setStation(station);
+      charger = chargerRepository.save(charger);
+
+      LocalDateTime now = LocalDateTime.now();
+
+      Booking booking1 = new Booking(client, charger, now.plusHours(1), 30);
+      Booking booking2 = new Booking(client, charger, now.plusHours(3), 45);
+
+      bookingRepository.saveAll(List.of(booking1, booking2));
+
+      // When: findAllByUserId is called
+      List<Booking> bookings = bookingRepository.findAllByUserId(client.getId());
+
+      // Then: the correct bookings are returned
+      assertThat(bookings).hasSize(2);
+      assertThat(bookings)
+          .extracting(Booking::getDuration)
+          .containsExactlyInAnyOrder(30, 45);
+  }
+
   private HttpHeaders createJsonHeaders() {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

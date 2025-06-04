@@ -223,4 +223,24 @@ public class BookingServiceTest {
     assertEquals("The requested time slot overlaps with an existing booking", ex.getMessage());
     verify(bookingRepository, never()).save(any());
   }
+
+  @Test
+  @Requirement("SCRUM-24")
+  public void testGetAllBookingsByClient_successful() {
+    long clientId = 42L;
+
+    Booking booking1 = new Booking();
+    Booking booking2 = new Booking();
+
+    List<Booking> mockBookings = List.of(booking1, booking2);
+
+    when(bookingRepository.findAllByUserId(clientId)).thenReturn(mockBookings);
+
+    List<Booking> result = bookingService.getAllBookingsByClient(clientId);
+
+    assertEquals(2, result.size());
+    assertEquals(mockBookings, result);
+    verify(bookingRepository).findAllByUserId(clientId);
+  }
+
 }
