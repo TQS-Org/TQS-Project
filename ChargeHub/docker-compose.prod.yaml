@@ -72,6 +72,6 @@ services:
 networks:
   chargehub-network:
     driver: bridge
- 
+
 volumes:
   db:

@@ -28,25 +28,24 @@ public class BookingController {
 
   @PostMapping("")
   public ResponseEntity<?> createBooking(@Valid @RequestBody CreateBookingDTO dto) {
-      bookingService.createBooking(dto);
-      return ResponseEntity.ok("Booking created successfully!"); 
+    bookingService.createBooking(dto);
+    return ResponseEntity.ok("Booking created successfully!");
   }
 
   @GetMapping("/charger/{id}")
   public ResponseEntity<List<Booking>> getBookingsByCharger(
-          @PathVariable("id") long chargerId,
-          @RequestParam(value = "date", required = false)
-          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-          
-      List<Booking> bookings;
-          
-      if (date != null) {
-          bookings = bookingService.getAllBookingsByDateAndCharger(chargerId, date);
-      } else {
-          bookings = bookingService.getAllBookingsByCharger(chargerId);
-      }
-    
-      return ResponseEntity.ok(bookings);
-  }
+      @PathVariable("id") long chargerId,
+      @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          LocalDate date) {
 
+    List<Booking> bookings;
+
+    if (date != null) {
+      bookings = bookingService.getAllBookingsByDateAndCharger(chargerId, date);
+    } else {
+      bookings = bookingService.getAllBookingsByCharger(chargerId);
+    }
+
+    return ResponseEntity.ok(bookings);
+  }
 }

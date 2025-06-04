@@ -11,14 +11,14 @@ import TQS.project.backend.repository.ChargerRepository;
 @Service
 public class ChargerService {
 
-    private ChargerRepository chargerRepository;
+  private ChargerRepository chargerRepository;
 
-    @Autowired
-    public ChargerService(ChargerRepository chargerRepository) {
-        this.chargerRepository = chargerRepository;
-    }
+  @Autowired
+  public ChargerService(ChargerRepository chargerRepository) {
+    this.chargerRepository = chargerRepository;
+  }
 
-    public Optional<Charger> getChargerById(Long id) {
-        return chargerRepository.findById(id);
-    }
+  public Optional<Charger> getChargerById(Long id) {
+    return chargerRepository.findById(id);
+  }
 }

@@ -3,7 +3,6 @@ package TQS.project.backend;
 import TQS.project.backend.Config.TestSecurityConfig;
 import TQS.project.backend.controller.ChargerController;
 import TQS.project.backend.entity.Charger;
-import TQS.project.backend.entity.Station;
 import TQS.project.backend.security.JwtAuthFilter;
 import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.ChargerService;
@@ -31,45 +30,43 @@ import java.util.Optional;
 @AutoConfigureMockMvc(addFilters = false)
 public class ChargerControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private ChargerService chargerService;
+  @SuppressWarnings("removal")
+  @MockBean
+  private ChargerService chargerService;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private JwtProvider jwtProvider;
+  @SuppressWarnings("removal")
+  @MockBean
+  private JwtProvider jwtProvider;
 
-    @SuppressWarnings("removal")
-    @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+  @SuppressWarnings("removal")
+  @MockBean
+  private JwtAuthFilter jwtAuthFilter;
 
+  @Test
+  @Requirement("SCRUM-20")
+  void getChargerById_existingId_returnsCharger() throws Exception {
+    Charger charger = new Charger();
+    charger.setId(1L);
+    charger.setType("AC");
+    charger.setPower(22.0);
 
-    @Test
-    @Requirement("SCRUM-20")
-    void getChargerById_existingId_returnsCharger() throws Exception {
-        Charger charger = new Charger();
-        charger.setId(1L);
-        charger.setType("AC");
-        charger.setPower(22.0);
+    when(chargerService.getChargerById(1L)).thenReturn(Optional.of(charger));
 
-        when(chargerService.getChargerById(1L)).thenReturn(Optional.of(charger));
+    mockMvc
+        .perform(get("/api/charger/1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1L))
+        .andExpect(jsonPath("$.type").value("AC"))
+        .andExpect(jsonPath("$.power").value(22.0));
+  }
 
-        mockMvc.perform(get("/api/charger/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.type").value("AC"))
-                .andExpect(jsonPath("$.power").value(22.0));
-    }
+  @Test
+  @Requirement("SCRUM-20")
+  void getChargerById_nonExistingId_returns404() throws Exception {
+    when(chargerService.getChargerById(99L)).thenReturn(Optional.empty());
 
-    @Test
-    @Requirement("SCRUM-20")
-    void getChargerById_nonExistingId_returns404() throws Exception {
-        when(chargerService.getChargerById(99L)).thenReturn(Optional.empty());
-
-        mockMvc.perform(get("/api/charger/99"))
-                .andExpect(status().isNotFound());
-    }
+    mockMvc.perform(get("/api/charger/99")).andExpect(status().isNotFound());
+  }
 }
