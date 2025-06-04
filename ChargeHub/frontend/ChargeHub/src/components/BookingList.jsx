@@ -6,8 +6,6 @@ export default function BookingList({ chargerId, selectedDate }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  console.error("Charger ID:", chargerId);
-
   useEffect(() => {
     const fetchBookings = async () => {
       const token = localStorage.getItem("token");
@@ -18,10 +16,6 @@ export default function BookingList({ chargerId, selectedDate }) {
       }
 
       const formattedDate = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
-
-      console.log("date: ", selectedDate)
-      console.log("formated date: ", formattedDate)
-
       try {
         const res = await fetch(
           `${CONFIG.API_URL}booking/charger/${chargerId}?date=${formattedDate}`,
@@ -33,7 +27,6 @@ export default function BookingList({ chargerId, selectedDate }) {
             credentials: "include",
           }
         );
-        console.log("TOKEN IN FETCH:", token);
 
         if (res.ok) {
           const data = await res.json();

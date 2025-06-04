@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import "../css/BookingForm.css";
 
 // helper to format LocalDateTime string (no timezone)
 function formatLocalDateTime(date) {
@@ -65,51 +66,44 @@ export default function BookingForm({ station, chargerId, onSubmit }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 border p-4 rounded shadow">
-      <h2 className="text-lg font-semibold">Create Booking</h2>
+    <form id="booking-form" onSubmit={handleSubmit}>
+    <h2>Create Booking</h2>
 
-      <div>
-        <label className="block mb-1">Start Time</label>
-        <select
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
-          className="w-full p-1 border rounded"
-          required
-        >
-          <option value="" disabled>Select time</option>
-          {timeOptions.map((time) => (
-            <option key={time} value={time}>{time}</option>
-          ))}
-        </select>
+    <div>
+      <label>Start Time</label>
+      <select
+        value={startTime}
+        onChange={(e) => setStartTime(e.target.value)}
+        required
+      >
+        <option value="" disabled>Select time</option>
+        {timeOptions.map((time) => (
+          <option key={time} value={time}>{time}</option>
+        ))}
+      </select>
+    </div>
+
+    <div>
+      <label>Duration (min)</label>
+      <input
+        type="number"
+        min={5}
+        max={60}
+        step={5}
+        value={duration}
+        onChange={(e) => setDuration(e.target.value)}
+        required
+      />
+    </div>
+
+    <button type="submit">Confirm Booking</button>
+
+    {feedback && (
+      <div className={`feedback ${feedback.type}`}>
+        {feedback.message}
       </div>
+    )}
+  </form>
 
-      <div>
-        <label className="block mb-1">Duration (min)</label>
-        <input
-          type="number"
-          min={5}
-          max={60}
-          step={5}
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
-          className="w-full p-1 border rounded"
-          required
-        />
-      </div>
-
-      <button type="submit" className="mt-2 px-4 py-2 bg-blue-600 text-white rounded">
-        Confirm Booking
-      </button>
-
-      {feedback && (
-        <div
-          className={`mt-3 p-2 rounded text-sm ${
-            feedback.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
-        >
-          {feedback.message}
-        </div>
-      )}
-    </form>
   );
 }

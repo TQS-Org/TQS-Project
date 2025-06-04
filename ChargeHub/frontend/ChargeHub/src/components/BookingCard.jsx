@@ -5,17 +5,19 @@ export default function BookingCard({ booking }) {
 
   const user = booking.user || { name: "Unknown", mail: "Unknown" };
 
+  // Extract just the HH:MM part from ISO datetime
+  const formatTime = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   return (
     <div className="booking-card">
-      <h3>Booking #{booking.id}</h3>
+      <h3>Booking</h3>
       <p>Client: {user.name}</p>
-      <p>Email: {user.mail}</p>
       <p>Date: {booking.date}</p>
-      <p>Start: {booking.startTime}</p>
-      <p>End: {booking.endTime}</p>
-      <p>Status: {booking.status}</p>
+      <p>Start: {formatTime(booking.startTime)}</p>
+      <p>End: {formatTime(booking.endTime)}</p>
     </div>
   );
 }
-
-

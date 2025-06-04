@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import CONFIG from "../config";
 import BookingList from "./components/BookingList";
 import BookingForm from "./components/BookingForm";
+import "./ChargerDetailsPage.css";
 
 export default function ChargerDetailsPage() {
   const { id } = useParams();
@@ -15,14 +16,10 @@ export default function ChargerDetailsPage() {
   useEffect(() => {
     const fetchCharger = async () => {
       const token = localStorage.getItem("token");
-
       try {
         const res = await fetch(`${CONFIG.API_URL}charger/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         if (res.ok) {
           const data = await res.json();
           setCharger(data);
@@ -33,7 +30,6 @@ export default function ChargerDetailsPage() {
         console.error(err);
       }
     };
-
     fetchCharger();
   }, [id]);
 
@@ -43,7 +39,6 @@ export default function ChargerDetailsPage() {
 
   const handleBookingSubmit = async (dto) => {
     const token = localStorage.getItem("token");
-
     try {
       const res = await fetch(`${CONFIG.API_URL}booking`, {
         method: "POST",
@@ -53,7 +48,6 @@ export default function ChargerDetailsPage() {
         },
         body: JSON.stringify(dto),
       });
-
       if (res.ok) {
         return "Booking created successfully!";
       } else {
@@ -66,57 +60,75 @@ export default function ChargerDetailsPage() {
   };
 
   const today = new Date().toISOString().split("T")[0];
-  if (!charger) return <div>Loading charger info...</div>;
+  if (!charger) {
+    return (
+      <div id="charger-details-page">
+        <div className="loading">Loading charger info...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="charger-details-page p-4 max-w-2xl mx-auto">
-      <button onClick={() => navigate(-1)} className="mb-2 text-blue-500">
+    <div id="charger-details-page">
+      <button className="back-button" onClick={() => navigate(-1)}>
         ← Back
       </button>
 
-      <h1 className="text-xl font-bold mb-2">Charger #{charger.id}</h1>
-      <div className="details-grid grid grid-cols-2 gap-2 mb-4">
-        <div>Type: {charger.type}</div>
-        <div>Connector: {charger.connectorType}</div>
-        <div>Power: {charger.power} kW</div>
-        <div>Status: {charger.available ? "Available" : "Unavailable"}</div>
-      </div>
-
-      <div className="calendar-filter mb-4">
-        <label className="block mb-1">Select Date:</label>
-        <input
-          type="date"
-          value={selectedDate.toISOString().split("T")[0]}
-          min={today}
-          onChange={handleDateChange}
-          className="border rounded p-1"
-        />
-      </div>
-
-      <BookingList chargerId={id} selectedDate={selectedDate} />
-
-      {!showBookingForm ? (
-        <button
-          className="mt-4 px-4 py-2 bg-green-600 text-white rounded"
-          onClick={() => setShowBookingForm(true)}
-        >
-          Book Charge
-        </button>
-      ) : (
-        <div className="mt-4">
-          <BookingForm
-            station={charger.station}
-            chargerId={Number(id)}
-            onSubmit={handleBookingSubmit}
-          />
-          <button
-            className="mt-2 text-sm text-red-500"
-            onClick={() => setShowBookingForm(false)}
-          >
-            Cancel
-          </button>
+      <div className="charger-card">
+        <h1 className="charger-title">Charger #{charger.id}</h1>
+        <div className="charger-info-grid">
+          <div><strong>Type:</strong> {charger.type}</div>
+          <div><strong>Connector:</strong> {charger.connectorType}</div>
+          <div><strong>Power:</strong> {charger.power} kW</div>
+          <div>
+            <strong>Status:</strong>{" "}
+            <span className={`status-badge ${charger.available ? "available" : "unavailable"}`}>
+              {charger.available ? "Available" : "Unavailable"}
+            </span>
+          </div>
         </div>
-      )}
+
+        {/* Only show date picker, booking list and button if charger is available */}
+        {charger.available && (
+          <>
+            <div className="date-picker-section">
+              <label htmlFor="date" className="date-label">Select Date:</label>
+              <input
+                type="date"
+                id="date"
+                value={selectedDate.toISOString().split("T")[0]}
+                min={today}
+                onChange={handleDateChange}
+                className="date-picker"
+              />
+            </div>
+
+            <BookingList chargerId={id} selectedDate={selectedDate} />
+
+            {showBookingForm && (
+              <div className="modal-overlay" onClick={() => setShowBookingForm(false)}>
+                <div
+                  className="modal-content"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <BookingForm
+                    station={charger.station}
+                    chargerId={Number(id)}
+                    onSubmit={handleBookingSubmit}
+                  />
+                  <button className="modal-close" onClick={() => setShowBookingForm(false)}>
+                    ✖
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <button className="primary-button" onClick={() => setShowBookingForm(true)}>
+              Book Charge
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
