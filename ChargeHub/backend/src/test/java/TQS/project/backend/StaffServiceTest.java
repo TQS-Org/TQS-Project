@@ -1,8 +1,10 @@
 package TQS.project.backend;
 
+import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Role;
 import TQS.project.backend.entity.Staff;
+import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StaffRepository;
 import TQS.project.backend.repository.StationRepository;
 import TQS.project.backend.service.StaffService;
@@ -28,13 +30,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ExtendWith(MockitoExtension.class)
 public class StaffServiceTest {
 
-  @Mock private StaffRepository staffRepository;
+  @Mock
+  private StaffRepository staffRepository;
 
-  @Mock private StationRepository stationRepository;
+  @Mock
+  private StationRepository stationRepository;
 
-  @Mock private PasswordEncoder passwordEncoder;
+  @Mock
+  private PasswordEncoder passwordEncoder;
 
-  @InjectMocks private StaffService staffService;
+  @InjectMocks
+  private StaffService staffService;
 
   @Test
   @Requirement("SCRUM-35")
@@ -55,12 +61,11 @@ public class StaffServiceTest {
     verify(staffRepository, times(1))
         .save(
             argThat(
-                staff ->
-                    staff.getName().equals(dto.getName())
-                        && staff.getMail().equals(dto.getMail())
-                        && staff.getPassword().equals("encodedpass")
-                        && staff.getRole() == Role.OPERATOR
-                        && staff.getStartDate().equals(LocalDate.now())));
+                staff -> staff.getName().equals(dto.getName())
+                    && staff.getMail().equals(dto.getMail())
+                    && staff.getPassword().equals("encodedpass")
+                    && staff.getRole() == Role.OPERATOR
+                    && staff.getStartDate().equals(LocalDate.now())));
   }
 
   @Test
@@ -71,12 +76,11 @@ public class StaffServiceTest {
 
     when(staffRepository.findByMail(dto.getMail())).thenReturn(Optional.of(new Staff()));
 
-    IllegalArgumentException thrown =
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> {
-              staffService.createOperator(dto);
-            });
+    IllegalArgumentException thrown = assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          staffService.createOperator(dto);
+        });
 
     assertEquals("Email already in use", thrown.getMessage());
     verify(staffRepository, never()).save(any());
@@ -99,5 +103,68 @@ public class StaffServiceTest {
 
     assertEquals(2, result.size());
     assertEquals("Operator One", result.get(0).getName());
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_success() {
+    // Prepare DTO
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(1L);
+    dto.setStationId(100L);
+
+    // Prepare staff and station
+    Staff staff = new Staff();
+    staff.setId(1L);
+
+    Station station = new Station();
+    station.setId(100L);
+
+    // Mock repositories
+    when(staffRepository.findById(1L)).thenReturn(Optional.of(staff));
+    when(stationRepository.findById(100L)).thenReturn(Optional.of(station));
+
+    // Call service
+    staffService.assignStationToOperator(dto);
+
+    // Verify staff is updated with assigned station
+    verify(staffRepository, times(1))
+        .save(argThat(savedStaff -> savedStaff.getAssignedStation().equals(station)));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_operatorNotFound() {
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(1L);
+    dto.setStationId(100L);
+
+    when(staffRepository.findById(1L)).thenReturn(Optional.empty());
+
+    RuntimeException thrown = assertThrows(
+        RuntimeException.class, () -> staffService.assignStationToOperator(dto));
+
+    assertEquals("Operator not found.", thrown.getMessage());
+    verify(staffRepository, never()).save(any());
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_stationNotFound() {
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(1L);
+    dto.setStationId(100L);
+
+    Staff staff = new Staff();
+    staff.setId(1L);
+
+    when(staffRepository.findById(1L)).thenReturn(Optional.of(staff));
+    when(stationRepository.findById(100L)).thenReturn(Optional.empty());
+
+    RuntimeException thrown = assertThrows(
+        RuntimeException.class, () -> staffService.assignStationToOperator(dto));
+
+    assertEquals("Station not found.", thrown.getMessage());
+    verify(staffRepository, never()).save(any());
   }
 }

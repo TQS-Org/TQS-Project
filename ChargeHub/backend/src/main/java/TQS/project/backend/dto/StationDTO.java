@@ -20,8 +20,6 @@ public class StationDTO {
     @NotBlank
     private String address;
 
-    @NotNull
-    @Min(1)
     private Integer numberOfChargers;
 
     private String openingHours;

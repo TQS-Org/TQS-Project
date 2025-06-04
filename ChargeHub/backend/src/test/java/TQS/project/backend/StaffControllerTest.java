@@ -1,6 +1,7 @@
 package TQS.project.backend;
 
 import TQS.project.backend.controller.StaffController;
+import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.security.JwtAuthFilter;
@@ -146,5 +147,54 @@ public class StaffControllerTest {
         .andExpect(jsonPath("$.number").value("Phone number must start with 9 and be exactly 9 digits"))
         .andExpect(jsonPath("$.mail").value("Email should be valid"))
         .andExpect(jsonPath("$.address").value("Address is required"));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_success() throws Exception {
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(1L);
+    dto.setStationId(100L);
+
+    doNothing().when(staffService).assignStationToOperator(dto);
+
+    mockMvc
+        .perform(post("/api/staff/operator/assign-station")
+            .contentType("application/json")
+            .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Station assigned to operator successfully."));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_notFound() throws Exception {
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(999L);
+    dto.setStationId(100L);
+
+    doThrow(new RuntimeException("Staff or Station not found."))
+        .when(staffService)
+        .assignStationToOperator(any(AssignStationDTO.class));
+
+    mockMvc
+        .perform(post("/api/staff/operator/assign-station")
+            .contentType("application/json")
+            .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Staff or Station not found."));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_validationFails() throws Exception {
+    AssignStationDTO dto = new AssignStationDTO();
+    // Missing required fields
+
+    mockMvc
+        .perform(post("/api/staff/operator/assign-station")
+            .contentType("application/json")
+            .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest());
   }
 }

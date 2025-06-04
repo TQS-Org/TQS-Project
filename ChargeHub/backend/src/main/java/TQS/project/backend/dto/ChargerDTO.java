@@ -18,9 +18,6 @@ public class ChargerDTO {
     @NotBlank
     private String connectorType;
 
-    @NotNull
-    private Long stationId;
-
     public String getType() {
         return type;
     }
@@ -51,13 +48,5 @@ public class ChargerDTO {
 
     public void setConnectorType(String connectorType) {
         this.connectorType = connectorType;
-    }
-
-    public Long getStationId() {
-        return stationId;
-    }
-
-    public void setStationId(Long stationId) {
-        this.stationId = stationId;
     }
 }

@@ -75,4 +75,21 @@ public class StationService {
   public List<Charger> getAllStationChargers(long id) {
     return chargerRepository.findAllByStationId(id);
   }
+
+  public Station updateStation(Long id, StationDTO dto) {
+    Station station = stationRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Station not found"));
+
+    station.setName(dto.getName());
+    station.setAddress(dto.getAddress());
+    station.setAddress(dto.getAddress());
+    station.setLatitude(dto.getLatitude());
+    station.setLongitude(dto.getLongitude());
+    station.setPrice(dto.getPrice());
+    station.setClosingHours(dto.getClosingHours());
+    station.setOpeningHours(dto.getOpeningHours());
+
+    return stationRepository.save(station);
+  }
+
 }

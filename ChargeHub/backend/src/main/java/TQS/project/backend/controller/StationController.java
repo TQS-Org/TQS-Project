@@ -61,4 +61,13 @@ public class StationController {
     List<Charger> chargers = stationService.getAllStationChargers(id);
     return ResponseEntity.ok(chargers);
   }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<Station> updateStation(
+      @PathVariable Long id,
+      @Valid @RequestBody StationDTO dto) {
+
+    Station updatedStation = stationService.updateStation(id, dto);
+    return ResponseEntity.ok(updatedStation);
+  }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.service.StaffService;
@@ -32,5 +33,11 @@ public class StaffController {
   public ResponseEntity<List<Staff>> getAllOperators() {
     List<Staff> operators = staffService.getAllOperators();
     return ResponseEntity.ok(operators);
+  }
+
+  @PostMapping("/operator/assign-station")
+  public ResponseEntity<?> assignStationToOperator(@Valid @RequestBody AssignStationDTO dto) {
+    staffService.assignStationToOperator(dto);
+    return ResponseEntity.ok("Station assigned to operator successfully.");
   }
 }

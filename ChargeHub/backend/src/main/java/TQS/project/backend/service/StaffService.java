@@ -1,9 +1,13 @@
 package TQS.project.backend.service;
 
+import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Role;
 import TQS.project.backend.entity.Staff;
+import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StaffRepository;
+import TQS.project.backend.repository.StationRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,9 +18,14 @@ import java.time.LocalDate;
 @Service
 public class StaffService {
 
-  @Autowired private StaffRepository staffRepository;
+  @Autowired
+  private StaffRepository staffRepository;
 
-  @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired
+  private StationRepository stationRepository;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   /**
    * Retrieves all staff members with the role of OPERATOR.
@@ -30,7 +39,8 @@ public class StaffService {
   /**
    * Creates a new operator staff member.
    *
-   * @param dto Data Transfer Object containing the details of the staff member to be created.
+   * @param dto Data Transfer Object containing the details of the staff member to
+   *            be created.
    * @throws IllegalArgumentException if the email is already in use.
    */
   public void createOperator(CreateStaffDTO dto) {
@@ -49,6 +59,23 @@ public class StaffService {
     staff.setActive(true);
     staff.setStartDate(LocalDate.now());
 
+    staffRepository.save(staff);
+  }
+
+  /**
+   * Assigns a station to an operator.
+   *
+   * @param dto Data Transfer Object containing the operator's email and station
+   *            ID.
+   * @throws IllegalArgumentException if the operator or station is not found.
+   */
+  public void assignStationToOperator(AssignStationDTO dto) {
+    Staff staff = staffRepository.findById(dto.getOperatorId())
+        .orElseThrow(() -> new RuntimeException("Operator not found."));
+    Station station = stationRepository.findById(dto.getStationId())
+        .orElseThrow(() -> new RuntimeException("Station not found."));
+
+    staff.setAssignedStation(station);
     staffRepository.save(staff);
   }
 }
