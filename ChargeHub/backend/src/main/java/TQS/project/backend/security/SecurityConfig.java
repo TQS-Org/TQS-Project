@@ -29,24 +29,34 @@ public class SecurityConfig {
     http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf()
         .disable()
-        .authorizeHttpRequests()
-        .requestMatchers(
-            "/api/auth/login",
-            "/api/auth/validate",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/v3/api-docs/**",
-            "/api-docs/**",
-            "/api/auth/register",
-            "/api/stations")
-        .permitAll()
-        .requestMatchers("/api/stations/search**")
-        .hasRole("EV_DRIVER")
-        .requestMatchers("/api/staff/operator", "/api/staff/operators")
-        .hasRole("ADMIN")
-        .anyRequest()
-        .authenticated()
-        .and()
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/actuator/**")
+                    .permitAll()
+                    .requestMatchers(
+                        "/api/auth/login",
+                        "/api/auth/validate",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/api-docs/**",
+                        "/api/auth/register",
+                        "/api/stations")
+                    .permitAll()
+                    .requestMatchers(
+                        "/api/stations/search**",
+                        "/api/booking",
+                        "/api/booking/",
+                        "/api/booking/**",
+                        "/api/booking/charger/**",
+                        "/api/charger/**")
+                    .hasRole("EV_DRIVER")
+                    .requestMatchers("/api/stations/search**")
+                    .hasRole("EV_DRIVER")
+                    .requestMatchers("/api/staff/operator", "/api/staff/operators")
+                    .hasRole("ADMIN")
+                    .anyRequest()
+                    .authenticated())
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
