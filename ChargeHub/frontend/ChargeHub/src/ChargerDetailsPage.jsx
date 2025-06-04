@@ -111,11 +111,12 @@ export default function ChargerDetailsPage() {
                   className="modal-content"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <BookingForm
-                    station={charger.station}
-                    chargerId={Number(id)}
-                    onSubmit={handleBookingSubmit}
-                  />
+                 <BookingForm
+                  station={charger.station}
+                  chargerId={Number(id)}
+                  onSubmit={handleBookingSubmit}
+                  selectedDate={selectedDate} // <== add this line
+                />
                   <button className="modal-close" onClick={() => setShowBookingForm(false)}>
                     ✖
                   </button>
