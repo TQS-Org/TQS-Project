@@ -7,6 +7,7 @@ import ProtectedRoute from './ProtectedRoute';
 import SignupPage from './SignUpPage';
 import Layout from './Layout';
 import StationDetailsPage from './StationDetailsPage';
+import ChargerDetailsPage from './ChargerDetailsPage';
 
 
 export default function App() {
@@ -58,6 +59,16 @@ export default function App() {
         }
       />
 
+      <Route
+        path="/chargers/:id"
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <ChargerDetailsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
 
     </Routes>
   );
