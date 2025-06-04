@@ -20,10 +20,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
   List<Booking> findAllBookingsByChargerId(long chargerId);
 
-  @Query("SELECT b FROM Booking b WHERE b.charger.id = :chargerId AND b.startTime >= :start AND b.startTime < :end")
+  @Query(
+      "SELECT b FROM Booking b WHERE b.charger.id = :chargerId AND b.startTime >= :start AND"
+          + " b.startTime < :end")
   List<Booking> findByChargerIdAndDate(
       @Param("chargerId") long chargerId,
       @Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end);
-
 }

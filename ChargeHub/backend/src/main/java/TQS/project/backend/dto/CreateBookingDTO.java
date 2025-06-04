@@ -10,50 +10,50 @@ import java.time.LocalDateTime;
 
 public class CreateBookingDTO {
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
-    private String mail;
+  @NotBlank(message = "Email is required")
+  @Email(message = "Email should be valid")
+  private String mail;
 
-    @NotNull(message = "Charger ID is mandatory")
-    private Long chargerId;
+  @NotNull(message = "Charger ID is mandatory")
+  private Long chargerId;
 
-    @NotNull(message = "Start time is mandatory")
-    private LocalDateTime startTime;
+  @NotNull(message = "Start time is mandatory")
+  private LocalDateTime startTime;
 
-    @Min(value = 5, message = "Duration must be at least 5 minutes")
-    @Max(value = 60, message = "Duration must be at most 60 minutes")
-    private int duration;
+  @Min(value = 5, message = "Duration must be at least 5 minutes")
+  @Max(value = 60, message = "Duration must be at most 60 minutes")
+  private int duration;
 
-    // Getters and Setters
-    public String getMail() {
-        return mail;
-    }
+  // Getters and Setters
+  public String getMail() {
+    return mail;
+  }
 
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
+  public void setMail(String mail) {
+    this.mail = mail;
+  }
 
-    public Long getChargerId() {
-        return chargerId;
-    }
+  public Long getChargerId() {
+    return chargerId;
+  }
 
-    public void setChargerId(Long chargerId) {
-        this.chargerId = chargerId;
-    }
+  public void setChargerId(Long chargerId) {
+    this.chargerId = chargerId;
+  }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
+  public LocalDateTime getStartTime() {
+    return startTime;
+  }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
+  public void setStartTime(LocalDateTime startTime) {
+    this.startTime = startTime;
+  }
 
-    public int getDuration() {
-        return duration;
-    }
+  public int getDuration() {
+    return duration;
+  }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
+  public void setDuration(int duration) {
+    this.duration = duration;
+  }
 }

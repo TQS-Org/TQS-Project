@@ -46,11 +46,11 @@ public class StationController {
             district, maxPrice, chargerType, minPower, maxPower, connectorType, available);
 
     return ResponseEntity.ok(results);
-      }
+  }
 
-    @GetMapping("/{id}/chargers")
-    public ResponseEntity<List<Charger>> getStationChargers(@PathVariable Long id){
-      List<Charger> chargers = stationService.getAllStationChargers(id);
-      return ResponseEntity.ok(chargers);
-    }
+  @GetMapping("/{id}/chargers")
+  public ResponseEntity<List<Charger>> getStationChargers(@PathVariable Long id) {
+    List<Charger> chargers = stationService.getAllStationChargers(id);
+    return ResponseEntity.ok(chargers);
+  }
 }

@@ -12,7 +12,6 @@ public class ChargerController {
 
   private final ChargerService chargerService;
 
-
   public ChargerController(ChargerService chargerService) {
     this.chargerService = chargerService;
   }
