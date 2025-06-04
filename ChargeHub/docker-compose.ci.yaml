@@ -42,7 +42,7 @@ services:
               "spring.datasource.username" : "$MYSQLDB_USER",
               "spring.datasource.password" : "$MYSQLDB_PASSWORD",
               "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQLDialect",
-              "spring.jpa.hibernate.ddl-auto" : "update"
+              "spring.jpa.hibernate.ddl-auto" : "update",
               "management.endpoint.health.show-details": "always",
               "management.endpoint.health.access": "unrestricted",
               "management.endpoints.web.exposure.include": "health,info,metrics,prometheus",
