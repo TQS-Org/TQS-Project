@@ -58,17 +58,16 @@ public class Booking {
   }
 
   private String generateRandomToken(int length) {
-      SecureRandom secureRandom = new SecureRandom();
-      String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    SecureRandom secureRandom = new SecureRandom();
+    String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-      StringBuilder token = new StringBuilder(length);
-      for (int i = 0; i < length; i++) {
-          int index = secureRandom.nextInt(CHARACTERS.length());
-          token.append(CHARACTERS.charAt(index));
-      }
-      return token.toString();
+    StringBuilder token = new StringBuilder(length);
+    for (int i = 0; i < length; i++) {
+      int index = secureRandom.nextInt(CHARACTERS.length());
+      token.append(CHARACTERS.charAt(index));
+    }
+    return token.toString();
   }
-
 
   // Getters and setters
 
