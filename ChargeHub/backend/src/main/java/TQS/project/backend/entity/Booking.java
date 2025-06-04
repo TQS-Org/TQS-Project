@@ -3,7 +3,7 @@ package TQS.project.backend.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.concurrent.ThreadLocalRandom;
+import java.security.SecureRandom;
 
 @Entity
 @Table(name = "booking")
@@ -58,14 +58,17 @@ public class Booking {
   }
 
   private String generateRandomToken(int length) {
-    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    StringBuilder token = new StringBuilder();
-    ThreadLocalRandom random = ThreadLocalRandom.current();
-    for (int i = 0; i < length; i++) {
-      token.append(chars.charAt(random.nextInt(chars.length())));
-    }
-    return token.toString();
+      SecureRandom secureRandom = new SecureRandom();
+      String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+      StringBuilder token = new StringBuilder(length);
+      for (int i = 0; i < length; i++) {
+          int index = secureRandom.nextInt(CHARACTERS.length());
+          token.append(CHARACTERS.charAt(index));
+      }
+      return token.toString();
   }
+
 
   // Getters and setters
 
