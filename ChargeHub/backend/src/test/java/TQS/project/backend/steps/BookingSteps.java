@@ -59,13 +59,13 @@ public class BookingSteps {
     WebElement dateInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("date")));
     LocalDate tomorrow = LocalDate.now().plusDays(1);
     String nextDayStr = tomorrow.format(DateTimeFormatter.ISO_DATE);
-    ((JavascriptExecutor) driver).executeScript(
-        "arguments[0].value = arguments[1];" +
-        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
-        "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
-        dateInput,
-        nextDayStr
-    );
+    ((JavascriptExecutor) driver)
+        .executeScript(
+            "arguments[0].value = arguments[1];"
+                + "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));"
+                + "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
+            dateInput,
+            nextDayStr);
   }
 
   // @And("I click the {string} button")
