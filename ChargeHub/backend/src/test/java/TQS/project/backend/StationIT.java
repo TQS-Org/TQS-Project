@@ -9,6 +9,7 @@ import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.StationRepository;
 import TQS.project.backend.repository.BookingRepository;
 import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.StaffRepository;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,17 +29,26 @@ import java.util.List;
 @Import(TestcontainersConfiguration.class)
 public class StationIT {
 
-  @Autowired private TestRestTemplate restTemplate;
+  @Autowired
+  private TestRestTemplate restTemplate;
 
-  @Autowired private ClientRepository clientRepository;
+  @Autowired
+  private ClientRepository clientRepository;
 
-  @Autowired private BookingRepository bookingRepository;
+  @Autowired
+  private BookingRepository bookingRepository;
 
-  @Autowired private StationRepository stationRepository;
+  @Autowired
+  private StationRepository stationRepository;
 
-  @Autowired private ChargerRepository chargerRepository;
+  @Autowired
+  private ChargerRepository chargerRepository;
 
-  @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired
+  private StaffRepository staffRepository; // Assuming you have a StaffRepository
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   private String token;
 
@@ -47,6 +57,7 @@ public class StationIT {
     bookingRepository.deleteAll();
     clientRepository.deleteAll();
     chargerRepository.deleteAll(); // <--- delete chargers before stations
+    staffRepository.deleteAll(); // Assuming you have a StaffRepository
     stationRepository.deleteAll();
 
     Client client = new Client();
@@ -77,8 +88,8 @@ public class StationIT {
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<LoginRequest> request = new HttpEntity<>(login, headers);
 
-    ResponseEntity<LoginResponse> response =
-        restTemplate.postForEntity("/api/auth/login", request, LoginResponse.class);
+    ResponseEntity<LoginResponse> response = restTemplate.postForEntity("/api/auth/login", request,
+        LoginResponse.class);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotNull();
     token = response.getBody().getToken();
@@ -91,8 +102,8 @@ public class StationIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    ResponseEntity<Station[]> response =
-        restTemplate.exchange("/api/stations", HttpMethod.GET, request, Station[].class);
+    ResponseEntity<Station[]> response = restTemplate.exchange("/api/stations", HttpMethod.GET, request,
+        Station[].class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotEmpty();
@@ -108,9 +119,8 @@ public class StationIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    ResponseEntity<Station> response =
-        restTemplate.exchange(
-            "/api/stations/" + station.getId(), HttpMethod.GET, request, Station.class);
+    ResponseEntity<Station> response = restTemplate.exchange(
+        "/api/stations/" + station.getId(), HttpMethod.GET, request, Station.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody().getId()).isEqualTo(station.getId());
@@ -119,17 +129,16 @@ public class StationIT {
   @Test
   @Requirement("SCRUM-16")
   void searchStations_withValidFilters_returnsMatchingStations() {
-    Station matchingStation =
-        new Station(
-            "Matching Station",
-            "BrandMatch",
-            38.76,
-            -9.14,
-            "Rua Z, Lisboa",
-            3,
-            "08:00",
-            "20:00",
-            0.30);
+    Station matchingStation = new Station(
+        "Matching Station",
+        "BrandMatch",
+        38.76,
+        -9.14,
+        "Rua Z, Lisboa",
+        3,
+        "08:00",
+        "20:00",
+        0.30);
     matchingStation = stationRepository.save(matchingStation);
 
     Charger matchingCharger = new Charger();
@@ -144,11 +153,9 @@ public class StationIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    String url =
-        "/api/stations/search?district=Lisboa&maxPrice=0.35&chargerType=DC&minPower=50&maxPower=150&connectorType=CCS&available=true";
+    String url = "/api/stations/search?district=Lisboa&maxPrice=0.35&chargerType=DC&minPower=50&maxPower=150&connectorType=CCS&available=true";
 
-    ResponseEntity<Station[]> response =
-        restTemplate.exchange(url, HttpMethod.GET, request, Station[].class);
+    ResponseEntity<Station[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Station[].class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotEmpty();
@@ -162,8 +169,8 @@ public class StationIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    ResponseEntity<String> response =
-        restTemplate.exchange("/api/stations/9999", HttpMethod.GET, request, String.class);
+    ResponseEntity<String> response = restTemplate.exchange("/api/stations/9999", HttpMethod.GET, request,
+        String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
@@ -172,17 +179,16 @@ public class StationIT {
   @Requirement("SCRUM-20")
   void getStationChargers_returnsChargersForStation() {
     // Create a station
-    Station station =
-        new Station(
-            "Charger Test Station",
-            "BrandTest",
-            38.80,
-            -9.15,
-            "Rua Charger, Lisboa",
-            3,
-            "07:00",
-            "23:00",
-            0.28);
+    Station station = new Station(
+        "Charger Test Station",
+        "BrandTest",
+        38.80,
+        -9.15,
+        "Rua Charger, Lisboa",
+        3,
+        "07:00",
+        "23:00",
+        0.28);
     station = stationRepository.save(station);
 
     // Create two chargers for this station
@@ -208,12 +214,11 @@ public class StationIT {
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
     // Send request
-    ResponseEntity<Charger[]> response =
-        restTemplate.exchange(
-            "/api/stations/" + station.getId() + "/chargers",
-            HttpMethod.GET,
-            request,
-            Charger[].class);
+    ResponseEntity<Charger[]> response = restTemplate.exchange(
+        "/api/stations/" + station.getId() + "/chargers",
+        HttpMethod.GET,
+        request,
+        Charger[].class);
 
     // Assert response
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
