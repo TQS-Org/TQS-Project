@@ -18,6 +18,7 @@ export default function LoginPage() {
       const { token } = res.data;
 
       localStorage.setItem('token', token);
+      localStorage.setItem('email', email);
 
       const role = await getUserRoleFromToken();
       console.log("Role from token:", role);

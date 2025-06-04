@@ -29,7 +29,7 @@ SELECT 6, 'ALVES BANDEIRA Olival', 'ALVES BANDEIRA', 38.21371, -7.54008, 'Évora
 WHERE NOT EXISTS (SELECT 1 FROM station WHERE latitude = 38.21371 AND longitude = -7.54008);
 
 INSERT INTO station (id, name, brand, latitude, longitude, address, number_of_chargers, opening_hours, closing_hours, price)
-SELECT 7, 'Prio Montalegre', 'PRIO', 38.55458, -9.08845, 'Setúbal', 3, '9:00', '23:00', 0.14
+SELECT 7, 'Prio Montalegre', 'PRIO', 38.55458, -9.08845, 'Setúbal', 3, '0:00', '23:00', 0.14
 WHERE NOT EXISTS (SELECT 1 FROM station WHERE latitude = 38.55458 AND longitude = -9.08845);
 
 INSERT INTO station (id, name, brand, latitude, longitude, address, number_of_chargers, opening_hours, closing_hours, price)

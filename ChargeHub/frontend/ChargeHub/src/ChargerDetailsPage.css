@@ -1,0 +1,192 @@
+/* ChargerDetailsPage.css */
+
+#charger-details-page {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+#charger-details-page .back-button {
+  background: none;
+  border: none;
+  color: #90caf9;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+#charger-details-page .charger-card {
+  background-color: #1e1e1e;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+#charger-details-page .charger-title {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+#charger-details-page .charger-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+#charger-details-page .status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+#charger-details-page .status-badge.available {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+#charger-details-page .status-badge.unavailable {
+  background-color: #757575;
+  color: #fff;
+}
+
+#charger-details-page .date-picker-section {
+  margin-bottom: 1.5rem;
+}
+
+#charger-details-page .date-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+#charger-details-page .date-picker {
+  padding: 0.6rem;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 1rem;
+}
+
+#charger-details-page .primary-button {
+  background-color: #2196f3;
+  color: white;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+#charger-details-page .primary-button:hover {
+  background-color: #1976d2;
+}
+
+#charger-details-page .cancel-button {
+  margin-top: 0.5rem;
+  background: none;
+  border: none;
+  color: #ef5350;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: block;
+}
+
+#charger-details-page .loading {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+#charger-details-page .booking-form-section {
+  margin-top: 1rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  #charger-details-page {
+    padding: 1rem 0.75rem;
+  }
+
+  #charger-details-page .charger-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #charger-details-page .primary-button {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  #charger-details-page .date-picker {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+
+  #charger-details-page .cancel-button {
+    font-size: 0.9rem;
+  }
+}
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 10, 10, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal content */
+.modal-content {
+  position: relative;
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Modal close button */
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.8rem;
+  background: none;
+  color: #ccc;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.modal-close:hover {
+  color: #fff;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
