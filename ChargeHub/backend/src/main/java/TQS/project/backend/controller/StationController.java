@@ -1,5 +1,6 @@
 package TQS.project.backend.controller;
 
+import TQS.project.backend.entity.Charger;
 import TQS.project.backend.dto.StationDTO;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.service.StationService;
@@ -53,5 +54,11 @@ public class StationController {
         district, maxPrice, chargerType, minPower, maxPower, connectorType, available);
 
     return ResponseEntity.ok(results);
+  }
+
+  @GetMapping("/{id}/chargers")
+  public ResponseEntity<List<Charger>> getStationChargers(@PathVariable Long id) {
+    List<Charger> chargers = stationService.getAllStationChargers(id);
+    return ResponseEntity.ok(chargers);
   }
 }

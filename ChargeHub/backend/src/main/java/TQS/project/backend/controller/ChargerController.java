@@ -1,30 +1,24 @@
 package TQS.project.backend.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
-import TQS.project.backend.dto.ChargerDTO;
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.service.ChargerService;
-
-import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("api/chargers")
+@RequestMapping("/api/charger")
 public class ChargerController {
 
-    @Autowired
-    private ChargerService chargerService;
+  private final ChargerService chargerService;
 
-    @PostMapping
-    public ResponseEntity<Charger> createCharger(@Valid @RequestBody ChargerDTO chargerDTO) {
-        Charger charger = chargerService.createCharger(chargerDTO);
-        return ResponseEntity.ok(charger);
-    }
+  public ChargerController(ChargerService chargerService) {
+    this.chargerService = chargerService;
+  }
 
-    @GetMapping("/station/{stationId}")
-    public ResponseEntity<List<Charger>> getChargersByStation(@PathVariable Long stationId) {
-        return ResponseEntity.ok(chargerService.getChargersByStation(stationId));
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<Charger> getChargerById(@PathVariable Long id) {
+    Optional<Charger> charger = chargerService.getChargerById(id);
+    return charger.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+  }
 }

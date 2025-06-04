@@ -7,6 +7,8 @@ import personMarker from "./assets/personmarker.png";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import CONFIG from '../config';
+import ChargerList from "./components/ChargerList";
+
 
 
 const userLat = 40.6293194;
@@ -106,6 +108,8 @@ export default function StationDetailsPage() {
       <div className="map-container">
         <div id="station-details-map" className="leaflet-container" />
       </div>
+
+      <ChargerList stationId={station.id} />
     </div>
   );
 }

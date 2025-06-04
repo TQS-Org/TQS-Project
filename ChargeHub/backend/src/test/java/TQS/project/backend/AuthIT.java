@@ -2,6 +2,7 @@ package TQS.project.backend;
 
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.repository.ClientRepository;
+import TQS.project.backend.repository.BookingRepository;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import TQS.project.backend.dto.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,10 +24,13 @@ public class AuthIT {
 
   @Autowired private ClientRepository clientRepository;
 
+  @Autowired private BookingRepository bookingRepository;
+
   @Autowired private PasswordEncoder passwordEncoder;
 
   @BeforeEach
   void setup() {
+    bookingRepository.deleteAll();
     clientRepository.deleteAll();
     Client client = new Client();
     client.setName("Alice");

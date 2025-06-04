@@ -10,49 +10,59 @@ import TQS.project.backend.repository.ChargerRepository;
 import TQS.project.backend.repository.StationRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChargerService {
 
-    @Autowired
-    private ChargerRepository chargerRepository;
+  @Autowired
+  private ChargerRepository chargerRepository;
 
-    @Autowired
-    private StationRepository stationRepository;
+  @Autowired
+  private StationRepository stationRepository;
 
-    public Charger createCharger(ChargerDTO dto) {
-        Station station = stationRepository.findById(dto.getStationId())
-                .orElseThrow(() -> new RuntimeException("Station not found"));
+  @Autowired
+  public ChargerService(ChargerRepository chargerRepository) {
+    this.chargerRepository = chargerRepository;
+  }
 
-        Charger charger = new Charger(dto.getType(), dto.getPower(), dto.getAvailable(), dto.getConnectorType());
-        charger.setStation(station);
-        return chargerRepository.save(charger);
-    }
+  public Optional<Charger> getChargerById(Long id) {
+    return chargerRepository.findById(id);
+  }
 
-    public Charger getCharger(Long id) {
-        return chargerRepository.findById(id).orElseThrow(() -> new RuntimeException("Charger not found"));
-    }
+  public Charger createCharger(ChargerDTO dto) {
+    Station station = stationRepository.findById(dto.getStationId())
+        .orElseThrow(() -> new RuntimeException("Station not found"));
 
-    public List<Charger> getChargersByStation(Long stationId) {
-        Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new RuntimeException("Station not found"));
-        return chargerRepository.findByStation(station);
-    }
+    Charger charger = new Charger(dto.getType(), dto.getPower(), dto.getAvailable(), dto.getConnectorType());
+    charger.setStation(station);
+    return chargerRepository.save(charger);
+  }
 
-    public Charger updateCharger(Long id, ChargerDTO dto) {
-        Charger charger = getCharger(id);
-        Station station = stationRepository.findById(dto.getStationId())
-                .orElseThrow(() -> new RuntimeException("Station not found"));
+  public Charger getCharger(Long id) {
+    return chargerRepository.findById(id).orElseThrow(() -> new RuntimeException("Charger not found"));
+  }
 
-        charger.setType(dto.getType());
-        charger.setPower(dto.getPower());
-        charger.setAvailable(dto.getAvailable());
-        charger.setConnectorType(dto.getConnectorType());
-        charger.setStation(station);
-        return chargerRepository.save(charger);
-    }
+  public List<Charger> getChargersByStation(Long stationId) {
+    Station station = stationRepository.findById(stationId)
+        .orElseThrow(() -> new RuntimeException("Station not found"));
+    return chargerRepository.findByStation(station);
+  }
 
-    public void deleteCharger(Long id) {
-        chargerRepository.deleteById(id);
-    }
+  public Charger updateCharger(Long id, ChargerDTO dto) {
+    Charger charger = getCharger(id);
+    Station station = stationRepository.findById(dto.getStationId())
+        .orElseThrow(() -> new RuntimeException("Station not found"));
+
+    charger.setType(dto.getType());
+    charger.setPower(dto.getPower());
+    charger.setAvailable(dto.getAvailable());
+    charger.setConnectorType(dto.getConnectorType());
+    charger.setStation(station);
+    return chargerRepository.save(charger);
+  }
+
+  public void deleteCharger(Long id) {
+    chargerRepository.deleteById(id);
+  }
 }

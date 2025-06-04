@@ -1,6 +1,7 @@
 package TQS.project.backend.service;
 
 import TQS.project.backend.dto.StationDTO;
+import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StationRepository;
 import TQS.project.backend.repository.ChargerRepository;
@@ -69,5 +70,9 @@ public class StationService {
         .filter(s -> maxPrice == null || s.getPrice() <= maxPrice)
         .filter(s -> stationIdsFromChargers.contains(s.getId()))
         .toList();
+  }
+
+  public List<Charger> getAllStationChargers(long id) {
+    return chargerRepository.findAllByStationId(id);
   }
 }
