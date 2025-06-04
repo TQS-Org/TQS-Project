@@ -116,7 +116,7 @@ export default function ChargerDetailsPage() {
                   chargerId={Number(id)}
                   onSubmit={handleBookingSubmit}
                   selectedDate={selectedDate} // <== add this line
-                />
+                 />
                   <button className="modal-close" onClick={() => setShowBookingForm(false)}>
                     ✖
                   </button>
