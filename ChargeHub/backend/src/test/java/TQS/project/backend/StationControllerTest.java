@@ -1,6 +1,7 @@
 package TQS.project.backend;
 
 import TQS.project.backend.controller.StationController;
+import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.security.JwtAuthFilter;
 import TQS.project.backend.security.JwtProvider;
@@ -120,5 +121,34 @@ public class StationControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0].name").value("Cheap Fast Charger"));
+  }
+
+  @Test
+  @Requirement("SCRUM-20")
+  void testGetStationChargers_returnsChargers() throws Exception {
+    Charger charger1 = new Charger();
+    charger1.setId(1L);
+    charger1.setType("AC");
+    charger1.setConnectorType("Type2");
+    charger1.setPower(22.0);
+    charger1.setAvailable(true);
+
+    Charger charger2 = new Charger();
+    charger2.setId(2L);
+    charger2.setType("DC");
+    charger2.setConnectorType("CCS");
+    charger2.setPower(50.0);
+    charger2.setAvailable(true);
+
+    List<Charger> chargers = List.of(charger1, charger2);
+
+    when(stationService.getAllStationChargers(1L)).thenReturn(chargers);
+
+    mockMvc
+        .perform(get("/api/stations/1/chargers"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].type").value("AC"))
+        .andExpect(jsonPath("$[1].type").value("DC"));
   }
 }

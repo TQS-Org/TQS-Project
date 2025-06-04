@@ -125,4 +125,36 @@ public class StationServiceTest {
 
     assertEquals(0, result.size());
   }
+
+  @Test
+  @Requirement("SCRUM-20")
+  void testGetAllStationChargers_returnsChargerList() {
+    Station station = new Station();
+    station.setId(1L);
+    station.setName("Charger Station");
+
+    Charger charger1 = new Charger();
+    charger1.setId(1L);
+    charger1.setType("AC");
+    charger1.setConnectorType("Type2");
+    charger1.setPower(22.0);
+    charger1.setAvailable(true);
+    charger1.setStation(station);
+
+    Charger charger2 = new Charger();
+    charger2.setId(2L);
+    charger2.setType("DC");
+    charger2.setConnectorType("CCS");
+    charger2.setPower(100.0);
+    charger2.setAvailable(true);
+    charger2.setStation(station);
+
+    when(chargerRepository.findAllByStationId(1L)).thenReturn(List.of(charger1, charger2));
+
+    List<Charger> result = stationService.getAllStationChargers(1L);
+
+    assertEquals(2, result.size());
+    assertEquals("AC", result.get(0).getType());
+    assertEquals("DC", result.get(1).getType());
+  }
 }
