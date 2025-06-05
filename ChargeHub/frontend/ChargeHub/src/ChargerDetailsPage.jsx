@@ -12,6 +12,11 @@ export default function ChargerDetailsPage() {
   const [charger, setCharger] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [showSessionModal, setShowSessionModal] = useState(false);
+  const [chargeToken, setChargeToken] = useState("");
+  const [sessionMessage, setSessionMessage] = useState(null);
+  const [sessionError, setSessionError] = useState(null);
+
 
   useEffect(() => {
     const fetchCharger = async () => {
@@ -67,6 +72,38 @@ export default function ChargerDetailsPage() {
       </div>
     );
   }
+
+    const handleStartSession = async () => {
+      const token = localStorage.getItem("token");
+      if (!chargeToken) {
+        setSessionError("Please enter a valid token.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${CONFIG.API_URL}charger/${id}/session`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ chargeToken }),
+        });
+
+        const text = await res.text();
+        if (res.ok) {
+          setSessionMessage(text);
+          setSessionError(null);
+        } else {
+          setSessionMessage(null);
+          setSessionError(text);
+        }
+      } catch (err) {
+        setSessionError("An error occurred while starting the session.");
+        console.error(err);
+      }
+    };
+
 
   return (
     <div id="charger-details-page">
@@ -127,7 +164,37 @@ export default function ChargerDetailsPage() {
             <button className="primary-button" onClick={() => setShowBookingForm(true)}>
               Book Charge
             </button>
+
+            <button className="primary-button mt-2" onClick={() => setShowSessionModal(true)}>
+              Start Charging Session
+            </button>
+
+            {showSessionModal && (
+              <div className="modal-overlay" onClick={() => setShowSessionModal(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <h2 className="text-lg font-semibold mb-2">Enter Charge Token</h2>
+                  <input
+                    type="text"
+                    className="input-token"
+                    value={chargeToken}
+                    maxLength={6}
+                    onChange={(e) => setChargeToken(e.target.value)}
+                    placeholder="Enter token"
+                  />
+                  <button className="primary-button mt-2" onClick={handleStartSession}>
+                    Submit Token
+                  </button>
+                  <button className="modal-close" onClick={() => setShowSessionModal(false)}>
+                    ✖
+                  </button>
+            
+                  {sessionMessage && <p className="text-green-600 mt-2">{sessionMessage}</p>}
+                  {sessionError && <p className="text-red-600 mt-2">{sessionError}</p>}
+                </div>
+              </div>
+            )}
           </>
+          
         )}
       </div>
     </div>

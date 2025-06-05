@@ -25,12 +25,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
+import TQS.project.backend.dto.ChargerTokenDTO;
+import org.springframework.http.MediaType;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 @Import(TestSecurityConfig.class)
 @WebMvcTest(ChargerController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class ChargerControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
   @SuppressWarnings("removal")
   @MockBean
@@ -68,5 +75,48 @@ public class ChargerControllerTest {
     when(chargerService.getChargerById(99L)).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/api/charger/99")).andExpect(status().isNotFound());
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  void createChargingSession_validRequest_returnsOk() throws Exception {
+    ChargerTokenDTO dto = new ChargerTokenDTO();
+    dto.setChargeToken("VALIDTOKEN");
+
+    mockMvc
+        .perform(
+            post("/api/charger/1/session")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                            "chargeToken": "VALIDTOKEN"
+                        }
+                        """))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Charger unlocked successfully, charge session starting..."));
+
+    verify(chargerService).startChargingSession("VALIDTOKEN", 1L);
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  void createChargingSession_invalidToken_returnsBadRequest() throws Exception {
+    doThrow(new IllegalArgumentException("No booking found for the given token."))
+        .when(chargerService)
+        .startChargingSession("BADTOKEN", 1L);
+
+    mockMvc
+        .perform(
+            post("/api/charger/1/session")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                            "chargeToken": "BADTOKEN"
+                        }
+                        """))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("No booking found for the given token."));
   }
 }

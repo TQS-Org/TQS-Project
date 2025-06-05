@@ -1,0 +1,74 @@
+/* client-booking-list.css */
+
+.client-booking-list {
+  padding: 1.5rem; /* Add some internal padding */
+  background-color: #2c2c2c; /* A slightly different dark shade for the list background */
+  border-radius: 8px; /* Match the main container's border-radius */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Softer shadow for nested elements */
+  margin-top: 1.5rem; /* Space from the main page title */
+}
+
+/* Flex container for the heading and button */
+.client-booking-list .flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem; /* Space below this row */
+}
+
+/* Heading for the booking list */
+.client-booking-list h2 {
+  color: #ffffff; /* White for the heading */
+  font-size: 1.75rem; /* Slightly smaller than the main page title */
+  font-weight: 600; /* Semi-bold */
+  margin: 0; /* Remove default margin */
+}
+
+/* Toggle button for showing upcoming/expired bookings */
+.client-booking-list button {
+  background-color: #00ab59; /* Vibrant blue, consistent with action buttons */
+  color: #ffffff; /* White text */
+  padding: 0.7rem 1.2rem; /* Comfortable padding */
+  border: none;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease, transform 0.1s ease; /* Smooth transitions */
+}
+
+.client-booking-list button:hover {
+  background-color: #00e676; /* Darker blue on hover */
+  transform: translateY(-1px); /* Slight lift on hover for feedback */
+}
+
+.client-booking-list button:active {
+  background-color: #00e676; /* Even darker blue when clicked */
+  transform: translateY(0); /* Reset lift */
+}
+
+/* Message when no bookings are found */
+.client-booking-list > div:last-child:not(.grid) {
+  color: #c0c0c0; /* Light gray for informational text */
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 1.1rem;
+}
+
+/* Grid layout for the booking cards */
+.client-booking-list .grid {
+  display: grid;
+  gap: 1rem; /* Space between the booking cards */
+  /* --- MODIFICATION START --- */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive columns */
+  justify-content: center; /* Center the grid items if they don't fill the row */
+  /* --- MODIFICATION END --- */
+}
+
+/* Styles for loading message */
+.client-booking-list > div:first-child[class*="Loading"] {
+    color: #e0e0e0;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+}
