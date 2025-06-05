@@ -173,7 +173,15 @@ export default function AdminStations() {
                 pattern="^([01]\d|2[0-3]):([0-5]\d)$"
                 title="Enter hours in HH:MM (24h)"
                 required
+                onInput={(e) => {
+                  if (e.target.value === "24:00") {
+                    e.target.setCustomValidity("Closing hour cannot be 24:00. Use 23:59 instead.");
+                  } else {
+                    e.target.setCustomValidity("");
+                  }
+                }}
               />
+
               <input
                 name="price"
                 placeholder="Price"

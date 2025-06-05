@@ -5,7 +5,7 @@ WHERE NOT EXISTS (SELECT 1 FROM client WHERE mail = 'driver@mail.com');
 
 -- === Stations ===
 INSERT INTO station (id, name, brand, latitude, longitude, address, number_of_chargers, opening_hours, closing_hours, price)
-SELECT 1, 'PRIO Borba (Sul)', 'PRIO', 40.19253, -8.50822, 'Coimbra', 3, '7:00', '23:00', 0.33
+SELECT 1, 'PRIO Borba (Sul)', 'PRIO', 40.19253, -8.50822, 'Coimbra', 3, '0:00', '23:55', 0.33
 WHERE NOT EXISTS (SELECT 1 FROM station WHERE latitude = 40.19253 AND longitude = -8.50822);
 
 INSERT INTO station (id, name, brand, latitude, longitude, address, number_of_chargers, opening_hours, closing_hours, price)
