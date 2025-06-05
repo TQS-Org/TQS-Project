@@ -27,25 +27,28 @@ public class BookingSteps {
 
   @Then("I should see a list of chargers")
   public void viewListOfChargers() {
-    List<WebElement> chargers = wait.until(
-        ExpectedConditions.visibilityOfAllElementsLocatedBy(
-            By.cssSelector(".charger-list .charger-card")));
+    List<WebElement> chargers =
+        wait.until(
+            ExpectedConditions.visibilityOfAllElementsLocatedBy(
+                By.cssSelector(".charger-list .charger-card")));
     Assertions.assertFalse(chargers.isEmpty(), "No chargers are visible");
   }
 
   @When("I click the first charger in the list")
   public void clickTheFirstCharger() {
-    List<WebElement> chargerCards = wait.until(
-        ExpectedConditions.visibilityOfAllElementsLocatedBy(
-            By.cssSelector(".charger-list .charger-card")));
+    List<WebElement> chargerCards =
+        wait.until(
+            ExpectedConditions.visibilityOfAllElementsLocatedBy(
+                By.cssSelector(".charger-list .charger-card")));
     Assertions.assertFalse(chargerCards.isEmpty(), "No charger cards found");
     chargerCards.get(0).click();
   }
 
   @Then("I should see the status value as {string}")
   public void viewBookingsForToday(String statusValue) {
-    WebElement statusBadge = new WebDriverWait(driver, Duration.ofSeconds(5))
-        .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".status-badge")));
+    WebElement statusBadge =
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+            .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".status-badge")));
 
     Assertions.assertEquals(
         statusValue, statusBadge.getText(), "Status text does not match expected value");
@@ -79,16 +82,18 @@ public class BookingSteps {
       String field = row.get(0).toLowerCase();
       String value = row.get(1);
       if (field.contains("starttime")) {
-        WebElement select = wait.until(
-            ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("form#booking-form select")));
+        WebElement select =
+            wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                    By.cssSelector("form#booking-form select")));
         select.click();
         WebElement option = select.findElement(By.cssSelector("option[value='" + value + "']"));
         option.click();
       } else if (field.contains("duration")) {
-        WebElement input = wait.until(
-            ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("form#booking-form input[type='number']")));
+        WebElement input =
+            wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                    By.cssSelector("form#booking-form input[type='number']")));
         input.clear();
         input.sendKeys(value);
       }
@@ -97,16 +102,18 @@ public class BookingSteps {
 
   @And("click the form {string} button")
   public void confirmBookingButton(String buttonText) {
-    WebElement confirmBtn = wait.until(
-        ExpectedConditions.elementToBeClickable(
-            By.xpath("//form[@id='booking-form']//button[contains(., '" + buttonText + "')]")));
+    WebElement confirmBtn =
+        wait.until(
+            ExpectedConditions.elementToBeClickable(
+                By.xpath("//form[@id='booking-form']//button[contains(., '" + buttonText + "')]")));
     confirmBtn.click();
   }
 
   @Then("I should get an alert with the message {string}")
   public void verifySuccessMessage(String expectedMessage) {
-    WebElement successMessage = wait.until(
-        ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".feedback.success")));
+    WebElement successMessage =
+        wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".feedback.success")));
     Assertions.assertEquals(expectedMessage, successMessage.getText().trim());
   }
 }
