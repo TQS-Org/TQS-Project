@@ -1,10 +1,15 @@
 package TQS.project.backend;
 
+import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
 import TQS.project.backend.entity.Staff;
+import TQS.project.backend.entity.Role;
+import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StaffRepository;
+import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.StationRepository;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,18 +27,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestcontainersConfiguration.class)
 public class StaffIT {
 
-  @Autowired private TestRestTemplate restTemplate;
+  @Autowired
+  private TestRestTemplate restTemplate;
 
-  @Autowired private StaffRepository staffRepository;
+  @Autowired
+  private StaffRepository staffRepository;
 
-  @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired
+  private StationRepository stationRepository;
+
+  @Autowired
+  private ChargerRepository chargerRepository;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   private String token;
 
   @BeforeEach
   void setup() {
     // Optional cleanup
+    chargerRepository.deleteAll();
     staffRepository.deleteAll();
+    stationRepository.deleteAll();
 
     // Insert admin manually
     Staff admin = new Staff();
@@ -54,8 +70,8 @@ public class StaffIT {
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<LoginRequest> request = new HttpEntity<>(login, headers);
 
-    ResponseEntity<LoginResponse> response =
-        restTemplate.postForEntity("/api/auth/login", request, LoginResponse.class);
+    ResponseEntity<LoginResponse> response = restTemplate.postForEntity("/api/auth/login", request,
+        LoginResponse.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotNull();
@@ -80,8 +96,7 @@ public class StaffIT {
 
     HttpEntity<CreateStaffDTO> request = new HttpEntity<>(dto, headers);
 
-    ResponseEntity<String> response =
-        restTemplate.postForEntity("/api/staff/operator", request, String.class);
+    ResponseEntity<String> response = restTemplate.postForEntity("/api/staff/operator", request, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).contains("Operator account created successfully.");
@@ -110,8 +125,7 @@ public class StaffIT {
 
     HttpEntity<CreateStaffDTO> request = new HttpEntity<>(dto, headers);
 
-    ResponseEntity<String> response =
-        restTemplate.postForEntity("/api/staff/operator", request, String.class);
+    ResponseEntity<String> response = restTemplate.postForEntity("/api/staff/operator", request, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).contains("Email already in use");
@@ -136,12 +150,56 @@ public class StaffIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
-    ResponseEntity<Staff[]> response =
-        restTemplate.exchange(
-            "/api/staff/operators", HttpMethod.GET, request, Staff[].class, request);
+    ResponseEntity<Staff[]> response = restTemplate.exchange(
+        "/api/staff/operators", HttpMethod.GET, request, Staff[].class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotEmpty();
     assertThat(response.getBody()[0].getMail()).isEqualTo("operator@mail.com");
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void assignStationToOperator_asAdmin_succeeds() {
+
+    // Create operator
+    Staff operator = new Staff();
+    operator.setMail("operator@mail.com");
+    operator.setPassword(passwordEncoder.encode("operatorpass"));
+    operator.setName("Operator");
+    operator.setAge(30);
+    operator.setNumber("911111111");
+    operator.setAddress("Porto");
+    operator.setActive(true);
+    operator.setRole(Role.OPERATOR);
+    operator.setStartDate(java.time.LocalDate.now());
+    operator = staffRepository.save(operator);
+
+    // Create station
+    Station station = new Station(
+        "Station Z", "BrandZ", 38.72, -9.13, "Rua Z, Lisboa", 4, "08:00", "20:00", 0.30);
+    station = stationRepository.save(station);
+
+    // Assign station to operator
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(operator.getId());
+    dto.setStationId(station.getId());
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(token);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<AssignStationDTO> request = new HttpEntity<>(dto, headers);
+
+    ResponseEntity<String> response = restTemplate.postForEntity("/api/staff/operator/assign-station", request,
+        String.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).contains("Station assigned to operator successfully.");
+
+    // DB validation
+    Staff updatedOperator = staffRepository.findById(operator.getId()).orElse(null);
+    assertThat(updatedOperator).isNotNull();
+    assertThat(updatedOperator.getAssignedStation().getId()).isEqualTo(station.getId());
   }
 }
