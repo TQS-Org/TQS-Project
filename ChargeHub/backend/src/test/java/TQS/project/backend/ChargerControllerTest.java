@@ -2,14 +2,19 @@ package TQS.project.backend;
 
 import TQS.project.backend.Config.TestSecurityConfig;
 import TQS.project.backend.controller.ChargerController;
+import TQS.project.backend.dto.ChargerDTO;
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.security.JwtAuthFilter;
 import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.ChargerService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +23,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.springframework.test.web.servlet.MockMvc;
@@ -74,6 +81,90 @@ public class ChargerControllerTest {
     when(chargerService.getChargerById(99L)).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/api/charger/99")).andExpect(status().isNotFound());
+  }
+
+  @DisplayName("Tests for ChargerController POST endpoint")
+  @Test
+  @Requirement("SCRUM-36")
+  void createChargerForStation_success() throws Exception {
+    ChargerDTO chargerDTO = new ChargerDTO();
+    chargerDTO.setType("DC");
+    chargerDTO.setConnectorType("CCS");
+    chargerDTO.setPower(50.0);
+    chargerDTO.setAvailable(true);
+
+    Charger createdCharger = new Charger();
+    createdCharger.setId(1L);
+    createdCharger.setType("DC");
+    createdCharger.setConnectorType("CCS");
+    createdCharger.setPower(50.0);
+    createdCharger.setAvailable(true);
+
+    when(chargerService.createChargerForStation(100L, chargerDTO)).thenReturn(createdCharger);
+
+    System.out.println("Mocked createdCharger: " + createdCharger);
+
+    mockMvc
+        .perform(
+            post("/api/charger/100")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(chargerDTO)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void createChargerForStation_validationFails() throws Exception {
+    ChargerDTO chargerDTO = new ChargerDTO();
+    // Invalid data: missing required fields, e.g., type, connectorType, etc.
+
+    mockMvc
+        .perform(
+            post("/api/charger/100")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(chargerDTO)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testUpdateCharger_success() throws Exception {
+    ChargerDTO dto = new ChargerDTO();
+    dto.setType("DC");
+    dto.setConnectorType("CCS");
+    dto.setPower(60.0);
+    dto.setAvailable(true);
+
+    Charger updatedCharger = new Charger();
+    updatedCharger.setId(1L);
+    updatedCharger.setType("DC");
+    updatedCharger.setPower(60.0);
+
+    when(chargerService.updateCharger(eq(1L), any(ChargerDTO.class))).thenReturn(updatedCharger);
+
+    mockMvc
+        .perform(
+            put("/api/charger/1")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(dto)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1L))
+        .andExpect(jsonPath("$.type").value("DC"))
+        .andExpect(jsonPath("$.power").value(60.0));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testUpdateCharger_validationFails() throws Exception {
+    ChargerDTO dto = new ChargerDTO();
+    // Missing required fields (e.g., type, connectorType, etc.)
+
+    mockMvc
+        .perform(
+            put("/api/charger/1")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(dto)))
+        .andExpect(status().isBadRequest());
   }
 
   @Test

@@ -30,4 +30,10 @@ public class ValidationExceptionHandler {
   public String handleIllegalArgument(IllegalArgumentException ex) {
     return ex.getMessage();
   }
+
+  @ExceptionHandler(RuntimeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public String handleRuntime(RuntimeException ex) {
+    return ex.getMessage();
+  }
 }
