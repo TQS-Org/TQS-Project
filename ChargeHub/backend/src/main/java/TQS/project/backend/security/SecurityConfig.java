@@ -51,7 +51,8 @@ public class SecurityConfig {
                         "/api/booking/",
                         "/api/booking/**",
                         "/api/booking/charger/**",
-                        "/api/charger/**")
+                        "/api/charger/**",
+                        "/api/client/**")
                     .hasRole("EV_DRIVER")
                     .requestMatchers("/api/stations/search**")
                     .hasRole("EV_DRIVER")

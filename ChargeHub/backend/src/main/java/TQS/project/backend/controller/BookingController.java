@@ -77,4 +77,13 @@ public class BookingController {
 
     return ResponseEntity.ok(bookings);
   }
+
+  @GetMapping("/client/{id}")
+  public ResponseEntity<List<Booking>> getBookingsByCharger(@PathVariable("id") long clientId) {
+
+    List<Booking> bookings = bookingService.getAllBookingsByClient(clientId);
+
+    return ResponseEntity.ok(bookings);
+  }
+  
 }

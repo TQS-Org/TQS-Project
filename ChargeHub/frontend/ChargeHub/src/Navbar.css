@@ -18,8 +18,15 @@
 }
 
 .navbar-title {
-  font-size: 1.5rem;
   font-weight: bold;
+  color:#ffffff;
+  background-color: transparent;  
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1.5rem;
 }
 
 .navbar-login {
@@ -34,6 +41,27 @@
   transition: background-color 0.2s ease;
 }
 
+.navbar-bookings {
+  background-color: #c2c2c2;  
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
 .navbar-login:hover {
   background-color: #00c853;
+}
+
+
+.navbar-bookings:hover {
+  background-color: #ffffff;
+}
+
+.navbar-title:hover {
+ color:#90d8b5 
 }

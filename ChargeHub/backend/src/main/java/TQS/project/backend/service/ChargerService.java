@@ -1,24 +1,79 @@
 package TQS.project.backend.service;
 
 import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import TQS.project.backend.entity.Charger;
+import TQS.project.backend.entity.ChargingSession;
+import TQS.project.backend.entity.Booking;
 import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.BookingRepository;
+import TQS.project.backend.repository.ChargingSessionRepository;
 
 @Service
 public class ChargerService {
 
   private ChargerRepository chargerRepository;
+  private BookingRepository bookingRepository;
+  private ChargingSessionRepository chargingSessionRepository;
 
   @Autowired
-  public ChargerService(ChargerRepository chargerRepository) {
+  public ChargerService(ChargerRepository chargerRepository, BookingRepository bookingRepository, ChargingSessionRepository chargingSessionRepository) {
     this.chargerRepository = chargerRepository;
+    this.bookingRepository = bookingRepository;
+    this.chargingSessionRepository = chargingSessionRepository;
   }
 
   public Optional<Charger> getChargerById(Long id) {
     return chargerRepository.findById(id);
   }
+
+  public void startChargingSession(String token, Long chargerId) {
+    Optional<Booking> optionalBooking = bookingRepository.findByToken(token);
+
+    if (optionalBooking.isEmpty()) {
+        throw new IllegalArgumentException("No booking found for the given token.");
+    }
+
+    Booking booking = optionalBooking.get();
+
+    if (!booking.getCharger().getId().equals(chargerId)) {
+        throw new IllegalArgumentException("Charger ID does not match the booking's charger.");
+    }
+
+    // Use ZonedDateTime with your desired timezone
+    ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Lisbon")); // or your correct zone
+
+    System.out.println("Now: " + now);
+    System.out.println("Start: " + booking.getStartTime());
+    System.out.println("End: " + booking.getEndTime());
+
+    // Convert booking times to ZonedDateTime in same zone before comparing:
+    ZonedDateTime start = booking.getStartTime().atZone(ZoneId.of("Europe/Lisbon"));
+    ZonedDateTime end = booking.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
+
+    if (now.isBefore(start) || now.isAfter(end)) {
+        throw new IllegalStateException("Current time is outside the booking time window.");
+    }
+
+    boolean sessionExists = chargingSessionRepository.existsByBooking(booking);
+    if (sessionExists) {
+        throw new IllegalStateException("Charging session already exists for this booking.");
+    }
+
+    ChargingSession session = new ChargingSession();
+    session.setBooking(booking);
+    session.setStartTime(now.toLocalDateTime());
+    session.setEndTime(end.toLocalDateTime());
+    session.setEnergyConsumed(0.0f);
+    session.setPrice(0.0f);
+    session.setSessionStatus("IN PROGRESS");
+
+    chargingSessionRepository.save(session);
+}
 }
