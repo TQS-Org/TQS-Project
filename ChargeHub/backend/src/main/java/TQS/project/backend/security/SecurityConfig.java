@@ -59,6 +59,8 @@ public class SecurityConfig {
                     .hasRole("EV_DRIVER")
                     .requestMatchers(HttpMethod.GET, "/api/stations/**")
                     .hasRole("EV_DRIVER")
+                    .requestMatchers(HttpMethod.PUT, "/api/charger/**")
+                    .hasRole("EV_DRIVER")
                     .requestMatchers(HttpMethod.GET, "/api/stations/*/chargers")
                     .hasAnyRole("EV_DRIVER", "OPERATOR", "ADMIN")
 

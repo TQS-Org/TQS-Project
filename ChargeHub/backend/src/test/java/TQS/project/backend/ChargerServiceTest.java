@@ -30,6 +30,7 @@ import org.mockito.quality.Strictness;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
@@ -172,12 +173,28 @@ public class ChargerServiceTest {
   }
 
   @Test
-  @Requirement("SCRUM-26")
+  @Requirement("SCRUM-27")
   void finishChargingSession_validSession_updatesFieldsCorrectly() {
+
+    Station station = new Station();
+    station.setPrice(30);
+
+    Charger charger = new Charger();
+    charger.setStation(station);
+    charger.setId(1L);
+    charger.setType("DC");
+
+    Booking booking = new Booking();
+    booking.setToken("VALIDTOKEN");
+    booking.setStartTime(LocalDateTime.now().minusMinutes(20));
+    booking.setEndTime(LocalDateTime.now().plusMinutes(20));
+    booking.setCharger(charger);
+
     ChargingSession session = new ChargingSession();
     session.setId(10L);
     session.setStartTime(LocalDateTime.now().minusHours(1));
-    session.setSessionStatus("ONGOING");
+    session.setSessionStatus("IN PROGRESS");
+    session.setBooking(booking);
 
     FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(15.5f, LocalDateTime.now());
 
@@ -188,12 +205,12 @@ public class ChargerServiceTest {
     assertThat(session.getEnergyConsumed()).isEqualTo(15.5f);
     assertThat(session.getEndTime()).isEqualTo(dto.getEndTime());
     assertThat(session.getSessionStatus()).isEqualTo("CONCLUDED");
-    assertThat(session.getPrice()).isEqualTo(15.5f * 0.25f); // price logic
+    assertEquals(session.getPrice(), 15.5f * station.getPrice());
     verify(chargingSessionRepository).save(session);
   }
 
   @Test
-  @Requirement("SCRUM-26")
+  @Requirement("SCRUM-27")
   void finishChargingSession_invalidSessionId_throwsException() {
     FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
 

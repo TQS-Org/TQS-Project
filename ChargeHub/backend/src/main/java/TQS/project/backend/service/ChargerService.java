@@ -85,7 +85,9 @@ public class ChargerService {
     session.setSessionStatus("CONCLUDED");
 
     // Optionally calculate price based on some business logic
-    float pricePerKWh = 0.25f; // example fixed rate
+    //float pricePerKWh = 0.25f; // example fixed rate
+
+    float pricePerKWh = (float) session.getBooking().getCharger().getStation().getPrice(); 
     session.setPrice(dto.getEnergyConsumed() * pricePerKWh);
 
     chargingSessionRepository.save(session);

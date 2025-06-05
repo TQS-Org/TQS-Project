@@ -130,7 +130,7 @@ public class ChargerControllerTest {
   }
 
   @Test
-  @Requirement("SCRUM-26")
+  @Requirement("SCRUM-27")
   void finishChargingSession_validRequest_returnsOk() throws Exception {
     FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(20.0f, LocalDateTime.now());
   
@@ -148,7 +148,7 @@ public class ChargerControllerTest {
   }
   
   @Test
-  @Requirement("SCRUM-26")
+  @Requirement("SCRUM-27")
   void finishChargingSession_invalidSession_returnsNotFound() throws Exception {
     FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
   

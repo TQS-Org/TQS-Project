@@ -26,8 +26,10 @@ import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
@@ -213,7 +215,7 @@ public class ChargerIT {
   }
 
   @Test
-  @Requirement("SCRUM-30")
+  @Requirement("SCRUM-27")
   void whenFinishChargingSessionWithValidData_thenSessionIsConcluded() {
     // Create and save booking
     Booking booking = new Booking();
@@ -229,10 +231,10 @@ public class ChargerIT {
     ChargingSession session = new ChargingSession();
     session.setBooking(booking);
     session.setStartTime(LocalDateTime.now().minusMinutes(30));
-    session.setEndTime(null); // not yet ended
+    session.setEndTime(booking.getEndTime());
     session.setEnergyConsumed(0);
     session.setPrice(0);
-    session.setSessionStatus("IN_PROGRESS");
+    session.setSessionStatus("IN PROGRESS");
     session = chargingSessionRepository.save(session);
 
     // Prepare request
@@ -252,17 +254,19 @@ public class ChargerIT {
     );
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getBody()).contains("Charging session concluded");
+    assertThat(response.getBody()).contains("Charging session successfully concluded.");
 
     ChargingSession updated = chargingSessionRepository.findById(session.getId()).get();
     assertThat(updated.getEnergyConsumed()).isEqualTo(20.0f);
     assertThat(updated.getSessionStatus()).isEqualTo("CONCLUDED");
-    assertThat(updated.getPrice()).isEqualTo(5.0f); // 20.0 * 0.25
-    assertThat(updated.getEndTime()).isEqualTo(dto.getEndTime());
+    assertEquals(updated.getPrice(),20.0f*((float)session.getBooking().getCharger().getStation().getPrice())); // 20.0 * 0.25
+    assertThat(updated.getEndTime().truncatedTo(ChronoUnit.MILLIS))
+    .isEqualTo(dto.getEndTime().truncatedTo(ChronoUnit.MILLIS));
+
   }
 
   @Test
-  @Requirement("SCRUM-30")
+  @Requirement("SCRUM-27")
   void whenFinishChargingSessionWithInvalidSessionId_thenReturnNotFound() {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(token);
