@@ -18,6 +18,7 @@ import TQS.project.backend.service.ChargerService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
@@ -38,11 +39,15 @@ import TQS.project.backend.entity.ChargingSession;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ChargerServiceTest {
 
-  @Mock private ChargerRepository chargerRepository;
-  @Mock private BookingRepository bookingRepository;
-  @Mock private ChargingSessionRepository chargingSessionRepository;
+  @Mock
+  private ChargerRepository chargerRepository;
+  @Mock
+  private BookingRepository bookingRepository;
+  @Mock
+  private ChargingSessionRepository chargingSessionRepository;
 
-  @InjectMocks private ChargerService chargerService;
+  @InjectMocks
+  private ChargerService chargerService;
 
   @Test
   @Requirement("SCRUM-20")
@@ -132,8 +137,8 @@ public class ChargerServiceTest {
     Booking booking = new Booking();
     booking.setToken("TOKEN");
     booking.setCharger(charger);
-    booking.setStartTime(LocalDateTime.now().plusHours(1)); // starts in future
-    booking.setEndTime(LocalDateTime.now().plusHours(2));
+    booking.setStartTime(LocalDateTime.now().plusMinutes(10));
+    booking.setEndTime(LocalDateTime.now().plusMinutes(20));
 
     when(bookingRepository.findByToken("TOKEN")).thenReturn(Optional.of(booking));
 
