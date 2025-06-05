@@ -9,7 +9,11 @@ import org.mockito.junit.jupiter.MockitoSettings;
 
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.Station;
+import TQS.project.backend.entity.Booking;
+import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.BookingRepository;
+import TQS.project.backend.repository.ChargingSessionRepository;
 import TQS.project.backend.service.ChargerService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
@@ -20,11 +24,23 @@ import java.util.Optional;
 
 import org.mockito.quality.Strictness;
 
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import TQS.project.backend.entity.Booking;
+import TQS.project.backend.entity.ChargingSession;
+
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ChargerServiceTest {
 
   @Mock private ChargerRepository chargerRepository;
+  @Mock private BookingRepository bookingRepository;
+  @Mock private ChargingSessionRepository chargingSessionRepository;
 
   @InjectMocks private ChargerService chargerService;
 
@@ -42,7 +58,7 @@ public class ChargerServiceTest {
 
     Optional<Charger> result = chargerService.getChargerById(1L);
 
-    assertThat(result.isPresent());
+    assertThat(result.isPresent()).isTrue();
     assertThat(result.get().getType()).isEqualTo("DC");
   }
 
@@ -54,5 +70,99 @@ public class ChargerServiceTest {
     Optional<Charger> result = chargerService.getChargerById(2L);
 
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  void startChargingSession_validBooking_createsSession() {
+    Charger charger = new Charger();
+    charger.setId(1L);
+
+    Booking booking = new Booking();
+    booking.setToken("VALIDTOKEN");
+    booking.setStartTime(LocalDateTime.now().minusMinutes(10));
+    booking.setEndTime(LocalDateTime.now().plusMinutes(10));
+    booking.setCharger(charger);
+
+    when(bookingRepository.findByToken("VALIDTOKEN")).thenReturn(Optional.of(booking));
+    when(chargingSessionRepository.existsByBooking(booking)).thenReturn(false);
+
+    chargerService.startChargingSession("VALIDTOKEN", 1L);
+
+    verify(chargingSessionRepository).save(any(ChargingSession.class));
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  void startChargingSession_invalidToken_throwsException() {
+    when(bookingRepository.findByToken("INVALID")).thenReturn(Optional.empty());
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          chargerService.startChargingSession("INVALID", 1L);
+        });
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  void startChargingSession_wrongChargerId_throwsException() {
+    Charger charger = new Charger();
+    charger.setId(2L); // expected != actual
+
+    Booking booking = new Booking();
+    booking.setToken("TOKEN");
+    booking.setCharger(charger);
+
+    when(bookingRepository.findByToken("TOKEN")).thenReturn(Optional.of(booking));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          chargerService.startChargingSession("TOKEN", 1L);
+        });
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  void startChargingSession_outsideTimeWindow_throwsException() {
+    Charger charger = new Charger();
+    charger.setId(1L);
+
+    Booking booking = new Booking();
+    booking.setToken("TOKEN");
+    booking.setCharger(charger);
+    booking.setStartTime(LocalDateTime.now().plusHours(1)); // starts in future
+    booking.setEndTime(LocalDateTime.now().plusHours(2));
+
+    when(bookingRepository.findByToken("TOKEN")).thenReturn(Optional.of(booking));
+
+    assertThrows(
+        IllegalStateException.class,
+        () -> {
+          chargerService.startChargingSession("TOKEN", 1L);
+        });
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  void startChargingSession_sessionAlreadyExists_throwsException() {
+    Charger charger = new Charger();
+    charger.setId(1L);
+
+    Booking booking = new Booking();
+    booking.setToken("TOKEN");
+    booking.setCharger(charger);
+    booking.setStartTime(LocalDateTime.now().minusMinutes(5));
+    booking.setEndTime(LocalDateTime.now().plusMinutes(5));
+
+    when(bookingRepository.findByToken("TOKEN")).thenReturn(Optional.of(booking));
+    when(chargingSessionRepository.existsByBooking(booking)).thenReturn(true);
+
+    assertThrows(
+        IllegalStateException.class,
+        () -> {
+          chargerService.startChargingSession("TOKEN", 1L);
+        });
   }
 }

@@ -7,7 +7,10 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-content">
-        <div className="navbar-title">EV Charging App</div>
+        <button className="navbar-title" onClick={() => navigate("/driver")}>EV Charging App</button>
+        <button className="navbar-bookings" onClick={() => navigate("/client/bookings")}>
+          My Bookigs
+        </button>
         <button className="navbar-login" onClick={() => navigate("/")}>
           Login
         </button>
