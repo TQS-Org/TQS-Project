@@ -18,14 +18,11 @@ import java.time.LocalDate;
 @Service
 public class StaffService {
 
-  @Autowired
-  private StaffRepository staffRepository;
+  @Autowired private StaffRepository staffRepository;
 
-  @Autowired
-  private StationRepository stationRepository;
+  @Autowired private StationRepository stationRepository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  @Autowired private PasswordEncoder passwordEncoder;
 
   /**
    * Retrieves all staff members with the role of OPERATOR.
@@ -39,8 +36,7 @@ public class StaffService {
   /**
    * Creates a new operator staff member.
    *
-   * @param dto Data Transfer Object containing the details of the staff member to
-   *            be created.
+   * @param dto Data Transfer Object containing the details of the staff member to be created.
    * @throws IllegalArgumentException if the email is already in use.
    */
   public void createOperator(CreateStaffDTO dto) {
@@ -65,21 +61,25 @@ public class StaffService {
   /**
    * Assigns a station to an operator.
    *
-   * @param dto Data Transfer Object containing the operator's email and station
-   *            ID.
+   * @param dto Data Transfer Object containing the operator's email and station ID.
    * @throws IllegalArgumentException if the operator or station is not found.
    */
   public void assignStationToOperator(AssignStationDTO dto) {
-    Staff staff = staffRepository.findById(dto.getOperatorId())
-        .orElseThrow(() -> new RuntimeException("Operator not found."));
-    Station station = stationRepository.findById(dto.getStationId())
-        .orElseThrow(() -> new RuntimeException("Station not found."));
+    Staff staff =
+        staffRepository
+            .findById(dto.getOperatorId())
+            .orElseThrow(() -> new RuntimeException("Operator not found."));
+    Station station =
+        stationRepository
+            .findById(dto.getStationId())
+            .orElseThrow(() -> new RuntimeException("Station not found."));
 
     // Check if the station is already assigned to another operator
     Optional<Staff> existingOperator = staffRepository.findByAssignedStationId(station.getId());
     if (existingOperator.isPresent() && !existingOperator.get().getId().equals(staff.getId())) {
       throw new IllegalStateException(
-          "This station is already assigned to another operator: " + existingOperator.get().getName());
+          "This station is already assigned to another operator: "
+              + existingOperator.get().getName());
     }
 
     staff.setAssignedStation(station);

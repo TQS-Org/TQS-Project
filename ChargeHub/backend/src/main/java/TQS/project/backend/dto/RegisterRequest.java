@@ -24,7 +24,9 @@ public class RegisterRequest {
   private String mail;
 
   @Size(min = 8, message = "Password must be at least 8 characters")
-  @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$", message = "Password must contain letters and numbers")
+  @Pattern(
+      regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$",
+      message = "Password must contain letters and numbers")
   private String password;
 
   public String getName() {

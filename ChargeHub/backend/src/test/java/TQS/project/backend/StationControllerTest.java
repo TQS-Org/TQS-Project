@@ -36,8 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 public class StationControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
   @SuppressWarnings("removal")
   @MockBean
@@ -105,13 +104,13 @@ public class StationControllerTest {
     station.setName("Cheap Fast Charger");
 
     when(stationService.searchStations(
-        anyString(),
-        anyDouble(),
-        anyString(),
-        anyDouble(),
-        anyDouble(),
-        anyString(),
-        anyBoolean()))
+            anyString(),
+            anyDouble(),
+            anyString(),
+            anyDouble(),
+            anyDouble(),
+            anyString(),
+            anyBoolean()))
         .thenReturn(List.of(station));
 
     mockMvc
@@ -176,9 +175,10 @@ public class StationControllerTest {
     when(stationService.createStation(any(StationDTO.class))).thenReturn(createdStation);
 
     mockMvc
-        .perform(post("/api/stations")
-            .contentType("application/json")
-            .content(new ObjectMapper().writeValueAsString(stationDTO)))
+        .perform(
+            post("/api/stations")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(stationDTO)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1))
         .andExpect(jsonPath("$.name").value("New Station"));
@@ -191,9 +191,10 @@ public class StationControllerTest {
     // Missing required fields, e.g., name, district, etc.
 
     mockMvc
-        .perform(post("/api/stations")
-            .contentType("application/json")
-            .content(new ObjectMapper().writeValueAsString(stationDTO)))
+        .perform(
+            post("/api/stations")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(stationDTO)))
         .andExpect(status().isBadRequest());
   }
 
@@ -214,13 +215,13 @@ public class StationControllerTest {
     updatedStation.setId(1L);
     updatedStation.setName("Updated Station");
 
-    when(stationService.updateStation(eq(1L), any(StationDTO.class)))
-        .thenReturn(updatedStation);
+    when(stationService.updateStation(eq(1L), any(StationDTO.class))).thenReturn(updatedStation);
 
     mockMvc
-        .perform(put("/api/stations/1")
-            .contentType("application/json")
-            .content(new ObjectMapper().writeValueAsString(dto)))
+        .perform(
+            put("/api/stations/1")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(dto)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1L))
         .andExpect(jsonPath("$.name").value("Updated Station"));
@@ -233,10 +234,10 @@ public class StationControllerTest {
     // Missing required fields
 
     mockMvc
-        .perform(put("/api/stations/1")
-            .contentType("application/json")
-            .content(new ObjectMapper().writeValueAsString(dto)))
+        .perform(
+            put("/api/stations/1")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(dto)))
         .andExpect(status().isBadRequest());
   }
-
 }

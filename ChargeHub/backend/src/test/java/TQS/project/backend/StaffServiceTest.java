@@ -30,17 +30,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ExtendWith(MockitoExtension.class)
 public class StaffServiceTest {
 
-  @Mock
-  private StaffRepository staffRepository;
+  @Mock private StaffRepository staffRepository;
 
-  @Mock
-  private StationRepository stationRepository;
+  @Mock private StationRepository stationRepository;
 
-  @Mock
-  private PasswordEncoder passwordEncoder;
+  @Mock private PasswordEncoder passwordEncoder;
 
-  @InjectMocks
-  private StaffService staffService;
+  @InjectMocks private StaffService staffService;
 
   @Test
   @Requirement("SCRUM-35")
@@ -61,11 +57,12 @@ public class StaffServiceTest {
     verify(staffRepository, times(1))
         .save(
             argThat(
-                staff -> staff.getName().equals(dto.getName())
-                    && staff.getMail().equals(dto.getMail())
-                    && staff.getPassword().equals("encodedpass")
-                    && staff.getRole() == Role.OPERATOR
-                    && staff.getStartDate().equals(LocalDate.now())));
+                staff ->
+                    staff.getName().equals(dto.getName())
+                        && staff.getMail().equals(dto.getMail())
+                        && staff.getPassword().equals("encodedpass")
+                        && staff.getRole() == Role.OPERATOR
+                        && staff.getStartDate().equals(LocalDate.now())));
   }
 
   @Test
@@ -76,11 +73,12 @@ public class StaffServiceTest {
 
     when(staffRepository.findByMail(dto.getMail())).thenReturn(Optional.of(new Staff()));
 
-    IllegalArgumentException thrown = assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          staffService.createOperator(dto);
-        });
+    IllegalArgumentException thrown =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+              staffService.createOperator(dto);
+            });
 
     assertEquals("Email already in use", thrown.getMessage());
     verify(staffRepository, never()).save(any());
@@ -137,8 +135,8 @@ public class StaffServiceTest {
 
     when(staffRepository.findById(1L)).thenReturn(Optional.empty());
 
-    RuntimeException thrown = assertThrows(
-        RuntimeException.class, () -> staffService.assignStationToOperator(dto));
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> staffService.assignStationToOperator(dto));
 
     assertEquals("Operator not found.", thrown.getMessage());
     verify(staffRepository, never()).save(any());
@@ -157,8 +155,8 @@ public class StaffServiceTest {
     when(staffRepository.findById(1L)).thenReturn(Optional.of(staff));
     when(stationRepository.findById(100L)).thenReturn(Optional.empty());
 
-    RuntimeException thrown = assertThrows(
-        RuntimeException.class, () -> staffService.assignStationToOperator(dto));
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> staffService.assignStationToOperator(dto));
 
     assertEquals("Station not found.", thrown.getMessage());
     verify(staffRepository, never()).save(any());
@@ -185,9 +183,8 @@ public class StaffServiceTest {
     when(stationRepository.findById(100L)).thenReturn(Optional.of(station));
     when(staffRepository.findByAssignedStationId(100L)).thenReturn(Optional.of(staff2));
 
-    IllegalStateException thrown = assertThrows(
-        IllegalStateException.class,
-        () -> staffService.assignStationToOperator(dto));
+    IllegalStateException thrown =
+        assertThrows(IllegalStateException.class, () -> staffService.assignStationToOperator(dto));
 
     assertTrue(thrown.getMessage().contains("already assigned to another operator"));
     verify(staffRepository, never()).save(any());

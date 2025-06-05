@@ -53,16 +53,17 @@ public class StationService {
       String connectorType,
       Boolean available) {
 
-    List<Long> stationIdsFromChargers = chargerRepository.findAll().stream()
-        .filter(c -> chargerType == null || chargerType.equalsIgnoreCase(c.getType()))
-        .filter(c -> minPower == null || c.getPower() >= minPower)
-        .filter(c -> maxPower == null || c.getPower() <= maxPower)
-        .filter(
-            c -> connectorType == null || connectorType.equalsIgnoreCase(c.getConnectorType()))
-        .filter(c -> available == null || c.getAvailable().equals(available))
-        .map(c -> c.getStation().getId())
-        .distinct()
-        .toList();
+    List<Long> stationIdsFromChargers =
+        chargerRepository.findAll().stream()
+            .filter(c -> chargerType == null || chargerType.equalsIgnoreCase(c.getType()))
+            .filter(c -> minPower == null || c.getPower() >= minPower)
+            .filter(c -> maxPower == null || c.getPower() <= maxPower)
+            .filter(
+                c -> connectorType == null || connectorType.equalsIgnoreCase(c.getConnectorType()))
+            .filter(c -> available == null || c.getAvailable().equals(available))
+            .map(c -> c.getStation().getId())
+            .distinct()
+            .toList();
 
     return stationRepository.findAll().stream()
         .filter(
@@ -77,8 +78,8 @@ public class StationService {
   }
 
   public Station updateStation(Long id, StationDTO dto) {
-    Station station = stationRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Station not found"));
+    Station station =
+        stationRepository.findById(id).orElseThrow(() -> new RuntimeException("Station not found"));
 
     station.setName(dto.getName());
     station.setAddress(dto.getAddress());
@@ -91,5 +92,4 @@ public class StationService {
 
     return stationRepository.save(station);
   }
-
 }

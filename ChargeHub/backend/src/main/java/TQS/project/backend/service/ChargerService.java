@@ -24,8 +24,7 @@ import TQS.project.backend.repository.ChargingSessionRepository;
 @Service
 public class ChargerService {
 
-  @Autowired
-  private ChargerRepository chargerRepository;
+  @Autowired private ChargerRepository chargerRepository;
   private BookingRepository bookingRepository;
   private StationRepository stationRepository;
   private ChargingSessionRepository chargingSessionRepository;
@@ -47,8 +46,10 @@ public class ChargerService {
   }
 
   public Charger createChargerForStation(Long stationId, ChargerDTO chargerDTO) {
-    Station station = stationRepository.findById(stationId)
-        .orElseThrow(() -> new RuntimeException("Station not found with ID: " + stationId));
+    Station station =
+        stationRepository
+            .findById(stationId)
+            .orElseThrow(() -> new RuntimeException("Station not found with ID: " + stationId));
 
     Charger charger = new Charger();
     charger.setType(chargerDTO.getType());
@@ -61,12 +62,16 @@ public class ChargerService {
   }
 
   public Charger getCharger(Long id) {
-    return chargerRepository.findById(id).orElseThrow(() -> new RuntimeException("Charger not found"));
+    return chargerRepository
+        .findById(id)
+        .orElseThrow(() -> new RuntimeException("Charger not found"));
   }
 
   public List<Charger> getChargersByStation(Long stationId) {
-    Station station = stationRepository.findById(stationId)
-        .orElseThrow(() -> new RuntimeException("Station not found"));
+    Station station =
+        stationRepository
+            .findById(stationId)
+            .orElseThrow(() -> new RuntimeException("Station not found"));
     return chargerRepository.findByStation(station);
   }
 

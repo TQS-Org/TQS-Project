@@ -27,10 +27,20 @@ public class ChargerController {
   }
 
   @Operation(summary = "Retrieve charger details by its ID.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Charger found and returned successfully.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Charger.class))),
-      @ApiResponse(responseCode = "404", description = "Charger not found with the given ID.", content = @Content)
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Charger found and returned successfully.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Charger.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Charger not found with the given ID.",
+            content = @Content)
+      })
   @GetMapping("/{id}")
   public ResponseEntity<Charger> getChargerById(@PathVariable Long id) {
     Optional<Charger> charger = chargerService.getChargerById(id);
@@ -39,8 +49,7 @@ public class ChargerController {
 
   @PostMapping("/{stationId}")
   public ResponseEntity<Charger> createChargerForStation(
-      @PathVariable Long stationId,
-      @Valid @RequestBody ChargerDTO chargerDTO) {
+      @PathVariable Long stationId, @Valid @RequestBody ChargerDTO chargerDTO) {
 
     Charger createdCharger = chargerService.createChargerForStation(stationId, chargerDTO);
 
@@ -49,8 +58,7 @@ public class ChargerController {
 
   @PutMapping("/{id}")
   public ResponseEntity<Charger> updateCharger(
-      @PathVariable Long id,
-      @Valid @RequestBody ChargerDTO dto) {
+      @PathVariable Long id, @Valid @RequestBody ChargerDTO dto) {
 
     Charger updatedCharger = chargerService.updateCharger(id, dto);
     return ResponseEntity.ok(updatedCharger);

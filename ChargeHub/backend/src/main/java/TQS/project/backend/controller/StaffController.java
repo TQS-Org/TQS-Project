@@ -25,8 +25,7 @@ import java.util.List;
 @RequestMapping("/api/staff")
 public class StaffController {
 
-  @Autowired
-  private StaffService staffService;
+  @Autowired private StaffService staffService;
 
   @Operation(summary = "Create a new operator staff account.")
   @ApiResponses(

@@ -25,14 +25,11 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 public class StationServiceTest {
 
-  @Mock
-  private StationRepository stationRepository;
+  @Mock private StationRepository stationRepository;
 
-  @Mock
-  private ChargerRepository chargerRepository;
+  @Mock private ChargerRepository chargerRepository;
 
-  @InjectMocks
-  private StationService stationService;
+  @InjectMocks private StationService stationService;
 
   @Test
   @Requirement("SCRUM-16")
@@ -98,7 +95,8 @@ public class StationServiceTest {
     when(chargerRepository.findAll()).thenReturn(List.of(charger));
     when(stationRepository.findAll()).thenReturn(List.of(station));
 
-    List<Station> result = stationService.searchStations("Lisboa", 0.40, "FAST", 50.0, 150.0, "CCS", true);
+    List<Station> result =
+        stationService.searchStations("Lisboa", 0.40, "FAST", 50.0, 150.0, "CCS", true);
 
     assertEquals(1, result.size());
     assertEquals("Filtered", result.get(0).getName());
@@ -124,7 +122,8 @@ public class StationServiceTest {
     when(chargerRepository.findAll()).thenReturn(List.of(charger));
     when(stationRepository.findAll()).thenReturn(List.of(station));
 
-    List<Station> result = stationService.searchStations("Lisboa", 0.40, "FAST", 50.0, 150.0, "CCS", true);
+    List<Station> result =
+        stationService.searchStations("Lisboa", 0.40, "FAST", 50.0, 150.0, "CCS", true);
 
     assertEquals(0, result.size());
   }
@@ -225,7 +224,8 @@ public class StationServiceTest {
 
     when(stationRepository.findById(1L)).thenReturn(Optional.empty());
 
-    RuntimeException thrown = assertThrows(RuntimeException.class, () -> stationService.updateStation(1L, dto));
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> stationService.updateStation(1L, dto));
 
     assertEquals("Station not found", thrown.getMessage());
     verify(stationRepository, never()).save(any());

@@ -43,8 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc(addFilters = false)
 public class ChargerControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
   @SuppressWarnings("removal")
   @MockBean
@@ -106,9 +105,10 @@ public class ChargerControllerTest {
     System.out.println("Mocked createdCharger: " + createdCharger);
 
     mockMvc
-        .perform(post("/api/charger/100")
-            .contentType("application/json")
-            .content(new ObjectMapper().writeValueAsString(chargerDTO)))
+        .perform(
+            post("/api/charger/100")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(chargerDTO)))
         .andExpect(status().isOk());
   }
 
@@ -119,9 +119,10 @@ public class ChargerControllerTest {
     // Invalid data: missing required fields, e.g., type, connectorType, etc.
 
     mockMvc
-        .perform(post("/api/charger/100")
-            .contentType("application/json")
-            .content(new ObjectMapper().writeValueAsString(chargerDTO)))
+        .perform(
+            post("/api/charger/100")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(chargerDTO)))
         .andExpect(status().isBadRequest());
   }
 
@@ -139,13 +140,13 @@ public class ChargerControllerTest {
     updatedCharger.setType("DC");
     updatedCharger.setPower(60.0);
 
-    when(chargerService.updateCharger(eq(1L), any(ChargerDTO.class)))
-        .thenReturn(updatedCharger);
+    when(chargerService.updateCharger(eq(1L), any(ChargerDTO.class))).thenReturn(updatedCharger);
 
     mockMvc
-        .perform(put("/api/charger/1")
-            .contentType("application/json")
-            .content(new ObjectMapper().writeValueAsString(dto)))
+        .perform(
+            put("/api/charger/1")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(dto)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1L))
         .andExpect(jsonPath("$.type").value("DC"))
@@ -159,9 +160,10 @@ public class ChargerControllerTest {
     // Missing required fields (e.g., type, connectorType, etc.)
 
     mockMvc
-        .perform(put("/api/charger/1")
-            .contentType("application/json")
-            .content(new ObjectMapper().writeValueAsString(dto)))
+        .perform(
+            put("/api/charger/1")
+                .contentType("application/json")
+                .content(new ObjectMapper().writeValueAsString(dto)))
         .andExpect(status().isBadRequest());
   }
 
@@ -177,10 +179,10 @@ public class ChargerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
-                        {
-                            "chargeToken": "VALIDTOKEN"
-                        }
-                        """))
+                    {
+                        "chargeToken": "VALIDTOKEN"
+                    }
+                    """))
         .andExpect(status().isOk())
         .andExpect(content().string("Charger unlocked successfully, charge session starting..."));
 
@@ -200,10 +202,10 @@ public class ChargerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
-                        {
-                            "chargeToken": "BADTOKEN"
-                        }
-                        """))
+                    {
+                        "chargeToken": "BADTOKEN"
+                    }
+                    """))
         .andExpect(status().isBadRequest())
         .andExpect(content().string("No booking found for the given token."));
   }

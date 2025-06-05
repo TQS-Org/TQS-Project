@@ -44,18 +44,13 @@ import TQS.project.backend.entity.ChargingSession;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ChargerServiceTest {
 
-  @Mock
-  private ChargerRepository chargerRepository;
-  @Mock
-  private BookingRepository bookingRepository;
-  @Mock
-  private ChargingSessionRepository chargingSessionRepository;
+  @Mock private ChargerRepository chargerRepository;
+  @Mock private BookingRepository bookingRepository;
+  @Mock private ChargingSessionRepository chargingSessionRepository;
 
-  @Mock
-  private StationRepository stationRepository;
+  @Mock private StationRepository stationRepository;
 
-  @InjectMocks
-  private ChargerService chargerService;
+  @InjectMocks private ChargerService chargerService;
 
   @Test
   @Requirement("SCRUM-20")
@@ -132,8 +127,7 @@ public class ChargerServiceTest {
 
     when(stationRepository.findById(1L)).thenReturn(Optional.empty());
 
-    assertThrows(RuntimeException.class,
-        () -> chargerService.createChargerForStation(1L, dto));
+    assertThrows(RuntimeException.class, () -> chargerService.createChargerForStation(1L, dto));
   }
 
   @Test
@@ -156,8 +150,7 @@ public class ChargerServiceTest {
   void getCharger_nonExistingId_throwsException() {
     when(chargerRepository.findById(1L)).thenReturn(Optional.empty());
 
-    assertThrows(RuntimeException.class,
-        () -> chargerService.getCharger(1L));
+    assertThrows(RuntimeException.class, () -> chargerService.getCharger(1L));
   }
 
   @Test
@@ -187,8 +180,7 @@ public class ChargerServiceTest {
   void getChargersByStation_stationNotFound_throwsException() {
     when(stationRepository.findById(1L)).thenReturn(Optional.empty());
 
-    assertThrows(RuntimeException.class,
-        () -> chargerService.getChargersByStation(1L));
+    assertThrows(RuntimeException.class, () -> chargerService.getChargersByStation(1L));
   }
 
   @Test

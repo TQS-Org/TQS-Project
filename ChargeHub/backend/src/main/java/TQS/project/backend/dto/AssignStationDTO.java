@@ -4,25 +4,23 @@ import jakarta.validation.constraints.NotNull;
 
 public class AssignStationDTO {
 
-    @NotNull
-    private Long operatorId;
+  @NotNull private Long operatorId;
 
-    @NotNull
-    private Long stationId;
+  @NotNull private Long stationId;
 
-    public Long getOperatorId() {
-        return operatorId;
-    }
+  public Long getOperatorId() {
+    return operatorId;
+  }
 
-    public void setOperatorId(Long operatorId) {
-        this.operatorId = operatorId;
-    }
+  public void setOperatorId(Long operatorId) {
+    this.operatorId = operatorId;
+  }
 
-    public Long getStationId() {
-        return stationId;
-    }
+  public Long getStationId() {
+    return stationId;
+  }
 
-    public void setStationId(Long stationId) {
-        this.stationId = stationId;
-    }
+  public void setStationId(Long stationId) {
+    this.stationId = stationId;
+  }
 }

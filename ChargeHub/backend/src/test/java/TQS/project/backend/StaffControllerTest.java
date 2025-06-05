@@ -35,11 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 public class StaffControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
   @SuppressWarnings("removal")
   @MockBean
@@ -144,7 +142,8 @@ public class StaffControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.name").value("Name is required"))
         .andExpect(jsonPath("$.age").value("Age must be at least 18"))
-        .andExpect(jsonPath("$.number").value("Phone number must start with 9 and be exactly 9 digits"))
+        .andExpect(
+            jsonPath("$.number").value("Phone number must start with 9 and be exactly 9 digits"))
         .andExpect(jsonPath("$.mail").value("Email should be valid"))
         .andExpect(jsonPath("$.address").value("Address is required"));
   }
@@ -159,9 +158,10 @@ public class StaffControllerTest {
     doNothing().when(staffService).assignStationToOperator(dto);
 
     mockMvc
-        .perform(post("/api/staff/operator/assign-station")
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(dto)))
+        .perform(
+            post("/api/staff/operator/assign-station")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isOk())
         .andExpect(content().string("Station assigned to operator successfully."));
   }
@@ -178,9 +178,10 @@ public class StaffControllerTest {
         .assignStationToOperator(any(AssignStationDTO.class));
 
     mockMvc
-        .perform(post("/api/staff/operator/assign-station")
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(dto)))
+        .perform(
+            post("/api/staff/operator/assign-station")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isBadRequest())
         .andExpect(content().string("Staff or Station not found."));
   }
@@ -192,9 +193,10 @@ public class StaffControllerTest {
     // Missing required fields
 
     mockMvc
-        .perform(post("/api/staff/operator/assign-station")
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(dto)))
+        .perform(
+            post("/api/staff/operator/assign-station")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isBadRequest());
   }
 }

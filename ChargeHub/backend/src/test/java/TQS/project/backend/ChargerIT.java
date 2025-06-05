@@ -35,29 +35,21 @@ import java.time.LocalDateTime;
 @Import(TestcontainersConfiguration.class)
 public class ChargerIT {
 
-  @Autowired
-  private TestRestTemplate restTemplate;
+  @Autowired private TestRestTemplate restTemplate;
 
-  @Autowired
-  private ClientRepository clientRepository;
+  @Autowired private ClientRepository clientRepository;
 
-  @Autowired
-  private StationRepository stationRepository;
+  @Autowired private StationRepository stationRepository;
 
-  @Autowired
-  private ChargerRepository chargerRepository;
+  @Autowired private ChargerRepository chargerRepository;
 
-  @Autowired
-  private BookingRepository bookingRepository;
+  @Autowired private BookingRepository bookingRepository;
 
-  @Autowired
-  private StaffRepository staffRepository;
+  @Autowired private StaffRepository staffRepository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  @Autowired private PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private ChargingSessionRepository chargingSessionRepository;
+  @Autowired private ChargingSessionRepository chargingSessionRepository;
 
   private String token;
   private Long chargerId;
@@ -80,9 +72,10 @@ public class ChargerIT {
     clientRepository.save(client);
 
     // Add at least 4 test stations
-    Station savedStation = stationRepository.save(
-        new Station(
-            "Station A", "BrandX", 38.72, -9.13, "Rua A, Lisboa", 4, "08:00", "20:00", 0.30));
+    Station savedStation =
+        stationRepository.save(
+            new Station(
+                "Station A", "BrandX", 38.72, -9.13, "Rua A, Lisboa", 4, "08:00", "20:00", 0.30));
 
     Charger charger = new Charger("DC", 50.0, true, "CCS");
     charger.setStation(savedStation);
@@ -95,8 +88,8 @@ public class ChargerIT {
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<LoginRequest> request = new HttpEntity<>(login, headers);
 
-    ResponseEntity<LoginResponse> response = restTemplate.postForEntity("/api/auth/login", request,
-        LoginResponse.class);
+    ResponseEntity<LoginResponse> response =
+        restTemplate.postForEntity("/api/auth/login", request, LoginResponse.class);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotNull();
     token = response.getBody().getToken();
@@ -109,8 +102,8 @@ public class ChargerIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-    ResponseEntity<Charger> response = restTemplate.exchange("/api/charger/" + chargerId, HttpMethod.GET, entity,
-        Charger.class);
+    ResponseEntity<Charger> response =
+        restTemplate.exchange("/api/charger/" + chargerId, HttpMethod.GET, entity, Charger.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     Charger charger = response.getBody();
@@ -126,7 +119,8 @@ public class ChargerIT {
     headers.setBearerAuth(token);
     HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-    ResponseEntity<String> response = restTemplate.exchange("/api/charger/99999", HttpMethod.GET, entity, String.class);
+    ResponseEntity<String> response =
+        restTemplate.exchange("/api/charger/99999", HttpMethod.GET, entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
@@ -153,13 +147,14 @@ public class ChargerIT {
     loginHeaders.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<LoginRequest> loginRequest = new HttpEntity<>(login, loginHeaders);
 
-    ResponseEntity<LoginResponse> loginResponse = restTemplate.postForEntity("/api/auth/login", loginRequest,
-        LoginResponse.class);
+    ResponseEntity<LoginResponse> loginResponse =
+        restTemplate.postForEntity("/api/auth/login", loginRequest, LoginResponse.class);
     String operatorToken = loginResponse.getBody().getToken();
 
     // Create a station and a charger
-    Station station = new Station(
-        "Station Y", "BrandY", 38.70, -9.10, "Rua Y, Lisboa", 4, "08:00", "20:00", 0.40);
+    Station station =
+        new Station(
+            "Station Y", "BrandY", 38.70, -9.10, "Rua Y, Lisboa", 4, "08:00", "20:00", 0.40);
     station = stationRepository.save(station);
 
     Charger charger = new Charger("AC", 22.0, true, "Type2");
@@ -179,8 +174,9 @@ public class ChargerIT {
 
     HttpEntity<ChargerDTO> request = new HttpEntity<>(updateDTO, headers);
 
-    ResponseEntity<Charger> response = restTemplate.exchange(
-        "/api/charger/" + charger.getId(), HttpMethod.PUT, request, Charger.class);
+    ResponseEntity<Charger> response =
+        restTemplate.exchange(
+            "/api/charger/" + charger.getId(), HttpMethod.PUT, request, Charger.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotNull();
@@ -213,15 +209,16 @@ public class ChargerIT {
     booking.setUser(clientRepository.findByMail("driver@mail.com").get());
     bookingRepository.save(booking);
 
-    String json = """
+    String json =
+        """
         {
           "chargeToken": "BOOKINGTOKEN123"
         }
         """;
 
     HttpEntity<String> entity = new HttpEntity<>(json, headers);
-    ResponseEntity<String> response = restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity,
-        String.class);
+    ResponseEntity<String> response =
+        restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).contains("Charger unlocked successfully");
@@ -234,15 +231,16 @@ public class ChargerIT {
     headers.setBearerAuth(token);
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    String json = """
+    String json =
+        """
         {
           "chargeToken": "INVALIDTOKEN"
         }
         """;
 
     HttpEntity<String> entity = new HttpEntity<>(json, headers);
-    ResponseEntity<String> response = restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity,
-        String.class);
+    ResponseEntity<String> response =
+        restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).contains("No booking found for the given token.");
@@ -268,15 +266,16 @@ public class ChargerIT {
     booking.setUser(clientRepository.findByMail("driver@mail.com").get());
     bookingRepository.save(booking);
 
-    String json = """
+    String json =
+        """
         {
           "chargeToken": "FUTURETOKEN"
         }
         """;
 
     HttpEntity<String> entity = new HttpEntity<>(json, headers);
-    ResponseEntity<String> response = restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity,
-        String.class);
+    ResponseEntity<String> response =
+        restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).contains("Current time is outside the booking time window.");
