@@ -46,13 +46,13 @@ public class ChargerController {
   }
 
   @PostMapping("/{id}/session")
-  public ResponseEntity<?> createChargingSession(@PathVariable("id") long chargerId, @RequestBody ChargerTokenDTO request) {
-      try {
-          chargerService.startChargingSession(request.getChargeToken(), chargerId);
-          return ResponseEntity.ok("Charger unlocked successfully, charge session starting...");
-      } catch (IllegalArgumentException | IllegalStateException e) {
-          return ResponseEntity.badRequest().body(e.getMessage());
-      }
+  public ResponseEntity<?> createChargingSession(
+      @PathVariable("id") long chargerId, @RequestBody ChargerTokenDTO request) {
+    try {
+      chargerService.startChargingSession(request.getChargeToken(), chargerId);
+      return ResponseEntity.ok("Charger unlocked successfully, charge session starting...");
+    } catch (IllegalArgumentException | IllegalStateException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
   }
-
 }

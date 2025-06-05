@@ -293,8 +293,8 @@ public class BookingIT {
   }
 
   @Test
-@Requirement("SCRUM-24")
-void whenGetBookingsByClientId_thenReturnCorrectBookings() {
+  @Requirement("SCRUM-24")
+  void whenGetBookingsByClientId_thenReturnCorrectBookings() {
     // Given: Create test client
     Client client = new Client();
     client.setMail("bookingtest@mail.com");
@@ -305,7 +305,9 @@ void whenGetBookingsByClientId_thenReturnCorrectBookings() {
     client = clientRepository.save(client);
 
     // Create station and charger
-    Station station = new Station("Repo Test Station", "TestBrand", 0.0, 0.0, "Test Addr", 4, "08:00", "22:00", 0.25);
+    Station station =
+        new Station(
+            "Repo Test Station", "TestBrand", 0.0, 0.0, "Test Addr", 4, "08:00", "22:00", 0.25);
     station = stationRepository.save(station);
 
     Charger charger = new Charger("AC", 22.0, true, "Type2");
@@ -325,7 +327,7 @@ void whenGetBookingsByClientId_thenReturnCorrectBookings() {
     HttpEntity<LoginRequest> loginEntity = new HttpEntity<>(loginRequest, loginHeaders);
 
     ResponseEntity<LoginResponse> loginResponse =
-            restTemplate.postForEntity("/api/auth/login", loginEntity, LoginResponse.class);
+        restTemplate.postForEntity("/api/auth/login", loginEntity, LoginResponse.class);
 
     assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
     String clientToken = loginResponse.getBody().getToken();
@@ -335,21 +337,17 @@ void whenGetBookingsByClientId_thenReturnCorrectBookings() {
     headers.setBearerAuth(clientToken);
     HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-    ResponseEntity<Booking[]> response = restTemplate.exchange(
-            "/api/booking/client/" + client.getId(),
-            HttpMethod.GET,
-            entity,
-            Booking[].class
-    );
+    ResponseEntity<Booking[]> response =
+        restTemplate.exchange(
+            "/api/booking/client/" + client.getId(), HttpMethod.GET, entity, Booking[].class);
 
     // Then: Validate bookings were returned
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     Booking[] bookings = response.getBody();
     assertThat(bookings).isNotNull();
     assertThat(bookings).hasSize(2);
-    assertThat(Arrays.stream(bookings).map(Booking::getDuration))
-            .containsExactlyInAnyOrder(30, 45);
-}
+    assertThat(Arrays.stream(bookings).map(Booking::getDuration)).containsExactlyInAnyOrder(30, 45);
+  }
 
   private HttpHeaders createJsonHeaders() {
     HttpHeaders headers = new HttpHeaders();

@@ -153,5 +153,4 @@ public class BookingControllerTest {
 
     verify(bookingService, times(1)).getAllBookingsByClient(clientId);
   }
-
 }

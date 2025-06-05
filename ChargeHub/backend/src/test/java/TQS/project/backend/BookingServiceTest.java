@@ -242,5 +242,4 @@ public class BookingServiceTest {
     assertEquals(mockBookings, result);
     verify(bookingRepository).findAllByUserId(clientId);
   }
-
 }

@@ -118,8 +118,8 @@ public class ChargerIT {
   }
 
   @Test
-@Requirement("SCRUM-24")
-void whenStartChargingSessionWithValidTokenAndCharger_thenSessionStarts() {
+  @Requirement("SCRUM-24")
+  void whenStartChargingSessionWithValidTokenAndCharger_thenSessionStarts() {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(token);
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -136,44 +136,46 @@ void whenStartChargingSessionWithValidTokenAndCharger_thenSessionStarts() {
     booking.setUser(clientRepository.findByMail("driver@mail.com").get());
     bookingRepository.save(booking);
 
-    String json = """
-    {
-      "chargeToken": "BOOKINGTOKEN123"
-    }
-    """;
+    String json =
+        """
+        {
+          "chargeToken": "BOOKINGTOKEN123"
+        }
+        """;
 
     HttpEntity<String> entity = new HttpEntity<>(json, headers);
-    ResponseEntity<String> response = restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
+    ResponseEntity<String> response =
+        restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).contains("Charger unlocked successfully");
+  }
 
-}
-
-@Test
-@Requirement("SCRUM-24")
-void whenStartChargingSessionWithInvalidToken_thenReturnBadRequest() {
+  @Test
+  @Requirement("SCRUM-24")
+  void whenStartChargingSessionWithInvalidToken_thenReturnBadRequest() {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(token);
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    String json = """
-    {
-      "chargeToken": "INVALIDTOKEN"
-    }
-    """;
+    String json =
+        """
+        {
+          "chargeToken": "INVALIDTOKEN"
+        }
+        """;
 
     HttpEntity<String> entity = new HttpEntity<>(json, headers);
-    ResponseEntity<String> response = restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
+    ResponseEntity<String> response =
+        restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).contains("No booking found for the given token.");
+  }
 
-}
-
-@Test
-@Requirement("SCRUM-24")
-void whenStartChargingSessionOutsideTimeWindow_thenReturnBadRequest() {
+  @Test
+  @Requirement("SCRUM-24")
+  void whenStartChargingSessionOutsideTimeWindow_thenReturnBadRequest() {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(token);
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -190,17 +192,18 @@ void whenStartChargingSessionOutsideTimeWindow_thenReturnBadRequest() {
     booking.setUser(clientRepository.findByMail("driver@mail.com").get());
     bookingRepository.save(booking);
 
-    String json = """
-    {
-      "chargeToken": "FUTURETOKEN"
-    }
-    """;
+    String json =
+        """
+        {
+          "chargeToken": "FUTURETOKEN"
+        }
+        """;
 
     HttpEntity<String> entity = new HttpEntity<>(json, headers);
-    ResponseEntity<String> response = restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
+    ResponseEntity<String> response =
+        restTemplate.postForEntity("/api/charger/" + chargerId + "/session", entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).contains("Current time is outside the booking time window.");
-
   }
 }

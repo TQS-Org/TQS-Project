@@ -1,7 +1,6 @@
 package TQS.project.backend.service;
 
 import java.util.Optional;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -23,7 +22,10 @@ public class ChargerService {
   private ChargingSessionRepository chargingSessionRepository;
 
   @Autowired
-  public ChargerService(ChargerRepository chargerRepository, BookingRepository bookingRepository, ChargingSessionRepository chargingSessionRepository) {
+  public ChargerService(
+      ChargerRepository chargerRepository,
+      BookingRepository bookingRepository,
+      ChargingSessionRepository chargingSessionRepository) {
     this.chargerRepository = chargerRepository;
     this.bookingRepository = bookingRepository;
     this.chargingSessionRepository = chargingSessionRepository;
@@ -37,13 +39,13 @@ public class ChargerService {
     Optional<Booking> optionalBooking = bookingRepository.findByToken(token);
 
     if (optionalBooking.isEmpty()) {
-        throw new IllegalArgumentException("No booking found for the given token.");
+      throw new IllegalArgumentException("No booking found for the given token.");
     }
 
     Booking booking = optionalBooking.get();
 
     if (!booking.getCharger().getId().equals(chargerId)) {
-        throw new IllegalArgumentException("Charger ID does not match the booking's charger.");
+      throw new IllegalArgumentException("Charger ID does not match the booking's charger.");
     }
 
     // Use ZonedDateTime with your desired timezone
@@ -58,12 +60,12 @@ public class ChargerService {
     ZonedDateTime end = booking.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
 
     if (now.isBefore(start) || now.isAfter(end)) {
-        throw new IllegalStateException("Current time is outside the booking time window.");
+      throw new IllegalStateException("Current time is outside the booking time window.");
     }
 
     boolean sessionExists = chargingSessionRepository.existsByBooking(booking);
     if (sessionExists) {
-        throw new IllegalStateException("Charging session already exists for this booking.");
+      throw new IllegalStateException("Charging session already exists for this booking.");
     }
 
     ChargingSession session = new ChargingSession();
@@ -75,5 +77,5 @@ public class ChargerService {
     session.setSessionStatus("IN PROGRESS");
 
     chargingSessionRepository.save(session);
-}
+  }
 }
