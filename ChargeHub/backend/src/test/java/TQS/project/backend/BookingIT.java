@@ -9,6 +9,7 @@ import TQS.project.backend.entity.Client;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.BookingRepository;
 import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.ChargingSessionRepository;
 import TQS.project.backend.repository.StationRepository;
 import TQS.project.backend.repository.StaffRepository;
 import TQS.project.backend.repository.ClientRepository;
@@ -27,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +40,7 @@ public class BookingIT {
   @Autowired private TestRestTemplate restTemplate;
   @Autowired private ClientRepository clientRepository;
   @Autowired private ChargerRepository chargerRepository;
+  @Autowired private ChargingSessionRepository chargingSessionRepository;
   @Autowired private BookingRepository bookingRepository;
   @Autowired private StationRepository stationRepository;
   @Autowired private StaffRepository staffRepository;
@@ -49,6 +52,7 @@ public class BookingIT {
   @BeforeEach
   void setup() {
     // Clean up repositories
+    chargingSessionRepository.deleteAllInBatch();
     bookingRepository.deleteAllInBatch();
     chargerRepository.deleteAllInBatch();
     staffRepository.deleteAllInBatch();
@@ -286,6 +290,63 @@ public class BookingIT {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEmpty();
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  void whenGetBookingsByClientId_thenReturnCorrectBookings() {
+    // Given: Create test client
+    Client client = new Client();
+    client.setMail("bookingtest@mail.com");
+    client.setPassword(passwordEncoder.encode("bookingpass"));
+    client.setName("Booking Tester");
+    client.setAge(25);
+    client.setNumber("111222333");
+    client = clientRepository.save(client);
+
+    // Create station and charger
+    Station station =
+        new Station(
+            "Repo Test Station", "TestBrand", 0.0, 0.0, "Test Addr", 4, "08:00", "22:00", 0.25);
+    station = stationRepository.save(station);
+
+    Charger charger = new Charger("AC", 22.0, true, "Type2");
+    charger.setStation(station);
+    charger = chargerRepository.save(charger);
+
+    // Create bookings
+    LocalDateTime now = LocalDateTime.now();
+    Booking booking1 = new Booking(client, charger, now.plusHours(1), 30);
+    Booking booking2 = new Booking(client, charger, now.plusHours(2), 45);
+    bookingRepository.saveAll(List.of(booking1, booking2));
+
+    // Login the test client
+    LoginRequest loginRequest = new LoginRequest(client.getMail(), "bookingpass");
+    HttpHeaders loginHeaders = new HttpHeaders();
+    loginHeaders.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<LoginRequest> loginEntity = new HttpEntity<>(loginRequest, loginHeaders);
+
+    ResponseEntity<LoginResponse> loginResponse =
+        restTemplate.postForEntity("/api/auth/login", loginEntity, LoginResponse.class);
+
+    assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+    String clientToken = loginResponse.getBody().getToken();
+
+    // When: Perform GET request to fetch bookings
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(clientToken);
+    HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+    ResponseEntity<Booking[]> response =
+        restTemplate.exchange(
+            "/api/booking/client/" + client.getId(), HttpMethod.GET, entity, Booking[].class);
+
+    // Then: Validate bookings were returned
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Booking[] bookings = response.getBody();
+    assertThat(bookings).isNotNull();
+    assertThat(bookings).hasSize(2);
+    assertThat(Arrays.stream(bookings).map(Booking::getDuration)).containsExactlyInAnyOrder(30, 45);
   }
 
   private HttpHeaders createJsonHeaders() {

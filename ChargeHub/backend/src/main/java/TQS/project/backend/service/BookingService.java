@@ -119,4 +119,8 @@ public class BookingService {
       }
     }
   }
+
+  public List<Booking> getAllBookingsByClient(long clientId) {
+    return bookingRepository.findAllByUserId(clientId);
+  }
 }

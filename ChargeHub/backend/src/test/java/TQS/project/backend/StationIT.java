@@ -48,6 +48,9 @@ public class StationIT {
   private ChargerRepository chargerRepository;
 
   @Autowired
+  private ChargerRepository chargingSessionRepository;
+
+  @Autowired
   private StaffRepository staffRepository; // Assuming you have a StaffRepository
 
   @Autowired
@@ -57,6 +60,7 @@ public class StationIT {
 
   @BeforeEach
   void setup() {
+    chargingSessionRepository.deleteAllInBatch();
     bookingRepository.deleteAll();
     clientRepository.deleteAll();
     chargerRepository.deleteAll(); // <--- delete chargers before stations
