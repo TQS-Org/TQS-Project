@@ -137,8 +137,8 @@ public class ChargerServiceTest {
     Booking booking = new Booking();
     booking.setToken("TOKEN");
     booking.setCharger(charger);
-    booking.setStartTime(LocalDateTime.now().plusMinutes(10));
-    booking.setEndTime(LocalDateTime.now().plusMinutes(20));
+    booking.setStartTime(LocalDateTime.of(2099, 1, 1, 0, 0));
+    booking.setEndTime(LocalDateTime.of(2099, 1, 2, 0, 0));
 
     when(bookingRepository.findByToken("TOKEN")).thenReturn(Optional.of(booking));
 

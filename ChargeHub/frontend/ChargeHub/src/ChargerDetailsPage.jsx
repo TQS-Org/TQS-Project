@@ -100,6 +100,7 @@ export default function ChargerDetailsPage() {
         }
       } catch (err) {
         setSessionError("An error occurred while starting the session.");
+        console.error(err);
       }
     };
 

@@ -31,17 +31,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import org.springframework.http.MediaType;
-
 @Import(TestSecurityConfig.class)
 @WebMvcTest(ChargerController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class ChargerControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
   @SuppressWarnings("removal")
   @MockBean
@@ -93,10 +89,10 @@ public class ChargerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
-                    {
-                        "chargeToken": "VALIDTOKEN"
-                    }
-                    """))
+                        {
+                            "chargeToken": "VALIDTOKEN"
+                        }
+                        """))
         .andExpect(status().isOk())
         .andExpect(content().string("Charger unlocked successfully, charge session starting..."));
 
@@ -116,10 +112,10 @@ public class ChargerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
-                    {
-                        "chargeToken": "BADTOKEN"
-                    }
-                    """))
+                        {
+                            "chargeToken": "BADTOKEN"
+                        }
+                        """))
         .andExpect(status().isBadRequest())
         .andExpect(content().string("No booking found for the given token."));
   }
