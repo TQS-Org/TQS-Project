@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.Station;
+import TQS.project.backend.dto.FinishedChargingSessionDTO;
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.repository.ChargerRepository;
@@ -19,6 +20,7 @@ import TQS.project.backend.service.ChargerService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -168,4 +170,38 @@ public class ChargerServiceTest {
           chargerService.startChargingSession("TOKEN", 1L);
         });
   }
+
+  @Test
+  @Requirement("SCRUM-26")
+  void finishChargingSession_validSession_updatesFieldsCorrectly() {
+    ChargingSession session = new ChargingSession();
+    session.setId(10L);
+    session.setStartTime(LocalDateTime.now().minusHours(1));
+    session.setSessionStatus("ONGOING");
+
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(15.5f, LocalDateTime.now());
+
+    when(chargingSessionRepository.findById(10L)).thenReturn(Optional.of(session));
+
+    chargerService.finishChargingSession(10L, dto);
+
+    assertThat(session.getEnergyConsumed()).isEqualTo(15.5f);
+    assertThat(session.getEndTime()).isEqualTo(dto.getEndTime());
+    assertThat(session.getSessionStatus()).isEqualTo("CONCLUDED");
+    assertThat(session.getPrice()).isEqualTo(15.5f * 0.25f); // price logic
+    verify(chargingSessionRepository).save(session);
+  }
+
+  @Test
+  @Requirement("SCRUM-26")
+  void finishChargingSession_invalidSessionId_throwsException() {
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
+
+    when(chargingSessionRepository.findById(999L)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> chargerService.finishChargingSession(999L, dto))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Charging session not found");
+  }
+
 }

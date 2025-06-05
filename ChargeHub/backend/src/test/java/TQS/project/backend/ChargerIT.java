@@ -1,9 +1,11 @@
 package TQS.project.backend;
 
 import TQS.project.backend.entity.Station;
+import TQS.project.backend.dto.FinishedChargingSessionDTO;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.entity.Charger;
+import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.dto.LoginResponse;
 import TQS.project.backend.repository.ClientRepository;
@@ -208,5 +210,75 @@ public class ChargerIT {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).contains("Current time is outside the booking time window.");
+  }
+
+  @Test
+  @Requirement("SCRUM-30")
+  void whenFinishChargingSessionWithValidData_thenSessionIsConcluded() {
+    // Create and save booking
+    Booking booking = new Booking();
+    booking.setToken("FINISHTOKEN");
+    booking.setStartTime(LocalDateTime.now().minusMinutes(40));
+    booking.setEndTime(LocalDateTime.now().plusMinutes(20));
+    booking.setDuration(30);
+    booking.setCharger(chargerRepository.findById(chargerId).get());
+    booking.setUser(clientRepository.findByMail("driver@mail.com").get());
+    booking = bookingRepository.save(booking);
+
+    // Create and save active session
+    ChargingSession session = new ChargingSession();
+    session.setBooking(booking);
+    session.setStartTime(LocalDateTime.now().minusMinutes(30));
+    session.setEndTime(null); // not yet ended
+    session.setEnergyConsumed(0);
+    session.setPrice(0);
+    session.setSessionStatus("IN_PROGRESS");
+    session = chargingSessionRepository.save(session);
+
+    // Prepare request
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(20.0f, LocalDateTime.now());
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(token);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<FinishedChargingSessionDTO> entity = new HttpEntity<>(dto, headers);
+
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/api/charger/" + chargerId + "/session/" + session.getId(),
+        HttpMethod.PUT,
+        entity,
+        String.class
+    );
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).contains("Charging session concluded");
+
+    ChargingSession updated = chargingSessionRepository.findById(session.getId()).get();
+    assertThat(updated.getEnergyConsumed()).isEqualTo(20.0f);
+    assertThat(updated.getSessionStatus()).isEqualTo("CONCLUDED");
+    assertThat(updated.getPrice()).isEqualTo(5.0f); // 20.0 * 0.25
+    assertThat(updated.getEndTime()).isEqualTo(dto.getEndTime());
+  }
+
+  @Test
+  @Requirement("SCRUM-30")
+  void whenFinishChargingSessionWithInvalidSessionId_thenReturnNotFound() {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(token);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
+    HttpEntity<FinishedChargingSessionDTO> entity = new HttpEntity<>(dto, headers);
+
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/api/charger/" + chargerId + "/session/99999",
+        HttpMethod.PUT,
+        entity,
+        String.class
+    );
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    assertThat(response.getBody()).contains("Charging session not found");
   }
 }

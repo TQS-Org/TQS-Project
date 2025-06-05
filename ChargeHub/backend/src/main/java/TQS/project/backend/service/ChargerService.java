@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.ChargingSession;
+import TQS.project.backend.dto.FinishedChargingSessionDTO;
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.repository.ChargerRepository;
 import TQS.project.backend.repository.BookingRepository;
@@ -51,10 +52,6 @@ public class ChargerService {
     // Use ZonedDateTime with your desired timezone
     ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Lisbon")); // or your correct zone
 
-    System.out.println("Now: " + now);
-    System.out.println("Start: " + booking.getStartTime());
-    System.out.println("End: " + booking.getEndTime());
-
     // Convert booking times to ZonedDateTime in same zone before comparing:
     ZonedDateTime start = booking.getStartTime().atZone(ZoneId.of("Europe/Lisbon"));
     ZonedDateTime end = booking.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
@@ -77,5 +74,24 @@ public class ChargerService {
     session.setSessionStatus("IN PROGRESS");
 
     chargingSessionRepository.save(session);
+  }
+
+  public void finishChargingSession(long chargingSessionId, FinishedChargingSessionDTO dto) {
+    ChargingSession session = chargingSessionRepository.findById(chargingSessionId)
+        .orElseThrow(() -> new IllegalArgumentException("Charging session not found"));
+
+    session.setEndTime(dto.getEndTime());
+    session.setEnergyConsumed(dto.getEnergyConsumed());
+    session.setSessionStatus("CONCLUDED");
+
+    // Optionally calculate price based on some business logic
+    float pricePerKWh = 0.25f; // example fixed rate
+    session.setPrice(dto.getEnergyConsumed() * pricePerKWh);
+
+    chargingSessionRepository.save(session);
+  }
+
+  public Optional<ChargingSession> getChargingSessionById(long id){
+    return chargingSessionRepository.findById(id);
   }
 }
