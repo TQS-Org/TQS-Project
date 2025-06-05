@@ -40,15 +40,11 @@ import TQS.project.backend.entity.ChargingSession;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ChargerServiceTest {
 
-  @Mock
-  private ChargerRepository chargerRepository;
-  @Mock
-  private BookingRepository bookingRepository;
-  @Mock
-  private ChargingSessionRepository chargingSessionRepository;
+  @Mock private ChargerRepository chargerRepository;
+  @Mock private BookingRepository bookingRepository;
+  @Mock private ChargingSessionRepository chargingSessionRepository;
 
-  @InjectMocks
-  private ChargerService chargerService;
+  @InjectMocks private ChargerService chargerService;
 
   @Test
   @Requirement("SCRUM-20")
