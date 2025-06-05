@@ -1,7 +1,6 @@
 package TQS.project.backend.service;
 
 import java.util.Optional;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ public class ChargerService {
   private ChargingSessionRepository chargingSessionRepository;
 
   @Autowired
-  public ChargerService(ChargerRepository chargerRepository, BookingRepository bookingRepository, ChargingSessionRepository ChargingSessionRepository) {
+  public ChargerService(ChargerRepository chargerRepository, BookingRepository bookingRepository, ChargingSessionRepository chargingSessionRepository) {
     this.chargerRepository = chargerRepository;
     this.bookingRepository = bookingRepository;
     this.chargingSessionRepository = chargingSessionRepository;
@@ -65,5 +64,5 @@ public class ChargerService {
     session.setSessionStatus("IN PROGRESS");
 
     chargingSessionRepository.save(session);
-}
+  }
 }

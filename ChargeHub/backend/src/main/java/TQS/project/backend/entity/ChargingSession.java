@@ -2,10 +2,9 @@ package TQS.project.backend.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID; 
 
 @Entity
-@Table(name = "chargingSession")
+@Table(name = "charging_session")
 public class ChargingSession {
 
     @Id
