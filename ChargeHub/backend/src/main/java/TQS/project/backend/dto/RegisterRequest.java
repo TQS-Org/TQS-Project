@@ -19,13 +19,12 @@ public class RegisterRequest {
   @Pattern(regexp = "^9\\d{8}$", message = "Phone number must start with 9 and be exactly 9 digits")
   private String number;
 
+  @NotBlank(message = "Email is required")
   @Email(message = "Email should be valid")
   private String mail;
 
   @Size(min = 8, message = "Password must be at least 8 characters")
-  @Pattern(
-      regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$",
-      message = "Password must contain letters and numbers")
+  @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$", message = "Password must contain letters and numbers")
   private String password;
 
   public String getName() {

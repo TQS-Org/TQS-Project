@@ -1,5 +1,6 @@
 package TQS.project.backend.service;
 
+import TQS.project.backend.dto.StationDTO;
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StationRepository;
@@ -21,6 +22,20 @@ public class StationService {
     this.chargerRepository = chargerRepository;
   }
 
+  public Station createStation(StationDTO dto) {
+    Station station = new Station();
+    station.setName(dto.getName());
+    station.setBrand(dto.getBrand());
+    station.setLatitude(dto.getLatitude());
+    station.setLongitude(dto.getLongitude());
+    station.setAddress(dto.getAddress());
+    station.setNumberOfChargers(dto.getNumberOfChargers());
+    station.setOpeningHours(dto.getOpeningHours());
+    station.setClosingHours(dto.getClosingHours());
+    station.setPrice(dto.getPrice());
+    return stationRepository.save(station);
+  }
+
   public List<Station> getAllStations() {
     return stationRepository.findAll();
   }
@@ -38,17 +53,16 @@ public class StationService {
       String connectorType,
       Boolean available) {
 
-    List<Long> stationIdsFromChargers =
-        chargerRepository.findAll().stream()
-            .filter(c -> chargerType == null || chargerType.equalsIgnoreCase(c.getType()))
-            .filter(c -> minPower == null || c.getPower() >= minPower)
-            .filter(c -> maxPower == null || c.getPower() <= maxPower)
-            .filter(
-                c -> connectorType == null || connectorType.equalsIgnoreCase(c.getConnectorType()))
-            .filter(c -> available == null || c.getAvailable().equals(available))
-            .map(c -> c.getStation().getId())
-            .distinct()
-            .toList();
+    List<Long> stationIdsFromChargers = chargerRepository.findAll().stream()
+        .filter(c -> chargerType == null || chargerType.equalsIgnoreCase(c.getType()))
+        .filter(c -> minPower == null || c.getPower() >= minPower)
+        .filter(c -> maxPower == null || c.getPower() <= maxPower)
+        .filter(
+            c -> connectorType == null || connectorType.equalsIgnoreCase(c.getConnectorType()))
+        .filter(c -> available == null || c.getAvailable().equals(available))
+        .map(c -> c.getStation().getId())
+        .distinct()
+        .toList();
 
     return stationRepository.findAll().stream()
         .filter(
@@ -61,4 +75,21 @@ public class StationService {
   public List<Charger> getAllStationChargers(long id) {
     return chargerRepository.findAllByStationId(id);
   }
+
+  public Station updateStation(Long id, StationDTO dto) {
+    Station station = stationRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Station not found"));
+
+    station.setName(dto.getName());
+    station.setAddress(dto.getAddress());
+    station.setAddress(dto.getAddress());
+    station.setLatitude(dto.getLatitude());
+    station.setLongitude(dto.getLongitude());
+    station.setPrice(dto.getPrice());
+    station.setClosingHours(dto.getClosingHours());
+    station.setOpeningHours(dto.getOpeningHours());
+
+    return stationRepository.save(station);
+  }
+
 }

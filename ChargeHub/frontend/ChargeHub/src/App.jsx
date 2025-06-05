@@ -52,7 +52,7 @@ export default function App() {
       <Route
         path="/stations/:id"
         element={
-          <ProtectedRoute requiredRole="EV_DRIVER">
+          <ProtectedRoute requiredRole={["EV_DRIVER", "ADMIN", "OPERATOR"]}>
             <Layout>
               <StationDetailsPage />
             </Layout>

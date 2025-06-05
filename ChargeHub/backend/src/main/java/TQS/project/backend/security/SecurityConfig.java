@@ -30,55 +30,54 @@ public class SecurityConfig {
         .csrf()
         .disable()
         .authorizeHttpRequests(
-            auth ->
-                auth
-                    // Public endpoints
-                    .requestMatchers("/actuator/**")
-                    .permitAll()
-                    .requestMatchers(
-                        "/api/auth/login",
-                        "/api/auth/validate",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**",
-                        "/api-docs/**",
-                        "/api/auth/register")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/stations")
-                    .permitAll() // GET /api/stations is public
+            auth -> auth
+                // Public endpoints
+                .requestMatchers("/actuator/**")
+                .permitAll()
+                .requestMatchers(
+                    "/api/auth/login",
+                    "/api/auth/validate",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**",
+                    "/api-docs/**",
+                    "/api/auth/register")
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/stations")
+                .permitAll() // GET /api/stations is public
 
-                    // EV_DRIVER endpoints
-                    .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/stations/search**",
-                        "/api/booking/**",
-                        "/api/charger/**",
-                        "/api/client/**")
-                    .hasRole("EV_DRIVER")
-                    .requestMatchers(HttpMethod.POST, "/api/charger/**", "/api/booking/**")
-                    .hasRole("EV_DRIVER")
-                    .requestMatchers(HttpMethod.GET, "/api/stations/**")
-                    .hasRole("EV_DRIVER")
-                    .requestMatchers(HttpMethod.GET, "/api/stations/*/chargers")
-                    .hasAnyRole("EV_DRIVER", "OPERATOR", "ADMIN")
+                // EV_DRIVER endpoints
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/stations/search**",
+                    "/api/booking/**",
+                    "/api/charger/**",
+                    "/api/client/**")
+                .hasRole("EV_DRIVER")
+                .requestMatchers(HttpMethod.POST, "/api/charger/*/session", "/api/booking/**")
+                .hasRole("EV_DRIVER")
+                .requestMatchers(HttpMethod.GET, "/api/stations/**")
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/stations/*/chargers").permitAll()
 
-                    // ADMIN endpoints
-                    .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/staff/operator",
-                        "/api/staff/operator/assign-station",
-                        "/api/stations")
-                    .hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.GET, "/api/staff/operators")
-                    .hasRole("ADMIN")
+                // ADMIN endpoints
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/staff/operator",
+                    "/api/staff/operator/assign-station",
+                    "/api/stations",
+                    "/api/charger/**")
+                .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/staff/operators")
+                .hasRole("ADMIN")
 
-                    // OPERATOR endpoints
-                    .requestMatchers(HttpMethod.PUT, "/api/stations/**", "/api/charger/**")
-                    .hasRole("OPERATOR")
+                // OPERATOR endpoints
+                .requestMatchers(HttpMethod.PUT, "/api/stations/**", "/api/charger/**")
+                .hasRole("OPERATOR")
 
-                    // fallback
-                    .anyRequest()
-                    .authenticated())
+                // fallback
+                .anyRequest()
+                .authenticated())
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
