@@ -29,11 +29,10 @@ public class StationController {
   @ApiResponse(
       responseCode = "200",
       description = "List of stations retrieved successfully.",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = Station.class)
-      )
-  )
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = Station.class)))
   @GetMapping
   public ResponseEntity<List<Station>> getAllStations() {
     List<Station> stations = stationService.getAllStations();
@@ -41,36 +40,34 @@ public class StationController {
   }
 
   @Operation(summary = "Get a station by its ID.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Station found and returned.",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = Station.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Station not found.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Station found and returned.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Station.class))),
+        @ApiResponse(responseCode = "404", description = "Station not found.", content = @Content)
+      })
   @GetMapping("/{id}")
   public ResponseEntity<Station> getStationById(@PathVariable Long id) {
     Optional<Station> station = stationService.getStationById(id);
     return station.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  @Operation(summary = "Search stations by optional filters: district, max price, charger type, power range, connector type, availability.")
+  @Operation(
+      summary =
+          "Search stations by optional filters: district, max price, charger type, power range,"
+              + " connector type, availability.")
   @ApiResponse(
       responseCode = "200",
       description = "Filtered list of stations returned.",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = Station.class)
-      )
-  )
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = Station.class)))
   @GetMapping("/search")
   public ResponseEntity<List<Station>> searchStations(
       @RequestParam(required = false) String district,
@@ -89,21 +86,17 @@ public class StationController {
   }
 
   @Operation(summary = "Get all chargers associated with a station.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "List of chargers returned.",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = Charger.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Station not found.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "List of chargers returned.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Charger.class))),
+        @ApiResponse(responseCode = "404", description = "Station not found.", content = @Content)
+      })
   @GetMapping("/{id}/chargers")
   public ResponseEntity<List<Charger>> getStationChargers(@PathVariable Long id) {
     List<Charger> chargers = stationService.getAllStationChargers(id);

@@ -32,18 +32,14 @@ public class BookingController {
   @Autowired private BookingService bookingService;
 
   @Operation(summary = "Create a new booking.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Booking created successfully.",
-          content = @Content(schema = @Schema(example = "Booking created successfully!"))
-      ),
-      @ApiResponse(
-          responseCode = "400",
-          description = "Invalid input data.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Booking created successfully.",
+            content = @Content(schema = @Schema(example = "Booking created successfully!"))),
+        @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content)
+      })
   @PostMapping("")
   public ResponseEntity<?> createBooking(@Valid @RequestBody CreateBookingDTO dto) {
     bookingService.createBooking(dto);
@@ -51,21 +47,20 @@ public class BookingController {
   }
 
   @Operation(summary = "Get bookings for a specific charger, optionally filtered by date.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "List of bookings retrieved successfully.",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = Booking.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "No bookings found for given charger.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "List of bookings retrieved successfully.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Booking.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No bookings found for given charger.",
+            content = @Content)
+      })
   @GetMapping("/charger/{id}")
   public ResponseEntity<List<Booking>> getBookingsByCharger(
       @PathVariable("id") long chargerId,

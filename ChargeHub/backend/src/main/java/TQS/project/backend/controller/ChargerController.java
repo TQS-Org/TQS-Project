@@ -23,21 +23,20 @@ public class ChargerController {
   }
 
   @Operation(summary = "Retrieve charger details by its ID.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Charger found and returned successfully.",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = Charger.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Charger not found with the given ID.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Charger found and returned successfully.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Charger.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Charger not found with the given ID.",
+            content = @Content)
+      })
   @GetMapping("/{id}")
   public ResponseEntity<Charger> getChargerById(@PathVariable Long id) {
     Optional<Charger> charger = chargerService.getChargerById(id);

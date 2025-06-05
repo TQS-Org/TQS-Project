@@ -40,32 +40,30 @@ public class AuthController {
   @ApiResponse(
       responseCode = "200",
       description = "Successfully authenticated and logged user in.",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = LoginResponse.class)
-      )
-  )
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = LoginResponse.class)))
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
     return ResponseEntity.ok(authService.login(request));
   }
 
   @Operation(summary = "Validate JWT token and return the user's role.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Token is valid.",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(example = "{\"role\": \"USER\"}")
-          )
-      ),
-      @ApiResponse(
-          responseCode = "403",
-          description = "Missing or invalid token.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Token is valid.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{\"role\": \"USER\"}"))),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Missing or invalid token.",
+            content = @Content)
+      })
   @GetMapping("/validate")
   public ResponseEntity<Map<String, String>> validateToken(HttpServletRequest request) {
     String authHeader = request.getHeader("Authorization");
@@ -78,21 +76,17 @@ public class AuthController {
   }
 
   @Operation(summary = "Register a new account.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Account registered successfully and user logged in.",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = LoginResponse.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "400",
-          description = "Invalid input data.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Account registered successfully and user logged in.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = LoginResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content)
+      })
   @PostMapping("/register")
   public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
     return ResponseEntity.ok(authService.register(request));
