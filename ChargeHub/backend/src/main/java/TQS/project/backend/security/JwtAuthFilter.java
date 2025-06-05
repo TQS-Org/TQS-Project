@@ -24,15 +24,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
-    if (request.getServletPath().matches("/api/auth/login/?")) {
-      filterChain.doFilter(request, response);
-      return;
-    }
-    if (request.getServletPath().matches("/api/auth/validate/?")) {
-      filterChain.doFilter(request, response);
-      return;
-    }
-    if (request.getServletPath().matches("/swagger-ui/index.html")) {
+    String path = request.getServletPath();
+
+    // Skip filtering for public actuator and auth endpoints
+    if (path.startsWith("/actuator/")
+        || path.startsWith("/v3/api-docs")
+        || path.startsWith("/api-docs")
+        || path.startsWith("/swagger-ui.html")
+        || path.startsWith("/swagger-ui-custom.html")
+        || path.startsWith("/api-docs/swagger-config")
+        || path.startsWith("/api/auth/")) {
       filterChain.doFilter(request, response);
       return;
     }

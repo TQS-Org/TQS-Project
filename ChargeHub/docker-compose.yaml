@@ -41,9 +41,18 @@ services:
               "spring.datasource.password" : "$MYSQLDB_PASSWORD",
               "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQLDialect",
               "spring.jpa.hibernate.ddl-auto" : "update",
-              "management.endpoints.web.exposure.include" : "health",
-              "management.endpoint.health.show-details" : "always",
-              "management.endpoint.health.enabled"  : "true"
+              "management.endpoint.health.show-details": "always",
+              "management.endpoint.health.access": "unrestricted",
+              "management.endpoints.web.exposure.include": "health,info,metrics,prometheus",
+              "management.endpoint.prometheus.show-details": "always",
+              "management.endpoint.info.access": "unrestricted",
+              "management.endpoint.info.show-details": "always",
+              "management.endpoint.metrics.access": "unrestricted",
+              "management.endpoint.metrics.show-details": "always",
+              "management.endpoint.prometheus.enabled": "true",
+              "management.metrics.export.prometheus.enabled": "true",
+              "springdoc.swagger-ui.path":"/swagger-ui-custom.html",
+              "springdoc.api-docs.path": "/api-docs"
             }'
     volumes:
       - ./backend:/app

@@ -42,10 +42,27 @@ services:
               "spring.datasource.username" : "$MYSQLDB_USER",
               "spring.datasource.password" : "$MYSQLDB_PASSWORD",
               "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQLDialect",
-              "spring.jpa.hibernate.ddl-auto" : "update"
+              "spring.jpa.hibernate.ddl-auto" : "update",
+              "management.endpoint.health.show-details": "always",
+              "management.endpoint.health.access": "unrestricted",
+              "management.endpoints.web.exposure.include": "health,info,metrics,prometheus",
+              "management.endpoint.prometheus.show-details": "always",
+              "management.endpoint.info.access": "unrestricted",
+              "management.endpoint.info.show-details": "always",
+              "management.endpoint.metrics.access": "unrestricted",
+              "management.endpoint.metrics.show-details": "always",
+              "management.endpoint.prometheus.enabled": "true",
+              "management.metrics.export.prometheus.enabled": "true",
+              "springdoc.swagger-ui.path":"/swagger-ui-custom.html",
+              "springdoc.api-docs.path": "/api-docs"
             }'
     networks:
       - chargehub-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build:
@@ -56,7 +73,7 @@ services:
     restart: on-failure
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3000:3000"
     networks:
