@@ -5,8 +5,8 @@ const BASE_URL = "http://deti-tqs-23.ua.pt:8080";
 
 export const options = {
   stages: [
-    { duration: "10s", target: 1 }, 
-    { duration: "20s", target: 1 },  
+    { duration: "10s", target: 10 }, 
+    { duration: "20s", target: 10 },  
     { duration: "10s", target: 0 },   
   ],
 };
@@ -19,7 +19,7 @@ const closeHour = 23;
 
 let currentDate = new Date();
 currentDate.setHours(0, 0, 0, 0);
-currentDate.setDate(currentDate.getDate() + 50);
+currentDate.setDate(currentDate.getDate() + 90);
 
 let currentSlotMinutes = openHour * 60; 
 
@@ -56,7 +56,7 @@ export default function () {
   let res = http.post(`${BASE_URL}/api/booking`, JSON.stringify(bookingData), {
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkcml2ZXJAbWFpbC5jb20iLCJyb2xlIjoiRVZfRFJJVkVSIiwiaWF0IjoxNzQ5MTM5NzU5LCJleHAiOjE3NDkxNDMzNTl9.1PxOM4Lmdi2JZ87r3X8M9bzPofJPh9VGw12Tu-ZBtEXLDJzamOWEdj1PszJsVJxKJBNswOhxj0Yh-k0VMtDRUQ",
+      "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkcml2ZXJAbWFpbC5jb20iLCJyb2xlIjoiRVZfRFJJVkVSIiwiaWF0IjoxNzQ5MTQ0MTg3LCJleHAiOjE3NDkxNDc3ODd9.HnCSO-kOMrNkziCfIFr9gbtVP4rfgeTPcJFIP6fKifE3C22z_Xnl07w2ldDqqmUHGS-ZeKwR8vo31vc5cfQAKw",
     },
   });
 
