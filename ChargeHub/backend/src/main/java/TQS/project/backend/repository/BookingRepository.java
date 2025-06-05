@@ -15,6 +15,8 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
   Optional<Booking> findById(long id);
 
+  Optional<Booking> findByToken(String token);
+
   @Query("SELECT b FROM Booking b WHERE b.charger.id = :chargerId")
   List<Booking> findAllBookingsByStationId(@Param("chargerId") long stationId);
 
@@ -27,4 +29,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
       @Param("chargerId") long chargerId,
       @Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end);
+
+  List<Booking> findAllByUserId(long clientId);
 }

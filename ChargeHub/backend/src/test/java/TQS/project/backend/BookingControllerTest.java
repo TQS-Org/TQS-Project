@@ -137,4 +137,20 @@ public class BookingControllerTest {
         .perform(get("/api/booking/charger/{id}", chargerId).param("date", "not-a-date"))
         .andExpect(status().isBadRequest());
   }
+
+  @Test
+  @Requirement("SCRUM-24")
+  public void testGetAllBookingsByClient_returnsBookings() throws Exception {
+    long clientId = 42L;
+    List<Booking> mockBookings = List.of(new Booking(), new Booking());
+
+    when(bookingService.getAllBookingsByClient(clientId)).thenReturn(mockBookings);
+
+    mockMvc
+        .perform(get("/api/booking/client/{id}", clientId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(2));
+
+    verify(bookingService, times(1)).getAllBookingsByClient(clientId);
+  }
 }
