@@ -108,26 +108,22 @@ public class StaffServiceTest {
   @Test
   @Requirement("SCRUM-36")
   void testAssignStationToOperator_success() {
-    // Prepare DTO
     AssignStationDTO dto = new AssignStationDTO();
     dto.setOperatorId(1L);
     dto.setStationId(100L);
 
-    // Prepare staff and station
     Staff staff = new Staff();
     staff.setId(1L);
 
     Station station = new Station();
     station.setId(100L);
 
-    // Mock repositories
     when(staffRepository.findById(1L)).thenReturn(Optional.of(staff));
     when(stationRepository.findById(100L)).thenReturn(Optional.of(station));
+    when(staffRepository.findByAssignedStationId(100L)).thenReturn(Optional.empty());
 
-    // Call service
     staffService.assignStationToOperator(dto);
 
-    // Verify staff is updated with assigned station
     verify(staffRepository, times(1))
         .save(argThat(savedStaff -> savedStaff.getAssignedStation().equals(station)));
   }
@@ -165,6 +161,35 @@ public class StaffServiceTest {
         RuntimeException.class, () -> staffService.assignStationToOperator(dto));
 
     assertEquals("Station not found.", thrown.getMessage());
+    verify(staffRepository, never()).save(any());
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_stationAlreadyAssigned_throwsException() {
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(1L);
+    dto.setStationId(100L);
+
+    Staff staff1 = new Staff();
+    staff1.setId(1L);
+
+    Staff staff2 = new Staff();
+    staff2.setId(2L);
+    staff2.setName("Other Operator");
+
+    Station station = new Station();
+    station.setId(100L);
+
+    when(staffRepository.findById(1L)).thenReturn(Optional.of(staff1));
+    when(stationRepository.findById(100L)).thenReturn(Optional.of(station));
+    when(staffRepository.findByAssignedStationId(100L)).thenReturn(Optional.of(staff2));
+
+    IllegalStateException thrown = assertThrows(
+        IllegalStateException.class,
+        () -> staffService.assignStationToOperator(dto));
+
+    assertTrue(thrown.getMessage().contains("already assigned to another operator"));
     verify(staffRepository, never()).save(any());
   }
 }

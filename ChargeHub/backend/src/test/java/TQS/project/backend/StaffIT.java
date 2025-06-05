@@ -8,9 +8,13 @@ import TQS.project.backend.entity.Staff;
 import TQS.project.backend.entity.Role;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StaffRepository;
+import TQS.project.backend.repository.BookingRepository;
+import TQS.project.backend.repository.ChargingSessionRepository;
+import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.ChargerRepository;
 import TQS.project.backend.repository.StationRepository;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import io.cucumber.java.bs.A;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +44,15 @@ public class StaffIT {
   private ChargerRepository chargerRepository;
 
   @Autowired
+  private BookingRepository bookingRepository;
+
+  @Autowired
+  private ChargingSessionRepository chargingSessionRepository;
+
+  @Autowired
+  private ClientRepository clientRepository;
+
+  @Autowired
   private PasswordEncoder passwordEncoder;
 
   private String token;
@@ -47,6 +60,9 @@ public class StaffIT {
   @BeforeEach
   void setup() {
     // Optional cleanup
+    chargingSessionRepository.deleteAll();
+    bookingRepository.deleteAll();
+    clientRepository.deleteAll();
     chargerRepository.deleteAll();
     staffRepository.deleteAll();
     stationRepository.deleteAll();

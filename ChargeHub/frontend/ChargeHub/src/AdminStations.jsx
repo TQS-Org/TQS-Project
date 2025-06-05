@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import "./AdminOperators.css"; // Reuse existing styles
+import "./css/AdminStations.css";
 import CONFIG from "../config";
+import AddChargerModal from "./components/AddChargerModal";
 
 export default function AdminStations() {
   const [stations, setStations] = useState([]);
@@ -9,6 +10,8 @@ export default function AdminStations() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showAddChargerModal, setShowAddChargerModal] = useState(false);
+  const [selectedStation, setSelectedStation] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -52,7 +55,14 @@ export default function AdminStations() {
         </div>
 
         {filteredAndSorted.map((st) => (
-          <div key={st.id} className="operator-card">
+          <div
+            key={st.id}
+            className="operator-card"
+            onClick={() => {
+              setSelectedStation(st);
+              setShowAddChargerModal(true);
+            }}
+          >
             <h3>{st.name}</h3>
             <p><strong>Address:</strong> {st.address}</p>
             <p><strong>Brand:</strong> {st.brand}</p>
@@ -71,13 +81,23 @@ export default function AdminStations() {
                 e.preventDefault();
                 const form = e.target;
 
+                const openingHours = form.openingHours.value;
+                const closingHours = form.closingHours.value;
+                const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+                if (!timeRegex.test(openingHours) || !timeRegex.test(closingHours)) {
+                  setErrorMsg("Hours must be in the format HH:MM (24h)");
+                  return;
+                }
+
+                setErrorMsg("");
+
                 const dto = {
                   name: form.name.value,
                   brand: form.brand.value,
-                  address: form.address.value,
                   latitude: parseFloat(form.latitude.value),
                   longitude: parseFloat(form.longitude.value),
-                  numberOfChargers: parseInt(form.numberOfChargers.value),
+                  address: form.address.value,
+                  numberOfChargers: parseInt(form.numberOfChargers.value, 10),
                   openingHours: form.openingHours.value,
                   closingHours: form.closingHours.value,
                   price: parseFloat(form.price.value),
@@ -93,7 +113,10 @@ export default function AdminStations() {
                   body: JSON.stringify(dto),
                 })
                   .then((res) => {
-                    if (!res.ok) return res.text().then((t) => { throw new Error(t); });
+                    if (!res.ok)
+                      return res.text().then((text) => {
+                        throw new Error(text);
+                      });
                     return res.json();
                   })
                   .then(() => {
@@ -101,24 +124,64 @@ export default function AdminStations() {
                     setErrorMsg("");
                     setShowSuccessModal(true);
 
+                    // Re-fetch updated list
                     fetch(`${CONFIG.API_URL}stations`, {
                       headers: { Authorization: `Bearer ${token}` },
                     })
                       .then((res) => res.json())
                       .then(setStations);
                   })
-                  .catch((err) => setErrorMsg(err.message || "Error"));
+                  .catch((err) => {
+                    setErrorMsg(err.message || "Something went wrong");
+                  });
               }}
             >
               <input name="name" placeholder="Name" required />
               <input name="brand" placeholder="Brand" required />
+              <input
+                name="latitude"
+                placeholder="Latitude"
+                type="number"
+                step="0.000001"
+                required
+              />
+              <input
+                name="longitude"
+                placeholder="Longitude"
+                type="number"
+                step="0.000001"
+                required
+              />
               <input name="address" placeholder="Address" required />
-              <input name="latitude" type="number" step="any" placeholder="Latitude" required />
-              <input name="longitude" type="number" step="any" placeholder="Longitude" required />
-              <input name="numberOfChargers" type="number" placeholder="Number of Chargers" required />
-              <input name="openingHours" placeholder="Opening Hours" required />
-              <input name="closingHours" placeholder="Closing Hours" required />
-              <input name="price" type="number" step="0.01" placeholder="Price (€)" required />
+              <input
+                name="numberOfChargers"
+                placeholder="Number of Chargers"
+                type="number"
+                min="1"
+                required
+              />
+              <input
+                name="openingHours"
+                placeholder="Opening Hours (HH:MM)"
+                pattern="^([01]\d|2[0-3]):([0-5]\d)$"
+                title="Enter hours in HH:MM (24h)"
+                required
+              />
+              <input
+                name="closingHours"
+                placeholder="Closing Hours (HH:MM)"
+                pattern="^([01]\d|2[0-3]):([0-5]\d)$"
+                title="Enter hours in HH:MM (24h)"
+                required
+              />
+              <input
+                name="price"
+                placeholder="Price"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+              />
 
               {errorMsg && <p className="error-msg">{errorMsg}</p>}
 
@@ -173,6 +236,22 @@ export default function AdminStations() {
           </div>
         </div>
       )}
+
+      {showAddChargerModal && (
+        <AddChargerModal
+          station={selectedStation}
+          onClose={() => setShowAddChargerModal(false)}
+          onChargerAdded={() => {
+            const token = localStorage.getItem("token");
+            fetch(`${CONFIG.API_URL}stations`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+              .then((res) => res.json())
+              .then(setStations);
+          }}
+        />
+      )}
+
     </div>
   );
 }

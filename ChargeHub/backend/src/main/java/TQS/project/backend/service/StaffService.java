@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
-
+import java.util.Optional;
 import java.time.LocalDate;
 
 @Service
@@ -74,6 +74,13 @@ public class StaffService {
         .orElseThrow(() -> new RuntimeException("Operator not found."));
     Station station = stationRepository.findById(dto.getStationId())
         .orElseThrow(() -> new RuntimeException("Station not found."));
+
+    // Check if the station is already assigned to another operator
+    Optional<Staff> existingOperator = staffRepository.findByAssignedStationId(station.getId());
+    if (existingOperator.isPresent() && !existingOperator.get().getId().equals(staff.getId())) {
+      throw new IllegalStateException(
+          "This station is already assigned to another operator: " + existingOperator.get().getName());
+    }
 
     staff.setAssignedStation(station);
     staffRepository.save(staff);
