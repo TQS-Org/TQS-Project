@@ -28,10 +28,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     // Skip filtering for public actuator and auth endpoints
     if (path.startsWith("/actuator/")
-        || path.matches("/api/auth/login/?")
-        || path.matches("/api/auth/validate/?")
-        || path.equals("/swagger-ui/index.html")
-        || path.equals("/api/auth/register")) {
+        || path.startsWith("/v3/api-docs")
+        || path.startsWith("/api-docs")
+        || path.startsWith("/swagger-ui.html")
+        || path.startsWith("/swagger-ui-custom.html")
+        || path.startsWith("/api-docs/swagger-config")
+        || path.startsWith("/api/auth/")) {
       filterChain.doFilter(request, response);
       return;
     }
