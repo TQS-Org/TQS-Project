@@ -2,6 +2,8 @@ package TQS.project.backend.service;
 
 import java.util.Optional;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,9 +46,18 @@ public class ChargerService {
         throw new IllegalArgumentException("Charger ID does not match the booking's charger.");
     }
 
-    LocalDateTime now = LocalDateTime.now();
+    // Use ZonedDateTime with your desired timezone
+    ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Lisbon")); // or your correct zone
 
-    if (now.isBefore(booking.getStartTime()) || now.isAfter(booking.getEndTime())) {
+    System.out.println("Now: " + now);
+    System.out.println("Start: " + booking.getStartTime());
+    System.out.println("End: " + booking.getEndTime());
+
+    // Convert booking times to ZonedDateTime in same zone before comparing:
+    ZonedDateTime start = booking.getStartTime().atZone(ZoneId.of("Europe/Lisbon"));
+    ZonedDateTime end = booking.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
+
+    if (now.isBefore(start) || now.isAfter(end)) {
         throw new IllegalStateException("Current time is outside the booking time window.");
     }
 
@@ -57,12 +68,12 @@ public class ChargerService {
 
     ChargingSession session = new ChargingSession();
     session.setBooking(booking);
-    session.setStartTime(now);
-    session.setEndTime(booking.getEndTime());
-    session.setEnergyConsumed(0.0f); // Placeholder value
-    session.setPrice(0.0f); // Placeholder value
+    session.setStartTime(now.toLocalDateTime());
+    session.setEndTime(end.toLocalDateTime());
+    session.setEnergyConsumed(0.0f);
+    session.setPrice(0.0f);
     session.setSessionStatus("IN PROGRESS");
 
     chargingSessionRepository.save(session);
-  }
+}
 }
