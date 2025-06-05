@@ -13,8 +13,8 @@ Feature: Book a charge
     When I select the next day
     And I click the "Book Charge" button
     And I fill in the booking form with:
-      | startTime     | 22:00        |
-      | duration      | 30           |
+      | startTime     | 23:40        |
+      | duration      | 10           |
     And click the form "Confirm Booking" button
     Then I should get an alert with the message "Booking created successfully!"
     

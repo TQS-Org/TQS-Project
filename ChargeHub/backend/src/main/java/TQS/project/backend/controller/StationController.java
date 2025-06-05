@@ -1,8 +1,10 @@
 package TQS.project.backend.controller;
 
 import TQS.project.backend.entity.Charger;
+import TQS.project.backend.dto.StationDTO;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.service.StationService;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,6 +25,12 @@ public class StationController {
 
   public StationController(StationService stationService) {
     this.stationService = stationService;
+  }
+
+  @PostMapping
+  public ResponseEntity<Station> createStation(@Valid @RequestBody StationDTO stationDTO) {
+    Station station = stationService.createStation(stationDTO);
+    return ResponseEntity.ok(station);
   }
 
   @Operation(summary = "Get a list of all stations.")
@@ -101,5 +109,13 @@ public class StationController {
   public ResponseEntity<List<Charger>> getStationChargers(@PathVariable Long id) {
     List<Charger> chargers = stationService.getAllStationChargers(id);
     return ResponseEntity.ok(chargers);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<Station> updateStation(
+      @PathVariable Long id, @Valid @RequestBody StationDTO dto) {
+
+    Station updatedStation = stationService.updateStation(id, dto);
+    return ResponseEntity.ok(updatedStation);
   }
 }

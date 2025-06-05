@@ -1,5 +1,6 @@
 package TQS.project.backend.service;
 
+import TQS.project.backend.dto.StationDTO;
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StationRepository;
@@ -19,6 +20,20 @@ public class StationService {
   public StationService(StationRepository stationRepository, ChargerRepository chargerRepository) {
     this.stationRepository = stationRepository;
     this.chargerRepository = chargerRepository;
+  }
+
+  public Station createStation(StationDTO dto) {
+    Station station = new Station();
+    station.setName(dto.getName());
+    station.setBrand(dto.getBrand());
+    station.setLatitude(dto.getLatitude());
+    station.setLongitude(dto.getLongitude());
+    station.setAddress(dto.getAddress());
+    station.setNumberOfChargers(dto.getNumberOfChargers());
+    station.setOpeningHours(dto.getOpeningHours());
+    station.setClosingHours(dto.getClosingHours());
+    station.setPrice(dto.getPrice());
+    return stationRepository.save(station);
   }
 
   public List<Station> getAllStations() {
@@ -60,5 +75,21 @@ public class StationService {
 
   public List<Charger> getAllStationChargers(long id) {
     return chargerRepository.findAllByStationId(id);
+  }
+
+  public Station updateStation(Long id, StationDTO dto) {
+    Station station =
+        stationRepository.findById(id).orElseThrow(() -> new RuntimeException("Station not found"));
+
+    station.setName(dto.getName());
+    station.setAddress(dto.getAddress());
+    station.setAddress(dto.getAddress());
+    station.setLatitude(dto.getLatitude());
+    station.setLongitude(dto.getLongitude());
+    station.setPrice(dto.getPrice());
+    station.setClosingHours(dto.getClosingHours());
+    station.setOpeningHours(dto.getOpeningHours());
+
+    return stationRepository.save(station);
   }
 }

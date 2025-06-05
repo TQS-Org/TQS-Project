@@ -19,6 +19,7 @@ public class RegisterRequest {
   @Pattern(regexp = "^9\\d{8}$", message = "Phone number must start with 9 and be exactly 9 digits")
   private String number;
 
+  @NotBlank(message = "Email is required")
   @Email(message = "Email should be valid")
   private String mail;
 

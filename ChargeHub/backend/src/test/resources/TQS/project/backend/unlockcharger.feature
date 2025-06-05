@@ -14,6 +14,6 @@ Feature: Book a charge
     And I click the "Book Charge" button
     And I fill in the booking form with:
       | startTime     | 18:00        |
-      | duration      | 30           |
+      | duration      | 10           |
     And click the form "Confirm Booking" button
     Then I should get an alert with the message "Booking created successfully!"

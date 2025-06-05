@@ -1,6 +1,7 @@
 package TQS.project.backend;
 
 import TQS.project.backend.controller.StaffController;
+import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.security.JwtAuthFilter;
@@ -119,5 +120,83 @@ public class StaffControllerTest {
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0].name").value("Operator One"))
         .andExpect(jsonPath("$[1].mail").value("op2@mail.com"));
+  }
+
+  @Test
+  @Requirement("SCRUM-35")
+  void testCreateOperator_validationFails() throws Exception {
+    // Create a DTO with invalid data
+    CreateStaffDTO dto = new CreateStaffDTO();
+    dto.setName(""); // Invalid: name is blank
+    dto.setMail("invalid-email"); // Invalid email format
+    dto.setPassword("short"); // Invalid: too short, no number
+    dto.setAge(17); // Invalid: less than 18
+    dto.setNumber("12345"); // Invalid phone number
+    dto.setAddress(""); // Invalid: blank
+
+    mockMvc
+        .perform(
+            post("/api/staff/operator")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.name").value("Name is required"))
+        .andExpect(jsonPath("$.age").value("Age must be at least 18"))
+        .andExpect(
+            jsonPath("$.number").value("Phone number must start with 9 and be exactly 9 digits"))
+        .andExpect(jsonPath("$.mail").value("Email should be valid"))
+        .andExpect(jsonPath("$.address").value("Address is required"));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_success() throws Exception {
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(1L);
+    dto.setStationId(100L);
+
+    doNothing().when(staffService).assignStationToOperator(dto);
+
+    mockMvc
+        .perform(
+            post("/api/staff/operator/assign-station")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Station assigned to operator successfully."));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_notFound() throws Exception {
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(999L);
+    dto.setStationId(100L);
+
+    doThrow(new RuntimeException("Staff or Station not found."))
+        .when(staffService)
+        .assignStationToOperator(any(AssignStationDTO.class));
+
+    mockMvc
+        .perform(
+            post("/api/staff/operator/assign-station")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Staff or Station not found."));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testAssignStationToOperator_validationFails() throws Exception {
+    AssignStationDTO dto = new AssignStationDTO();
+    // Missing required fields
+
+    mockMvc
+        .perform(
+            post("/api/staff/operator/assign-station")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest());
   }
 }
