@@ -103,8 +103,8 @@ public class PaymentController {
       SessionCreateParams params =
           SessionCreateParams.builder()
               .setMode(SessionCreateParams.Mode.PAYMENT)
-              .setSuccessUrl("http://localhost:3000/client/bookings") // adapt!
-              .setCancelUrl("http://localhost:3000/cancel") // adapt!
+              .setSuccessUrl("http://deti-tqs-23.ua.pt:3000/client/bookings") // adapt!
+              .setCancelUrl("http://deti-tqs-23.ua.pt:3000/cancel") // adapt!
               .addAllLineItem(lineItems)
               .build();
 
