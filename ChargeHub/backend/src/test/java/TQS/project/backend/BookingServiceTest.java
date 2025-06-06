@@ -7,6 +7,7 @@ import TQS.project.backend.entity.Client;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.BookingRepository;
 import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.ChargingSessionRepository;
 import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.service.BookingService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
@@ -32,6 +33,7 @@ public class BookingServiceTest {
   private ClientRepository clientRepository;
   private BookingRepository bookingRepository;
   private ChargerRepository chargerRepository;
+  private ChargingSessionRepository chargingSessionRepository;
 
   private BookingService bookingService;
 
@@ -40,7 +42,10 @@ public class BookingServiceTest {
     clientRepository = mock(ClientRepository.class);
     bookingRepository = mock(BookingRepository.class);
     chargerRepository = mock(ChargerRepository.class);
-    bookingService = new BookingService(clientRepository, bookingRepository, chargerRepository);
+    chargingSessionRepository = mock(ChargingSessionRepository.class);
+    bookingService =
+        new BookingService(
+            clientRepository, bookingRepository, chargerRepository, chargingSessionRepository);
   }
 
   @Test
@@ -222,5 +227,24 @@ public class BookingServiceTest {
 
     assertEquals("The requested time slot overlaps with an existing booking", ex.getMessage());
     verify(bookingRepository, never()).save(any());
+  }
+
+  @Test
+  @Requirement("SCRUM-24")
+  public void testGetAllBookingsByClient_successful() {
+    long clientId = 42L;
+
+    Booking booking1 = new Booking();
+    Booking booking2 = new Booking();
+
+    List<Booking> mockBookings = List.of(booking1, booking2);
+
+    when(bookingRepository.findAllByUserId(clientId)).thenReturn(mockBookings);
+
+    List<Booking> result = bookingService.getAllBookingsByClient(clientId);
+
+    assertEquals(2, result.size());
+    assertEquals(mockBookings, result);
+    verify(bookingRepository).findAllByUserId(clientId);
   }
 }

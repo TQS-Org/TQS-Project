@@ -1,0 +1,110 @@
+/* Booking card: add inner padding for better spacing */
+.booking-card {
+  background-color: #292929;
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem; /* increased horizontal padding! */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  color: #f1f1f1;
+}
+
+/* Booking list container: add inner padding for better spacing */
+.client-booking-list {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 2rem 2.5rem; /* increased horizontal padding! */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  margin-top: 2rem;
+  color: #f1f1f1;
+  transition: background-color 0.3s ease;
+}
+
+.client-booking-list:hover {
+  background-color: #2a2a2a; /* Slightly lighter on hover */
+}
+
+/* === FLEX CONTAINER FOR HEADING AND BUTTON === */
+.client-booking-list .flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* === HEADING STYLE === */
+.client-booking-list h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+/* === TOGGLE BUTTON === */
+.client-booking-list button {
+  background-color: #00c853;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.client-booking-list button:hover {
+  background-color: #00e676;
+  transform: translateY(-2px);
+}
+
+.client-booking-list button:active {
+  background-color: #00e676;
+  transform: translateY(0);
+}
+
+/* === EMPTY STATE TEXT === */
+.client-booking-list > div:last-child:not(.grid) {
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 1.1rem;
+  color: #c0c0c0;
+}
+
+/* === GRID LAYOUT FOR BOOKING CARDS === */
+.client-booking-list .grid {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.booking-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* === BOOKING CARD CONTENT === */
+.booking-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #00e676;
+}
+
+.booking-card p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #e0e0e0;
+}
+
+.booking-card p:last-child {
+  color: #90caf9; /* Token has different color to stand out */
+  word-break: break-all; /* Handle long tokens */
+}
+
+/* === LOADING MESSAGE === */
+.client-booking-list > div:first-child[class*="Loading"] {
+  color: #b0b0b0;
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}

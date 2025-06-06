@@ -70,9 +70,9 @@ public class BookingSteps {
 
   // @And("I click the {string} button")
   // public void clickButtonByText(String buttonText) {
-  //  WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
-  //      By.xpath("//button[contains(normalize-space(), '" + buttonText + "')]")));
-  //  button.click();
+  // WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
+  // By.xpath("//button[contains(normalize-space(), '" + buttonText + "')]")));
+  // button.click();
   // }
 
   @And("I fill in the booking form with:")

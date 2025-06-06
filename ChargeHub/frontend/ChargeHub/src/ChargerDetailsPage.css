@@ -1,10 +1,10 @@
 /* ChargerDetailsPage.css */
 
 #charger-details-page {
-  max-width: 720px;
+  max-width: 960px; /* Increased width */
   margin: 2rem auto;
   padding: 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #121212;
   color: #e0e0e0;
 }
@@ -79,7 +79,7 @@
 }
 
 #charger-details-page .primary-button {
-  background-color: #2196f3;
+  background-color: #4CAF50; /* Green color */
   color: white;
   padding: 0.7rem 1.4rem;
   border: none;
@@ -88,10 +88,11 @@
   font-size: 1rem;
   margin-top: 1rem;
   width: 100%;
+  transition: background-color 0.3s ease; /* Smooth transition for hover */
 }
 
 #charger-details-page .primary-button:hover {
-  background-color: #1976d2;
+  background-color: #388E3C; /* Darker green on hover */
 }
 
 #charger-details-page .cancel-button {
@@ -186,7 +187,22 @@
 
 /* Fade-in animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
+.input-token {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  padding: 0.5rem;
+  width: 100%;
+  border-radius: 6px;
+  font-size: 1rem;
+}

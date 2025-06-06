@@ -8,6 +8,9 @@ import SignupPage from './SignUpPage';
 import Layout from './Layout';
 import StationDetailsPage from './StationDetailsPage';
 import ChargerDetailsPage from './ChargerDetailsPage';
+import ClientBookingsPage from './ClientBookingsPage';
+import CancelPage from './components/CancelPage';
+import ChargingSessionPage from './ChargingSessionPage';
 
 
 export default function App() {
@@ -26,11 +29,35 @@ export default function App() {
         }
       />
 
+      <Route 
+        path="/cancel" 
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <CancelPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/cancel" 
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <CancelPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/operator"
         element={
           <ProtectedRoute requiredRole="OPERATOR">
-            <OperatorPage />
+            <Layout>
+              <OperatorPage />
+            </Layout>
           </ProtectedRoute>
         }
       />
@@ -51,7 +78,7 @@ export default function App() {
       <Route
         path="/stations/:id"
         element={
-          <ProtectedRoute requiredRole="EV_DRIVER">
+          <ProtectedRoute requiredRole={["EV_DRIVER", "ADMIN", "OPERATOR"]}>
             <Layout>
               <StationDetailsPage />
             </Layout>
@@ -65,6 +92,27 @@ export default function App() {
           <ProtectedRoute requiredRole="EV_DRIVER">
             <Layout>
               <ChargerDetailsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/client/bookings"
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <ClientBookingsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/booking/:id/status"
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <ChargingSessionPage />
             </Layout>
           </ProtectedRoute>
         }

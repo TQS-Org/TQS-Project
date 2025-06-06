@@ -13,7 +13,7 @@ name: CI with Maven and SonarCloud
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths-ignore:
       # don't run this workflow when the are pushes, and there are only changes for this directories:
       - ".github/**"
@@ -23,7 +23,7 @@ on:
       # don't run this workflow when the are pushes and there are only changes for the following files:
       - "**.md"
       - "**.gitignore"
-      
+
   pull_request:
     types: [opened, synchronize, reopened]
     paths-ignore:
@@ -44,19 +44,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '21' ]
+        java: ["21"]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'temurin'
+          distribution: "temurin"
           cache: maven
 
       - name: Cache Maven packages
@@ -75,14 +75,22 @@ jobs:
           mkdir -p ./ChargeHub/backend/src/test/resources
           cat <<EOF > ./ChargeHub/backend/src/test/resources/application.properties
           spring.application.name=backend
-          management.endpoints.web.exposure.include=health
           management.endpoint.health.show-details=always
-          management.endpoint.health.enabled=true
+          management.endpoint.health.access=unrestricted
+          management.endpoints.web.exposure.include=health,info,metrics,prometheus
+          management.endpoint.prometheus.show-details=always
+          management.endpoint.info.access=unrestricted
+          management.endpoint.info.show-details=always
+          management.endpoint.metrics.access=unrestricted
+          management.endpoint.metrics.show-details=always
+          management.endpoint.prometheus.enabled=true
+          management.metrics.export.prometheus.enabled=true
           springdoc.swagger-ui.path=/swagger-ui-custom.html
           springdoc.api-docs.path=/api-docs
           jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
           spring.flyway.enabled=true
           spring.flyway.locations=classpath:db/migration
+          stripe.api-key=${{ secrets.STRIPE_API }}
           EOF
 
       - name: Write main application.properties
@@ -90,14 +98,22 @@ jobs:
           mkdir -p ./ChargeHub/backend/src/main/resources
           cat <<EOF > ./ChargeHub/backend/src/main/resources/application.properties
           spring.application.name=backend
-          management.endpoints.web.exposure.include=health
           management.endpoint.health.show-details=always
-          management.endpoint.health.enabled=true
+          management.endpoint.health.access=unrestricted
+          management.endpoints.web.exposure.include=health,info,metrics,prometheus
+          management.endpoint.prometheus.show-details=always
+          management.endpoint.info.access=unrestricted
+          management.endpoint.info.show-details=always
+          management.endpoint.metrics.access=unrestricted
+          management.endpoint.metrics.show-details=always
+          management.endpoint.prometheus.enabled=true
+          management.metrics.export.prometheus.enabled=true
           springdoc.swagger-ui.path=/swagger-ui-custom.html
           springdoc.api-docs.path=/api-docs
           jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
           spring.flyway.enabled=true
           spring.flyway.locations=classpath:db/migration
+          stripe.api-key=${{ secrets.STRIPE_API }}
           EOF
 
       - name: Build and run unit tests
@@ -126,7 +142,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           paths: |
-            ${{ github.workspace }}/**/target/site/jacoco-merged-test-coverage-report/jacoco.xml 
+            ${{ github.workspace }}/**/target/site/jacoco-merged-test-coverage-report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 80
           min-coverage-changed-files: 80
@@ -147,4 +163,3 @@ jobs:
             -Dxray.reportFormat=junit \
             -Dxray.reportFile=target/TEST-junit-jupiter.xml \
             app.getxray:xray-maven-plugin:import-results
-

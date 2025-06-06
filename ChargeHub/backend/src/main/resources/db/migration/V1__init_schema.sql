@@ -62,3 +62,15 @@ CREATE TABLE IF NOT EXISTS booking (
     CONSTRAINT fk_booking_charger FOREIGN KEY (charger_id) REFERENCES charger(id),
     CONSTRAINT uk_booking_token UNIQUE (token)
 );
+
+CREATE TABLE IF NOT EXISTS charging_session (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    booking BIGINT NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    energy_consumed FLOAT,
+    price FLOAT,
+    session_status VARCHAR(255) NOT NULL,
+    CONSTRAINT fk_charging_session_booking FOREIGN KEY (booking)
+        REFERENCES booking(id)
+);

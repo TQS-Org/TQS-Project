@@ -1,10 +1,18 @@
 package TQS.project.backend;
 
+import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.dto.LoginResponse;
 import TQS.project.backend.entity.Staff;
+import TQS.project.backend.entity.Role;
+import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StaffRepository;
+import TQS.project.backend.repository.BookingRepository;
+import TQS.project.backend.repository.ChargingSessionRepository;
+import TQS.project.backend.repository.ClientRepository;
+import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.StationRepository;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +34,16 @@ public class StaffIT {
 
   @Autowired private StaffRepository staffRepository;
 
+  @Autowired private StationRepository stationRepository;
+
+  @Autowired private ChargerRepository chargerRepository;
+
+  @Autowired private BookingRepository bookingRepository;
+
+  @Autowired private ChargingSessionRepository chargingSessionRepository;
+
+  @Autowired private ClientRepository clientRepository;
+
   @Autowired private PasswordEncoder passwordEncoder;
 
   private String token;
@@ -33,7 +51,12 @@ public class StaffIT {
   @BeforeEach
   void setup() {
     // Optional cleanup
+    chargingSessionRepository.deleteAll();
+    bookingRepository.deleteAll();
+    clientRepository.deleteAll();
+    chargerRepository.deleteAll();
     staffRepository.deleteAll();
+    stationRepository.deleteAll();
 
     // Insert admin manually
     Staff admin = new Staff();
@@ -137,11 +160,106 @@ public class StaffIT {
     HttpEntity<Void> request = new HttpEntity<>(headers);
 
     ResponseEntity<Staff[]> response =
-        restTemplate.exchange(
-            "/api/staff/operators", HttpMethod.GET, request, Staff[].class, request);
+        restTemplate.exchange("/api/staff/operators", HttpMethod.GET, request, Staff[].class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotEmpty();
     assertThat(response.getBody()[0].getMail()).isEqualTo("operator@mail.com");
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void assignStationToOperator_asAdmin_succeeds() {
+
+    // Create operator
+    Staff operator = new Staff();
+    operator.setMail("operator@mail.com");
+    operator.setPassword(passwordEncoder.encode("operatorpass"));
+    operator.setName("Operator");
+    operator.setAge(30);
+    operator.setNumber("911111111");
+    operator.setAddress("Porto");
+    operator.setActive(true);
+    operator.setRole(Role.OPERATOR);
+    operator.setStartDate(java.time.LocalDate.now());
+    operator = staffRepository.save(operator);
+
+    // Create station
+    Station station =
+        new Station(
+            "Station Z", "BrandZ", 38.72, -9.13, "Rua Z, Lisboa", 4, "08:00", "20:00", 0.30);
+    station = stationRepository.save(station);
+
+    // Assign station to operator
+    AssignStationDTO dto = new AssignStationDTO();
+    dto.setOperatorId(operator.getId());
+    dto.setStationId(station.getId());
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(token);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<AssignStationDTO> request = new HttpEntity<>(dto, headers);
+
+    ResponseEntity<String> response =
+        restTemplate.postForEntity("/api/staff/operator/assign-station", request, String.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).contains("Station assigned to operator successfully.");
+
+    // DB validation
+    Staff updatedOperator = staffRepository.findById(operator.getId()).orElse(null);
+    assertThat(updatedOperator).isNotNull();
+    assertThat(updatedOperator.getAssignedStation().getId()).isEqualTo(station.getId());
+  }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void getStationForOperator_asOperator_succeeds() {
+    // Create operator
+    Staff operator = new Staff();
+    operator.setMail("operator@mail.com");
+    operator.setPassword(passwordEncoder.encode("op123"));
+    operator.setName("Operator X");
+    operator.setAge(32);
+    operator.setNumber("911111111");
+    operator.setAddress("Faro");
+    operator.setActive(true);
+    operator.setRole(Role.OPERATOR);
+    operator.setStartDate(java.time.LocalDate.now());
+
+    // Create station and assign
+    Station station =
+        new Station("Station X", "BrandX", 40.7, -8.6, "Rua X, Aveiro", 5, "07:00", "23:00", 0.28);
+    station = stationRepository.save(station);
+    operator.setAssignedStation(station);
+    staffRepository.save(operator);
+
+    // Login as operator
+    LoginRequest loginRequest = new LoginRequest("operator@mail.com", "op123");
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<LoginRequest> loginEntity = new HttpEntity<>(loginRequest, headers);
+
+    ResponseEntity<LoginResponse> loginResponse =
+        restTemplate.postForEntity("/api/auth/login", loginEntity, LoginResponse.class);
+
+    assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+    String operatorToken = loginResponse.getBody().getToken();
+
+    // Make GET request to retrieve the assigned station
+    HttpHeaders authHeaders = new HttpHeaders();
+    authHeaders.setBearerAuth(operatorToken);
+    HttpEntity<Void> request = new HttpEntity<>(authHeaders);
+
+    ResponseEntity<Station> response =
+        restTemplate.exchange("/api/staff/station", HttpMethod.GET, request, Station.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Station returnedStation = response.getBody();
+    assertThat(returnedStation).isNotNull();
+    assertThat(returnedStation.getId()).isEqualTo(station.getId());
+    assertThat(returnedStation.getName()).isEqualTo("Station X");
+    assertThat(returnedStation.getAddress()).isEqualTo("Rua X, Aveiro");
   }
 }

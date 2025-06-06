@@ -14,4 +14,6 @@ public interface StaffRepository extends JpaRepository<Staff, Long> {
   Optional<Staff> findByMail(String email);
 
   List<Staff> findByRole(Role role);
+
+  Optional<Staff> findByAssignedStationId(Long stationId);
 }

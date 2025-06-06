@@ -1,5 +1,6 @@
 import { useState } from "react";
 import AdminOperators from "./AdminOperators";
+import AdminStations from "./AdminStations"; // New import
 import "./AdminPage.css";
 
 export default function AdminPage() {
@@ -22,18 +23,12 @@ export default function AdminPage() {
           >
             Show Stations
           </li>
-          <li
-            className={activeSection === "drivers" ? "active" : ""}
-            onClick={() => setActiveSection("drivers")}
-          >
-            Show Drivers
-          </li>
         </ul>
       </nav>
 
       <main className="admin-content">
         {activeSection === "operators" && <AdminOperators />}
-        {/* You can add: {activeSection === "stations" && <AdminStations />} later */}
+        {activeSection === "stations" && <AdminStations />}
       </main>
     </div>
   );
