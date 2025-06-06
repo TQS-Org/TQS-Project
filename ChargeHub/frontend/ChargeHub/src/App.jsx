@@ -10,6 +10,7 @@ import StationDetailsPage from './StationDetailsPage';
 import ChargerDetailsPage from './ChargerDetailsPage';
 import ClientBookingsPage from './ClientBookingsPage';
 import CancelPage from './components/CancelPage';
+import ChargingSessionPage from './ChargingSessionPage';
 
 
 export default function App() {
@@ -23,6 +24,17 @@ export default function App() {
           <ProtectedRoute requiredRole="EV_DRIVER">
             <Layout>
               <DriverPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/cancel" 
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <CancelPage />
             </Layout>
           </ProtectedRoute>
         }
@@ -91,6 +103,16 @@ export default function App() {
           <ProtectedRoute requiredRole="EV_DRIVER">
             <Layout>
               <ClientBookingsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/booking/:id/status"
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <ChargingSessionPage />
             </Layout>
           </ProtectedRoute>
         }

@@ -16,6 +16,7 @@ import TQS.project.backend.repository.StationRepository;
 import java.util.List;
 import java.util.Optional;
 import TQS.project.backend.entity.ChargingSession;
+import TQS.project.backend.dto.FinishedChargingSessionDTO;
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.repository.ChargerRepository;
 import TQS.project.backend.repository.BookingRepository;
@@ -101,10 +102,6 @@ public class ChargerService {
     // Use ZonedDateTime with your desired timezone
     ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Lisbon")); // or your correct zone
 
-    System.out.println("Now: " + now);
-    System.out.println("Start: " + booking.getStartTime());
-    System.out.println("End: " + booking.getEndTime());
-
     // Convert booking times to ZonedDateTime in same zone before comparing:
     ZonedDateTime start = booking.getStartTime().atZone(ZoneId.of("Europe/Lisbon"));
     ZonedDateTime end = booking.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
@@ -127,5 +124,34 @@ public class ChargerService {
     session.setSessionStatus("IN PROGRESS");
 
     chargingSessionRepository.save(session);
+
+    System.out.println("Session Created: " + session);
+  }
+
+  public void finishChargingSession(long chargingSessionId, FinishedChargingSessionDTO dto) {
+    ChargingSession session =
+        chargingSessionRepository
+            .findById(chargingSessionId)
+            .orElseThrow(() -> new IllegalArgumentException("Charging session not found"));
+
+    // Convert incoming endTime to Europe/Lisbon timezone
+    ZonedDateTime endLisbon = dto.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
+
+    System.out.println("energy: " + dto.getEnergyConsumed());
+    System.out.println("Time: " + endLisbon);
+
+    session.setEndTime(endLisbon.toLocalDateTime()); // or change entity field to ZonedDateTime
+    session.setEnergyConsumed(dto.getEnergyConsumed());
+    session.setSessionStatus("CONCLUDED");
+
+    // Use price from the station
+    float pricePerKWh = (float) session.getBooking().getCharger().getStation().getPrice();
+    session.setPrice(dto.getEnergyConsumed() * pricePerKWh);
+
+    chargingSessionRepository.save(session);
+  }
+
+  public Optional<ChargingSession> getChargingSessionById(long id) {
+    return chargingSessionRepository.findById(id);
   }
 }
