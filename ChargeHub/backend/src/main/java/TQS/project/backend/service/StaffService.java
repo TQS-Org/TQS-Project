@@ -1,20 +1,26 @@
 package TQS.project.backend.service;
 
+import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Role;
 import TQS.project.backend.entity.Staff;
+import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.StaffRepository;
+import TQS.project.backend.repository.StationRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
-
+import java.util.Optional;
 import java.time.LocalDate;
 
 @Service
 public class StaffService {
 
   @Autowired private StaffRepository staffRepository;
+
+  @Autowired private StationRepository stationRepository;
 
   @Autowired private PasswordEncoder passwordEncoder;
 
@@ -49,6 +55,34 @@ public class StaffService {
     staff.setActive(true);
     staff.setStartDate(LocalDate.now());
 
+    staffRepository.save(staff);
+  }
+
+  /**
+   * Assigns a station to an operator.
+   *
+   * @param dto Data Transfer Object containing the operator's email and station ID.
+   * @throws IllegalArgumentException if the operator or station is not found.
+   */
+  public void assignStationToOperator(AssignStationDTO dto) {
+    Staff staff =
+        staffRepository
+            .findById(dto.getOperatorId())
+            .orElseThrow(() -> new RuntimeException("Operator not found."));
+    Station station =
+        stationRepository
+            .findById(dto.getStationId())
+            .orElseThrow(() -> new RuntimeException("Station not found."));
+
+    // Check if the station is already assigned to another operator
+    Optional<Staff> existingOperator = staffRepository.findByAssignedStationId(station.getId());
+    if (existingOperator.isPresent() && !existingOperator.get().getId().equals(staff.getId())) {
+      throw new IllegalStateException(
+          "This station is already assigned to another operator: "
+              + existingOperator.get().getName());
+    }
+
+    staff.setAssignedStation(station);
     staffRepository.save(staff);
   }
 }

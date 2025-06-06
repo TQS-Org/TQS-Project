@@ -55,21 +55,22 @@ public class SecurityConfig {
                         "/api/charger/**",
                         "/api/client/**")
                     .hasRole("EV_DRIVER")
-                    .requestMatchers(HttpMethod.POST, "/api/charger/**", "/api/booking/**")
+                    .requestMatchers(HttpMethod.POST, "/api/charger/*/session", "/api/booking/**")
                     .hasRole("EV_DRIVER")
                     .requestMatchers(HttpMethod.GET, "/api/stations/**")
-                    .hasRole("EV_DRIVER")
+                    .permitAll()
                     .requestMatchers(HttpMethod.PUT, "/api/charger/**")
                     .hasRole("EV_DRIVER")
                     .requestMatchers(HttpMethod.GET, "/api/stations/*/chargers")
-                    .hasAnyRole("EV_DRIVER", "OPERATOR", "ADMIN")
+                    .permitAll()
 
                     // ADMIN endpoints
                     .requestMatchers(
                         HttpMethod.POST,
                         "/api/staff/operator",
                         "/api/staff/operator/assign-station",
-                        "/api/stations")
+                        "/api/stations",
+                        "/api/charger/**")
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.GET, "/api/staff/operators")
                     .hasRole("ADMIN")

@@ -2,14 +2,18 @@ package TQS.project.backend;
 
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.dto.FinishedChargingSessionDTO;
+import TQS.project.backend.dto.ChargerDTO;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.entity.Client;
+import TQS.project.backend.entity.Staff;
 import TQS.project.backend.dto.LoginResponse;
 import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.StationRepository;
+import TQS.project.backend.entity.Role;
+import TQS.project.backend.repository.StaffRepository;
 import TQS.project.backend.repository.BookingRepository;
 import TQS.project.backend.repository.ChargerRepository;
 import TQS.project.backend.repository.ChargingSessionRepository;
@@ -45,9 +49,11 @@ public class ChargerIT {
 
   @Autowired private BookingRepository bookingRepository;
 
-  @Autowired private ChargingSessionRepository chargingSessionRepository;
+  @Autowired private StaffRepository staffRepository;
 
   @Autowired private PasswordEncoder passwordEncoder;
+
+  @Autowired private ChargingSessionRepository chargingSessionRepository;
 
   private String token;
   private Long chargerId;
@@ -58,6 +64,7 @@ public class ChargerIT {
     bookingRepository.deleteAll();
     clientRepository.deleteAll();
     chargerRepository.deleteAll();
+    staffRepository.deleteAll();
     stationRepository.deleteAll();
 
     Client client = new Client();
@@ -120,6 +127,70 @@ public class ChargerIT {
         restTemplate.exchange("/api/charger/99999", HttpMethod.GET, entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void updateCharger_asOperator_succeeds() {
+    // Create operator in DB
+    Staff operator = new Staff();
+    operator.setMail("operator@mail.com");
+    operator.setPassword(passwordEncoder.encode("operatorpass"));
+    operator.setName("Operator");
+    operator.setAge(30);
+    operator.setNumber("911111111");
+    operator.setAddress("Porto");
+    operator.setActive(true);
+    operator.setRole(Role.OPERATOR);
+    operator.setStartDate(java.time.LocalDate.now());
+    staffRepository.save(operator);
+
+    // Log in as operator
+    LoginRequest login = new LoginRequest("operator@mail.com", "operatorpass");
+    HttpHeaders loginHeaders = new HttpHeaders();
+    loginHeaders.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<LoginRequest> loginRequest = new HttpEntity<>(login, loginHeaders);
+
+    ResponseEntity<LoginResponse> loginResponse =
+        restTemplate.postForEntity("/api/auth/login", loginRequest, LoginResponse.class);
+    String operatorToken = loginResponse.getBody().getToken();
+
+    // Create a station and a charger
+    Station station =
+        new Station(
+            "Station Y", "BrandY", 38.70, -9.10, "Rua Y, Lisboa", 4, "08:00", "20:00", 0.40);
+    station = stationRepository.save(station);
+
+    Charger charger = new Charger("AC", 22.0, true, "Type2");
+    charger.setStation(station);
+    charger = chargerRepository.save(charger);
+
+    // Update DTO
+    ChargerDTO updateDTO = new ChargerDTO();
+    updateDTO.setType("DC");
+    updateDTO.setConnectorType("CCS");
+    updateDTO.setPower(50.0);
+    updateDTO.setAvailable(false);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(operatorToken);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<ChargerDTO> request = new HttpEntity<>(updateDTO, headers);
+
+    ResponseEntity<Charger> response =
+        restTemplate.exchange(
+            "/api/charger/" + charger.getId(), HttpMethod.PUT, request, Charger.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getType()).isEqualTo("DC");
+    assertThat(response.getBody().getAvailable()).isFalse();
+
+    // DB validation
+    Charger updated = chargerRepository.findById(charger.getId()).orElse(null);
+    assertThat(updated).isNotNull();
+    assertThat(updated.getType()).isEqualTo("DC");
   }
 
   @Disabled("Temporarily disabled due to problems with LocalDateTime on CI pipeline reason")

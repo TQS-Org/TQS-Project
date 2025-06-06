@@ -4,7 +4,10 @@ import TQS.project.backend.entity.Station;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.entity.Client;
+import TQS.project.backend.entity.Staff;
 import TQS.project.backend.dto.LoginResponse;
+import TQS.project.backend.dto.StationDTO;
+import TQS.project.backend.entity.Role;
 import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.repository.StationRepository;
 import TQS.project.backend.repository.BookingRepository;
@@ -228,5 +231,117 @@ public class StationIT {
     assertThat(response.getBody().length).isEqualTo(2);
     assertThat(response.getBody()[0].getType()).isIn("AC", "DC");
     assertThat(response.getBody()[1].getType()).isIn("AC", "DC");
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void createStation_asAdmin_succeeds() {
+    // Create admin in DB
+    Staff admin = new Staff();
+    admin.setMail("admin@mail.com");
+    admin.setPassword(passwordEncoder.encode("adminpass"));
+    admin.setName("Admin One");
+    admin.setAge(40);
+    admin.setNumber("999999999");
+    admin.setAddress("Santarém");
+    admin.setActive(true);
+    admin.setRole(Role.ADMIN);
+    admin.setStartDate(java.time.LocalDate.now());
+    staffRepository.save(admin);
+
+    // Log in as admin
+    LoginRequest login = new LoginRequest("admin@mail.com", "adminpass");
+    HttpHeaders loginHeaders = new HttpHeaders();
+    loginHeaders.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<LoginRequest> loginRequest = new HttpEntity<>(login, loginHeaders);
+
+    ResponseEntity<LoginResponse> loginResponse =
+        restTemplate.postForEntity("/api/auth/login", loginRequest, LoginResponse.class);
+    assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    String adminToken = loginResponse.getBody().getToken();
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(adminToken);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    StationDTO stationDTO = new StationDTO();
+    stationDTO.setName("New Station");
+    stationDTO.setBrand("BrandNew");
+    stationDTO.setLatitude(38.80);
+    stationDTO.setLongitude(-9.10);
+    stationDTO.setAddress("Rua Nova, Lisboa");
+    stationDTO.setNumberOfChargers(5);
+    stationDTO.setOpeningHours("06:00");
+    stationDTO.setClosingHours("22:00");
+    stationDTO.setPrice(0.25);
+
+    HttpEntity<StationDTO> request = new HttpEntity<>(stationDTO, headers);
+
+    ResponseEntity<Station> response =
+        restTemplate.postForEntity("/api/stations", request, Station.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getName()).isEqualTo("New Station");
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void updateStation_asOperator_succeeds() {
+    // Create operator in DB
+    Staff operator = new Staff();
+    operator.setMail("operator@mail.com");
+    operator.setPassword(passwordEncoder.encode("operatorpass"));
+    operator.setName("Operator");
+    operator.setAge(30);
+    operator.setNumber("911111111");
+    operator.setAddress("Porto");
+    operator.setActive(true);
+    operator.setRole(Role.OPERATOR);
+    operator.setStartDate(java.time.LocalDate.now());
+    staffRepository.save(operator);
+
+    // Log in as operator
+    LoginRequest login = new LoginRequest("operator@mail.com", "operatorpass");
+    HttpHeaders loginHeaders = new HttpHeaders();
+    loginHeaders.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<LoginRequest> loginRequest = new HttpEntity<>(login, loginHeaders);
+
+    ResponseEntity<LoginResponse> loginResponse =
+        restTemplate.postForEntity("/api/auth/login", loginRequest, LoginResponse.class);
+    assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    String operatorToken = loginResponse.getBody().getToken();
+
+    // Create a station to update
+    Station station =
+        new Station(
+            "Old Station", "BrandOld", 38.70, -9.11, "Old Rua, Lisboa", 3, "07:00", "21:00", 0.35);
+    station = stationRepository.save(station);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(operatorToken);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    StationDTO updateDTO = new StationDTO();
+    updateDTO.setName("Updated Station");
+    updateDTO.setBrand("BrandUpdated");
+    updateDTO.setAddress("Updated Rua, Lisboa");
+    updateDTO.setLatitude(38.75);
+    updateDTO.setLongitude(-9.14);
+    updateDTO.setPrice(0.30);
+    updateDTO.setOpeningHours("08:00");
+    updateDTO.setClosingHours("20:00");
+
+    HttpEntity<StationDTO> request = new HttpEntity<>(updateDTO, headers);
+
+    ResponseEntity<Station> response =
+        restTemplate.exchange(
+            "/api/stations/" + station.getId(), HttpMethod.PUT, request, Station.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getName()).isEqualTo("Updated Station");
   }
 }

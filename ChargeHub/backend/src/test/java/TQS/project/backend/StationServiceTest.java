@@ -3,6 +3,7 @@ package TQS.project.backend;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.service.StationService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import TQS.project.backend.dto.StationDTO;
 import TQS.project.backend.entity.Charger;
 import TQS.project.backend.repository.StationRepository;
 import TQS.project.backend.repository.ChargerRepository;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import org.mockito.InjectMocks;
@@ -156,5 +158,76 @@ public class StationServiceTest {
     assertEquals(2, result.size());
     assertEquals("AC", result.get(0).getType());
     assertEquals("DC", result.get(1).getType());
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testCreateStation_success() {
+    StationDTO dto = new StationDTO();
+    dto.setName("New Station");
+    dto.setBrand("Tesla");
+    dto.setLatitude(38.72);
+    dto.setLongitude(-9.13);
+    dto.setAddress("Lisboa");
+    dto.setNumberOfChargers(10);
+    dto.setOpeningHours("08:00");
+    dto.setClosingHours("22:00");
+    dto.setPrice(0.30);
+
+    Station savedStation = new Station();
+    savedStation.setId(1L);
+    savedStation.setName("New Station");
+
+    when(stationRepository.save(any(Station.class))).thenReturn(savedStation);
+
+    Station result = stationService.createStation(dto);
+
+    assertNotNull(result);
+    assertEquals(1L, result.getId());
+    assertEquals("New Station", result.getName());
+    verify(stationRepository, times(1)).save(any(Station.class));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testUpdateStation_success() {
+    Station existing = new Station();
+    existing.setId(1L);
+    existing.setName("Old Name");
+
+    StationDTO dto = new StationDTO();
+    dto.setName("Updated Name");
+    dto.setAddress("New Address");
+    dto.setLatitude(38.72);
+    dto.setLongitude(-9.13);
+    dto.setPrice(0.40);
+    dto.setOpeningHours("08:00");
+    dto.setClosingHours("22:00");
+
+    when(stationRepository.findById(1L)).thenReturn(Optional.of(existing));
+    when(stationRepository.save(any(Station.class))).thenReturn(existing);
+
+    Station result = stationService.updateStation(1L, dto);
+
+    assertNotNull(result);
+    assertEquals("Updated Name", result.getName());
+    assertEquals("New Address", result.getAddress());
+    assertEquals(0.40, result.getPrice());
+    verify(stationRepository, times(1)).save(any(Station.class));
+  }
+
+  @Test
+  @Requirement("SCRUM-36")
+  void testUpdateStation_stationNotFound_throwsException() {
+    StationDTO dto = new StationDTO();
+    dto.setName("Updated Name");
+
+    when(stationRepository.findById(1L)).thenReturn(Optional.empty());
+
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> stationService.updateStation(1L, dto));
+
+    assertEquals("Station not found", thrown.getMessage());
+    verify(stationRepository, never()).save(any());
   }
 }
