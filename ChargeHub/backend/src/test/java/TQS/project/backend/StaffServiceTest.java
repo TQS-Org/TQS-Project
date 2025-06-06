@@ -189,4 +189,53 @@ public class StaffServiceTest {
     assertTrue(thrown.getMessage().contains("already assigned to another operator"));
     verify(staffRepository, never()).save(any());
   }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void testGetStationForOperator_success() {
+    String email = "operator@mail.com";
+
+    Station station = new Station();
+    station.setId(100L);
+
+    Staff staff = new Staff();
+    staff.setMail(email);
+    staff.setAssignedStation(station);
+
+    when(staffRepository.findByMail(email)).thenReturn(Optional.of(staff));
+
+    Station result = staffService.getStationForOperator(email);
+
+    assertNotNull(result);
+    assertEquals(100L, result.getId());
+  }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void testGetStationForOperator_noOperatorFound() {
+    String email = "missing@mail.com";
+    when(staffRepository.findByMail(email)).thenReturn(Optional.empty());
+
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> staffService.getStationForOperator(email));
+
+    assertEquals("Operator not found with email: " + email, thrown.getMessage());
+  }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void testGetStationForOperator_noStationAssigned() {
+    String email = "operator@mail.com";
+
+    Staff staff = new Staff();
+    staff.setMail(email);
+    staff.setAssignedStation(null);
+
+    when(staffRepository.findByMail(email)).thenReturn(Optional.of(staff));
+
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> staffService.getStationForOperator(email));
+
+    assertEquals("No station assigned to this operator.", thrown.getMessage());
+  }
 }

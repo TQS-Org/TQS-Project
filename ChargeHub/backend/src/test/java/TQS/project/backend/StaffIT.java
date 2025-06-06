@@ -212,4 +212,54 @@ public class StaffIT {
     assertThat(updatedOperator).isNotNull();
     assertThat(updatedOperator.getAssignedStation().getId()).isEqualTo(station.getId());
   }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void getStationForOperator_asOperator_succeeds() {
+    // Create operator
+    Staff operator = new Staff();
+    operator.setMail("operator@mail.com");
+    operator.setPassword(passwordEncoder.encode("op123"));
+    operator.setName("Operator X");
+    operator.setAge(32);
+    operator.setNumber("911111111");
+    operator.setAddress("Faro");
+    operator.setActive(true);
+    operator.setRole(Role.OPERATOR);
+    operator.setStartDate(java.time.LocalDate.now());
+
+    // Create station and assign
+    Station station =
+        new Station("Station X", "BrandX", 40.7, -8.6, "Rua X, Aveiro", 5, "07:00", "23:00", 0.28);
+    station = stationRepository.save(station);
+    operator.setAssignedStation(station);
+    staffRepository.save(operator);
+
+    // Login as operator
+    LoginRequest loginRequest = new LoginRequest("operator@mail.com", "op123");
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<LoginRequest> loginEntity = new HttpEntity<>(loginRequest, headers);
+
+    ResponseEntity<LoginResponse> loginResponse =
+        restTemplate.postForEntity("/api/auth/login", loginEntity, LoginResponse.class);
+
+    assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+    String operatorToken = loginResponse.getBody().getToken();
+
+    // Make GET request to retrieve the assigned station
+    HttpHeaders authHeaders = new HttpHeaders();
+    authHeaders.setBearerAuth(operatorToken);
+    HttpEntity<Void> request = new HttpEntity<>(authHeaders);
+
+    ResponseEntity<Station> response =
+        restTemplate.exchange("/api/staff/station", HttpMethod.GET, request, Station.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Station returnedStation = response.getBody();
+    assertThat(returnedStation).isNotNull();
+    assertThat(returnedStation.getId()).isEqualTo(station.getId());
+    assertThat(returnedStation.getName()).isEqualTo("Station X");
+    assertThat(returnedStation.getAddress()).isEqualTo("Rua X, Aveiro");
+  }
 }

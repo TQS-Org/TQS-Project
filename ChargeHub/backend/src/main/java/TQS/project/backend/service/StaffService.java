@@ -85,4 +85,19 @@ public class StaffService {
     staff.setAssignedStation(station);
     staffRepository.save(staff);
   }
+
+  public Station getStationForOperator(String email) {
+    Optional<Staff> operator = staffRepository.findByMail(email);
+    if (operator.isEmpty()) {
+      throw new RuntimeException("Operator not found with email: " + email);
+    } else {
+      Station station = operator.get().getAssignedStation();
+
+      if (station == null) {
+        throw new RuntimeException("No station assigned to this operator.");
+      }
+
+      return station;
+    }
+  }
 }

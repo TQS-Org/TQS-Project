@@ -4,6 +4,7 @@ import TQS.project.backend.controller.StaffController;
 import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Staff;
+import TQS.project.backend.entity.Station;
 import TQS.project.backend.security.JwtAuthFilter;
 import TQS.project.backend.security.JwtProvider;
 import TQS.project.backend.service.StaffService;
@@ -198,5 +199,35 @@ public class StaffControllerTest {
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void testGetMyStation_success() throws Exception {
+    Station station = new Station();
+    station.setId(100L);
+    station.setName("My Station");
+
+    when(jwtProvider.getEmailFromToken("testtoken")).thenReturn("operator@mail.com");
+    when(staffService.getStationForOperator("operator@mail.com")).thenReturn(station);
+
+    mockMvc
+        .perform(get("/api/staff/station").header("Authorization", "Bearer testtoken"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(100L))
+        .andExpect(jsonPath("$.name").value("My Station"));
+  }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void testGetMyStation_noStationAssigned() throws Exception {
+    when(jwtProvider.getEmailFromToken("testtoken")).thenReturn("operator@mail.com");
+    when(staffService.getStationForOperator("operator@mail.com"))
+        .thenThrow(new RuntimeException("No station assigned to this operator."));
+
+    mockMvc
+        .perform(get("/api/staff/station").header("Authorization", "Bearer testtoken"))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("No station assigned to this operator."));
   }
 }
