@@ -47,6 +47,19 @@ public class ChargerController {
     return charger.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 
+  @Operation(summary = "Create a new charger for a given station.")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Charger created successfully.",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Charger.class))
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid input data or station not found.",
+          content = @Content
+      )
+  })
   @PostMapping("/{stationId}")
   public ResponseEntity<Charger> createChargerForStation(
       @PathVariable Long stationId, @Valid @RequestBody ChargerDTO chargerDTO) {
@@ -56,6 +69,19 @@ public class ChargerController {
     return ResponseEntity.ok(createdCharger);
   }
 
+  @Operation(summary = "Update an existing charger.")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Charger updated successfully.",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Charger.class))
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid input or charger not found.",
+          content = @Content
+      )
+  })
   @PutMapping("/{id}")
   public ResponseEntity<Charger> updateCharger(
       @PathVariable Long id, @Valid @RequestBody ChargerDTO dto) {
@@ -64,6 +90,19 @@ public class ChargerController {
     return ResponseEntity.ok(updatedCharger);
   }
 
+  @Operation(summary = "Start a charging session using a charge token.")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Charging session started successfully.",
+          content = @Content(schema = @Schema(example = "Charger unlocked successfully, charge session starting..."))
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid token or charger state not suitable for charging.",
+          content = @Content(schema = @Schema(example = "Error message describing failure"))
+      )
+  })
   @PostMapping("/{id}/session")
   public ResponseEntity<?> createChargingSession(
       @PathVariable("id") long chargerId, @RequestBody ChargerTokenDTO request) {

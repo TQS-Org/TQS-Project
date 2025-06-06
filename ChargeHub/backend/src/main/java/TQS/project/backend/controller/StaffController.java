@@ -63,6 +63,19 @@ public class StaffController {
     return ResponseEntity.ok(operators);
   }
 
+  @Operation(summary = "Assign a station to an operator.")
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              responseCode = "200",
+              description = "Station assigned to operator successfully.",
+              content =
+                  @Content(schema = @Schema(example = "Station assigned to operator successfully."))),
+          @ApiResponse(
+              responseCode = "400",
+              description = "Invalid input or assignment failed.",
+              content = @Content(schema = @Schema(example = "Invalid operator or station ID.")))
+      })
   @PostMapping("/operator/assign-station")
   public ResponseEntity<?> assignStationToOperator(@Valid @RequestBody AssignStationDTO dto) {
     staffService.assignStationToOperator(dto);

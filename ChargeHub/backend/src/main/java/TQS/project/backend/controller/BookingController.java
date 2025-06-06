@@ -78,6 +78,21 @@ public class BookingController {
     return ResponseEntity.ok(bookings);
   }
 
+  @Operation(summary = "Get all bookings made by a specific client.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "List of client bookings retrieved successfully.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Booking.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No bookings found for the given client.",
+            content = @Content)
+      })
   @GetMapping("/client/{id}")
   public ResponseEntity<List<Booking>> getBookingsByCharger(@PathVariable("id") long clientId) {
 
