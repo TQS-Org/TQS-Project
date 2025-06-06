@@ -135,6 +135,9 @@ public class ChargerService {
     // Convert incoming endTime to Europe/Lisbon timezone
     ZonedDateTime endLisbon = dto.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
 
+    System.out.println("energy: "+dto.getEnergyConsumed());
+    System.out.println("Time: "+endLisbon);
+
     session.setEndTime(endLisbon.toLocalDateTime()); // or change entity field to ZonedDateTime
     session.setEnergyConsumed(dto.getEnergyConsumed());
     session.setSessionStatus("CONCLUDED");

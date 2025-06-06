@@ -45,93 +45,105 @@ export default function ChargingStatusPage() {
   }, [id, token]);
 
   useEffect(() => {
-  if (!session || !booking) return;
+    if (!session || !booking) return;
 
-  const startTime = new Date(session.startTime);
-  const endTime = new Date(session.endTime);
-  const power = booking.charger.power;
+    const startTime = new Date(session.startTime);
+    const endTime = new Date(session.endTime);
+    const power = booking.charger.power;
 
-  const now = new Date();
-  const isSessionConcluded = session.sessionStatus === "CONCLUDED" || now >= endTime;
-
-  if (isSessionConcluded) {
-    setChargingEnded(true);
-    setProgress(100);
-    setEnergy(session.energyConsumed || 0);
-    return; // Don't start interval
-  }
-
-  const totalDurationSec = (endTime - startTime) / 1000;
-
-  intervalRef.current = setInterval(() => {
     const now = new Date();
-    const elapsedSec = (now - startTime) / 1000;
-    const currentProgress = Math.min((elapsedSec / totalDurationSec) * 100, 100);
+    console.log(session.sessionStatus)
+    const isSessionConcluded = session.sessionStatus === "CONCLUDED";
 
-    setProgress(currentProgress);
-
-    const energyUsed = (elapsedSec / 3600) * power;
-    setEnergy(energyUsed);
-
-    if (currentProgress >= 100) {
-      handleStopCharging();
+    if (isSessionConcluded) {
+      console.log(session.sessionStatus)
+      setChargingEnded(true);
+      setProgress(100);
+      setEnergy(session.energyConsumed || 0);
+      return;
     }
-  }, 1000);
 
-  return () => clearInterval(intervalRef.current);
-}, [session, booking]);
+    const totalDurationSec = (endTime - startTime) / 1000;
 
+    intervalRef.current = setInterval(() => {
+      const now = new Date();
+      const elapsedSec = (now - startTime) / 1000;
+      const currentProgress = Math.min((elapsedSec / totalDurationSec) * 100, 100);
 
-  const handleStopCharging = async () => {
-    if (chargingEnded || !session || !booking) return;
+      setProgress(currentProgress);
 
-    clearInterval(intervalRef.current);
+      const energyUsed = (elapsedSec / 3600) * power;
+      setEnergy(energyUsed);
+
+      if (currentProgress >= 100) {
+  clearInterval(intervalRef.current);
+  const finalEnergy = (elapsedSec / 3600) * power;
+  handleStopCharging(true, finalEnergy);
+}
+    }, 1000);
+
+    return () => clearInterval(intervalRef.current);
+  }, [session, booking]);
+
+  const handleStopCharging = async (isAutoStop = false, finalEnergy = null) => {
+  if ((!isAutoStop && chargingEnded) || !session || !booking) return;
+
+  clearInterval(intervalRef.current);
+
+  const now = new Date().toISOString();
+  const energyToSend = finalEnergy ?? energy;
+
+  try {
+    const res = await fetch(
+      `/api/charger/${booking.charger.id}/session/${session.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          energyConsumed: energyToSend,
+          endTime: now,
+        }),
+      }
+    );
+
+    if (!res.ok) throw new Error("Failed to stop session");
+
+    const updatedSessionRes = await fetch(`/api/booking/${id}/session`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!updatedSessionRes.ok) throw new Error("Failed to fetch updated session");
+    const updatedSession = await updatedSessionRes.json();
+    setSession(updatedSession);
+    setEnergy(energyToSend); // 👈 ensure UI reflects final energy
     setChargingEnded(true);
 
-    const now = new Date().toISOString();
+    if (!isAutoStop) alert("Charging session successfully concluded.");
+  } catch (err) {
+    console.error("Error stopping session:", err);
+    if (!isAutoStop) alert("Failed to stop charging session.");
+  }
+};
 
-    try {
-      const res = await fetch(
-        `/api/charger/${booking.charger.id}/session/${session.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            energyConsumed: energy,
-            endTime: now,
-          }),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to stop session");
-      alert("Charging session successfully concluded.");
-    } catch (err) {
-      console.error("Error stopping session:", err);
-      alert("Failed to stop charging session.");
-    }
-  };
 
   if (!session || !booking) return <p style={{ color: "white" }}>Loading...</p>;
 
   return (
-    <div className="battery-container">
-      <h2>{chargingEnded ? "Charging Session Completed" : "Charging in Progress"}</h2>
-      <div className="battery">
-        <div
-          className="battery-fill"
-          style={{ width: `${progress}%` }}
-        ></div>
-      </div>
-      <p>{Math.floor(progress)}%</p>
-      <p>Energy Consumed: {(chargingEnded ? session.energyConsumed : energy).toFixed(2)} kWh</p>
-<p>Total Cost: {(chargingEnded ? session.price : energy * booking.charger.station.price).toFixed(2)} €</p>
-      {!chargingEnded && (
-        <button onClick={handleStopCharging}>Stop Charging</button>
-      )}
-      {chargingEnded && <p>Charging session finished.</p>}
-    </div>
+    <div className="charging-status-container">
+  <h2>{chargingEnded ? "Charging Session Completed" : "Charging in Progress"}</h2>
+  <div className="battery">
+    <div className="battery-fill" style={{ width: `${progress}%` }}></div>
+  </div>
+  <p>{Math.floor(progress)}%</p>
+  <p>Energy Consumed: {(chargingEnded ? session.energyConsumed : energy).toFixed(2)} kWh</p>
+  {!chargingEnded && <button onClick={handleStopCharging}>Stop Charging</button>}
+  {chargingEnded && <p>Charging session finished.</p>}
+</div>
+
   );
 }
