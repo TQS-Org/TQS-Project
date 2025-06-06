@@ -74,20 +74,23 @@ public class ChargerService {
     session.setSessionStatus("IN PROGRESS");
 
     chargingSessionRepository.save(session);
+
+    System.out.println("Session Created: "+ session);
   }
 
   public void finishChargingSession(long chargingSessionId, FinishedChargingSessionDTO dto) {
     ChargingSession session = chargingSessionRepository.findById(chargingSessionId)
         .orElseThrow(() -> new IllegalArgumentException("Charging session not found"));
 
-    session.setEndTime(dto.getEndTime());
+    // Convert incoming endTime to Europe/Lisbon timezone
+    ZonedDateTime endLisbon = dto.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
+
+    session.setEndTime(endLisbon.toLocalDateTime()); // or change entity field to ZonedDateTime
     session.setEnergyConsumed(dto.getEnergyConsumed());
     session.setSessionStatus("CONCLUDED");
 
-    // Optionally calculate price based on some business logic
-    //float pricePerKWh = 0.25f; // example fixed rate
-
-    float pricePerKWh = (float) session.getBooking().getCharger().getStation().getPrice(); 
+    // Use price from the station
+    float pricePerKWh = (float) session.getBooking().getCharger().getStation().getPrice();
     session.setPrice(dto.getEnergyConsumed() * pricePerKWh);
 
     chargingSessionRepository.save(session);

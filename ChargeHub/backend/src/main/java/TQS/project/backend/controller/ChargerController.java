@@ -1,6 +1,7 @@
 package TQS.project.backend.controller;
 
 import TQS.project.backend.entity.Charger;
+import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.service.ChargerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

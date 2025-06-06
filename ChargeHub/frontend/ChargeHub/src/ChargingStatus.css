@@ -1,0 +1,51 @@
+.battery {
+  position: relative;
+  margin: 2rem auto;
+  width: 300px;
+  height: 100px;
+  border: 6px solid cyan;
+  border-radius: 15px;
+  box-sizing: border-box;
+  background-color: rgba(0, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.battery-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: cyan;
+  border-radius: 9px 0 0 9px;
+  transition: width 0.5s ease;
+  width: 0%; /* this is controlled via React inline style */
+}
+
+.battery::after {
+  content: "";
+  position: absolute;
+  right: -20px;
+  top: 30%;
+  width: 12px;
+  height: 40%;
+  background-color: cyan;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+
+button {
+  background-color: cyan;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+button:hover {
+  background-color: #00e0e0;
+}

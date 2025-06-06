@@ -9,6 +9,7 @@ import Layout from './Layout';
 import StationDetailsPage from './StationDetailsPage';
 import ChargerDetailsPage from './ChargerDetailsPage';
 import ClientBookingsPage from './ClientBookingsPage';
+import ChargingSessionPage from './ChargingSessionPage';
 
 
 export default function App() {
@@ -77,6 +78,16 @@ export default function App() {
           <ProtectedRoute requiredRole="EV_DRIVER">
             <Layout>
               <ClientBookingsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/booking/:id/status"
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <ChargingSessionPage />
             </Layout>
           </ProtectedRoute>
         }

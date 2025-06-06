@@ -9,7 +9,7 @@ SELECT 1, 'PRIO Borba (Sul)', 'PRIO', 40.19253, -8.50822, 'Coimbra', 3, '7:00', 
 WHERE NOT EXISTS (SELECT 1 FROM station WHERE latitude = 40.19253 AND longitude = -8.50822);
 
 INSERT INTO station (id, name, brand, latitude, longitude, address, number_of_chargers, opening_hours, closing_hours, price)
-SELECT 2, 'Chamauto - Sociedade Transmontana de Automóveis Lda', 'GALP', 38.8899, -9.04055, 'Lisboa', 1, '10:00', '24:00', 0.33
+SELECT 2, 'Chamauto - Sociedade Transmontana de Automóveis Lda', 'GALP', 38.8899, -9.04055, 'Lisboa', 1, '10:00', '23:59', 0.33
 WHERE NOT EXISTS (SELECT 1 FROM station WHERE latitude = 38.8899 AND longitude = -9.04055);
 
 INSERT INTO station (id, name, brand, latitude, longitude, address, number_of_chargers, opening_hours, closing_hours, price)

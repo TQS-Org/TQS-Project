@@ -7,6 +7,7 @@ import TQS.project.backend.entity.Client;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.BookingRepository;
 import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.ChargingSessionRepository;
 import TQS.project.backend.repository.ClientRepository;
 import TQS.project.backend.service.BookingService;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
@@ -32,6 +33,7 @@ public class BookingServiceTest {
   private ClientRepository clientRepository;
   private BookingRepository bookingRepository;
   private ChargerRepository chargerRepository;
+  private ChargingSessionRepository chargingSessionRepository;
 
   private BookingService bookingService;
 
@@ -40,7 +42,8 @@ public class BookingServiceTest {
     clientRepository = mock(ClientRepository.class);
     bookingRepository = mock(BookingRepository.class);
     chargerRepository = mock(ChargerRepository.class);
-    bookingService = new BookingService(clientRepository, bookingRepository, chargerRepository);
+    chargingSessionRepository = mock(ChargingSessionRepository.class);
+    bookingService = new BookingService(clientRepository, bookingRepository, chargerRepository, chargingSessionRepository);
   }
 
   @Test

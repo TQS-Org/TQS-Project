@@ -9,10 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 
 import TQS.project.backend.entity.Charger;
+import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.dto.FinishedChargingSessionDTO;
 import TQS.project.backend.entity.Booking;
-import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.repository.ChargerRepository;
 import TQS.project.backend.repository.BookingRepository;
 import TQS.project.backend.repository.ChargingSessionRepository;
@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import TQS.project.backend.entity.Booking;
-import TQS.project.backend.entity.ChargingSession;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)

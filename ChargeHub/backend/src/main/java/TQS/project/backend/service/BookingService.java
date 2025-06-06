@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,12 @@ import jakarta.transaction.Transactional;
 import TQS.project.backend.dto.CreateBookingDTO;
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.entity.Charger;
+import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.entity.Station;
 import TQS.project.backend.repository.BookingRepository;
 import TQS.project.backend.repository.ChargerRepository;
+import TQS.project.backend.repository.ChargingSessionRepository;
 import TQS.project.backend.repository.ClientRepository;
 
 @Service
@@ -28,15 +31,18 @@ public class BookingService {
   private final ClientRepository clientRepository;
   private final BookingRepository bookingRepository;
   private final ChargerRepository chargerRepository;
+  private final ChargingSessionRepository chargingSessionRepository;
 
   @Autowired
   public BookingService(
       ClientRepository clientRepository,
       BookingRepository bookingRepository,
-      ChargerRepository chargerRepository) {
+      ChargerRepository chargerRepository,
+      ChargingSessionRepository chargingSessionRepository) {
     this.clientRepository = clientRepository;
     this.bookingRepository = bookingRepository;
     this.chargerRepository = chargerRepository;
+    this.chargingSessionRepository = chargingSessionRepository;
   }
 
   @Transactional
@@ -123,4 +129,13 @@ public class BookingService {
   public List<Booking> getAllBookingsByClient(long clientId) {
     return bookingRepository.findAllByUserId(clientId);
   }
+
+  public ChargingSession getChargingSessionByBookingId(Long bookingId) {
+    return chargingSessionRepository.findByBookingId(bookingId);
+  }
+
+  public Booking getBookingById(long id){
+    return bookingRepository.findById(id).orElse(null);
+  }
+
 }

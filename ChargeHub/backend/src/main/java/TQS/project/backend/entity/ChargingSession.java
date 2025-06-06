@@ -3,6 +3,8 @@ package TQS.project.backend.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "charging_session")
 public class ChargingSession {
@@ -13,6 +15,7 @@ public class ChargingSession {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "booking", nullable = false)
+  @JsonIgnore
   private Booking booking;
 
   @Column(nullable = false)
