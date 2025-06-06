@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.service.ClientService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/api/client")
@@ -23,6 +28,19 @@ public class ClientController {
     this.clientService = clientService;
   }
 
+  @Operation(summary = "Retrieve client information by email.")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Client found and returned.",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Client.class))
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Client not found.",
+          content = @Content
+      )
+  })
   @GetMapping("/{mail}")
   public ResponseEntity<Client> getClientByMail(@PathVariable String mail) {
     Optional<Client> client = clientService.getClientByMail(mail);

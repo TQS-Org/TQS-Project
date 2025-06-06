@@ -80,6 +80,21 @@ public class BookingController {
     return ResponseEntity.ok(bookings);
   }
 
+  @Operation(summary = "Get all bookings made by a specific client.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "List of client bookings retrieved successfully.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Booking.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No bookings found for the given client.",
+            content = @Content)
+      })
   @GetMapping("/client/{id}")
   public ResponseEntity<List<Booking>> getBookingsByCharger(@PathVariable("id") long clientId) {
 
@@ -88,32 +103,40 @@ public class BookingController {
     return ResponseEntity.ok(bookings);
   }
 
+  @Operation(summary = "Get the charging session associated with a booking.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Charging session retrieved successfully.",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChargingSession.class))),
+      @ApiResponse(responseCode = "404", description = "No charging session found for this booking.",
+          content = @Content(schema = @Schema(example = "No charging session found for this booking.")))
+  })
   @GetMapping("{id}/session")
   public ResponseEntity<?> getChargingSessionByBooking(@PathVariable("id") long id) {
-    System.out.println("Received request for session with booking id: " + id);
     ChargingSession session = bookingService.getChargingSessionByBookingId(id);
 
     if (session == null) {
-      System.out.println("No session found for booking id: " + id);
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("No charging session found for this booking.");
     }
 
-    System.out.println("Session found for booking id: " + id);
     return ResponseEntity.ok(session);
   }
 
+  @Operation(summary = "Get a booking by its ID.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Booking retrieved successfully.",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Booking.class))),
+      @ApiResponse(responseCode = "404", description = "No booking found with the given ID.",
+          content = @Content(schema = @Schema(example = "No booking found for this booking.")))
+  })
   @GetMapping("{id}")
   public ResponseEntity<?> getByBookingId(@PathVariable("id") long id) {
-    System.out.println("Received request for booking with booking id: " + id);
     Booking booking = bookingService.getBookingById(id);
 
     if (booking == null) {
-      System.out.println("No booking found for booking id: " + id);
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No booking found for this booking.");
     }
 
-    System.out.println("Booking for booking id: " + id);
     return ResponseEntity.ok(booking);
   }
 }

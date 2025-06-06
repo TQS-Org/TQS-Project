@@ -2,6 +2,12 @@ package TQS.project.backend.controller;
 
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.repository.BookingRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import com.stripe.exception.StripeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +36,29 @@ public class PaymentController {
     this.bookingRepository = bookingRepository;
   }
 
+  @Operation(summary = "Create a Stripe checkout session for a booking payment.")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Stripe session created successfully. Contains sessionId and redirect URL.",
+          content = @Content(mediaType = "application/json", schema = @Schema(example = """
+              {
+                "sessionId": "cs_test_a1b2c3d4e5",
+                "url": "https://checkout.stripe.com/pay/cs_test_a1b2c3d4e5"
+              }
+              """))
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid booking token.",
+          content = @Content(schema = @Schema(example = "{ \"error\": \"Invalid booking token\" }"))
+      ),
+      @ApiResponse(
+          responseCode = "500",
+          description = "Stripe API error or server issue.",
+          content = @Content(schema = @Schema(example = "{ \"error\": \"StripeException message\" }"))
+      )
+  })
   @PostMapping("/create-checkout-session")
   public ResponseEntity<Map<String, String>> createCheckoutSession(
       @RequestParam String bookingToken) {
