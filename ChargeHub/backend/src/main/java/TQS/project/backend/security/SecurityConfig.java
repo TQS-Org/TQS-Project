@@ -76,6 +76,8 @@ public class SecurityConfig {
                     // OPERATOR endpoints
                     .requestMatchers(HttpMethod.PUT, "/api/stations/**", "/api/charger/**")
                     .hasRole("OPERATOR")
+                    .requestMatchers(HttpMethod.GET, "/api/staff/station")
+                    .hasRole("OPERATOR")
 
                     // fallback
                     .anyRequest()

@@ -43,7 +43,9 @@ export default function App() {
         path="/operator"
         element={
           <ProtectedRoute requiredRole="OPERATOR">
-            <OperatorPage />
+            <Layout>
+              <OperatorPage />
+            </Layout>
           </ProtectedRoute>
         }
       />
