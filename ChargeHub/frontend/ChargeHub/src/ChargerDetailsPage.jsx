@@ -81,6 +81,7 @@ export default function ChargerDetailsPage() {
       }
 
       try {
+        // Step 1: Start the charging session
         const res = await fetch(`${CONFIG.API_URL}charger/${id}/session`, {
           method: "POST",
           headers: {
@@ -94,6 +95,31 @@ export default function ChargerDetailsPage() {
         if (res.ok) {
           setSessionMessage(text);
           setSessionError(null);
+
+          // Step 2: Call /api/payment/create-checkout-session
+          const paymentRes = await fetch(
+            `${CONFIG.API_URL}payment/create-checkout-session?bookingToken=${chargeToken}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (paymentRes.ok) {
+            const paymentData = await paymentRes.json();
+            if (paymentData.url) {
+              // Redirect to Stripe Checkout page
+              window.location.href = paymentData.url;
+            } else {
+              alert("No payment URL returned.");
+            }
+          } else {
+            const errorText = await paymentRes.text();
+            alert("Payment session creation failed: " + errorText);
+          }
+
         } else {
           setSessionMessage(null);
           setSessionError(text);
@@ -103,6 +129,8 @@ export default function ChargerDetailsPage() {
         console.error(err);
       }
     };
+
+
 
 
   return (
