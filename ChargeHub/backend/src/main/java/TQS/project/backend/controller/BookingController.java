@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import TQS.project.backend.dto.CreateBookingDTO;
 import TQS.project.backend.entity.Booking;
+import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -84,5 +87,33 @@ public class BookingController {
     List<Booking> bookings = bookingService.getAllBookingsByClient(clientId);
 
     return ResponseEntity.ok(bookings);
+  }
+
+  @GetMapping("{id}/session")
+  public ResponseEntity<?> getChargingSessionByBooking(@PathVariable("id") long id) {
+    System.out.println("Received request for session with booking id: " + id);
+    ChargingSession session = bookingService.getChargingSessionByBookingId(id);
+
+    if (session == null) {
+      System.out.println("No session found for booking id: " + id);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No charging session found for this booking.");
+    }
+
+    System.out.println("Session found for booking id: " + id);
+    return ResponseEntity.ok(session);
+  }
+
+  @GetMapping("{id}")
+  public ResponseEntity<?> getByBookingId(@PathVariable("id") long id) {
+    System.out.println("Received request for booking with booking id: " + id);
+    Booking booking = bookingService.getBookingById(id);
+
+    if (booking == null) {
+      System.out.println("No booking found for booking id: " + id);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No booking found for this booking.");
+    }
+
+    System.out.println("Booking for booking id: " + id);
+    return ResponseEntity.ok(booking);
   }
 }

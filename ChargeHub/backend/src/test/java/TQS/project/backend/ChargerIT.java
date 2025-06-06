@@ -1,10 +1,12 @@
 package TQS.project.backend;
 
 import TQS.project.backend.entity.Station;
+import TQS.project.backend.dto.FinishedChargingSessionDTO;
 import TQS.project.backend.dto.ChargerDTO;
 import TQS.project.backend.dto.LoginRequest;
 import TQS.project.backend.entity.Booking;
 import TQS.project.backend.entity.Charger;
+import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.entity.Client;
 import TQS.project.backend.entity.Staff;
 import TQS.project.backend.dto.LoginResponse;
@@ -28,8 +30,10 @@ import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
@@ -279,5 +283,77 @@ public class ChargerIT {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).contains("Current time is outside the booking time window.");
+  }
+
+  @Test
+  @Requirement("SCRUM-27")
+  void whenFinishChargingSessionWithValidData_thenSessionIsConcluded() {
+    // Create and save booking
+    Booking booking = new Booking();
+    booking.setToken("FINISHTOKEN");
+    booking.setStartTime(LocalDateTime.now().minusMinutes(40));
+    booking.setEndTime(LocalDateTime.now().plusMinutes(20));
+    booking.setDuration(30);
+    booking.setCharger(chargerRepository.findById(chargerId).get());
+    booking.setUser(clientRepository.findByMail("driver@mail.com").get());
+    booking = bookingRepository.save(booking);
+
+    // Create and save active session
+    ChargingSession session = new ChargingSession();
+    session.setBooking(booking);
+    session.setStartTime(LocalDateTime.now().minusMinutes(30));
+    session.setEndTime(booking.getEndTime());
+    session.setEnergyConsumed(0);
+    session.setPrice(0);
+    session.setSessionStatus("IN PROGRESS");
+    session = chargingSessionRepository.save(session);
+
+    // Prepare request
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(20.0f, LocalDateTime.now());
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(token);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<FinishedChargingSessionDTO> entity = new HttpEntity<>(dto, headers);
+
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/api/charger/" + chargerId + "/session/" + session.getId(),
+        HttpMethod.PUT,
+        entity,
+        String.class
+    );
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).contains("Charging session successfully concluded.");
+
+    ChargingSession updated = chargingSessionRepository.findById(session.getId()).get();
+    assertThat(updated.getEnergyConsumed()).isEqualTo(20.0f);
+    assertThat(updated.getSessionStatus()).isEqualTo("CONCLUDED");
+    assertEquals(updated.getPrice(),20.0f*((float)session.getBooking().getCharger().getStation().getPrice())); // 20.0 * 0.25
+    assertThat(updated.getEndTime().truncatedTo(ChronoUnit.MILLIS))
+    .isEqualTo(dto.getEndTime().truncatedTo(ChronoUnit.MILLIS));
+
+  }
+
+  @Test
+  @Requirement("SCRUM-27")
+  void whenFinishChargingSessionWithInvalidSessionId_thenReturnNotFound() {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(token);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
+    HttpEntity<FinishedChargingSessionDTO> entity = new HttpEntity<>(dto, headers);
+
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/api/charger/" + chargerId + "/session/99999",
+        HttpMethod.PUT,
+        entity,
+        String.class
+    );
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    assertThat(response.getBody()).contains("Charging session not found");
   }
 }

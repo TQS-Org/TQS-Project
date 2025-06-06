@@ -1,0 +1,52 @@
+/* ClientBookingsPage.css - Dark Mode with Larger Container */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+}
+
+.max-w-6xl {
+  max-width: 80rem; /* Increased from 64rem */
+  margin: auto;
+  padding: 24px; /* Increased padding */
+}
+
+h1 {
+  font-size: 2.2rem; /* Slightly larger */
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #04d14f;
+}
+
+.ClientBookingList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Increased gap */
+  background: #1e1e1e;
+  padding: 25px; /* More padding */
+  border-radius: 10px; /* Slightly larger border-radius */
+  box-shadow: 0 6px 12px rgba(255, 255, 255, 0.1);
+}
+
+.loading,
+.error,
+.no-user-info {
+  text-align: center;
+  font-size: 1.4rem;
+  color: #ff6666;
+  padding: 12px;
+}
+
+@media (max-width: 768px) {
+  .max-w-6xl {
+    max-width: 95%; /* Adjusted for smaller screens */
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}

@@ -10,9 +10,10 @@ import org.mockito.junit.jupiter.MockitoSettings;
 
 import TQS.project.backend.dto.ChargerDTO;
 import TQS.project.backend.entity.Charger;
-import TQS.project.backend.entity.Station;
-import TQS.project.backend.entity.Booking;
 import TQS.project.backend.entity.ChargingSession;
+import TQS.project.backend.entity.Station;
+import TQS.project.backend.dto.FinishedChargingSessionDTO;
+import TQS.project.backend.entity.Booking;
 import TQS.project.backend.repository.ChargerRepository;
 import TQS.project.backend.repository.StationRepository;
 import TQS.project.backend.repository.BookingRepository;
@@ -22,6 +23,7 @@ import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -32,13 +34,13 @@ import org.mockito.quality.Strictness;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import TQS.project.backend.entity.Booking;
-import TQS.project.backend.entity.ChargingSession;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -301,4 +303,54 @@ public class ChargerServiceTest {
           chargerService.startChargingSession("TOKEN", 1L);
         });
   }
+
+  @Test
+  @Requirement("SCRUM-27")
+  void finishChargingSession_validSession_updatesFieldsCorrectly() {
+
+    Station station = new Station();
+    station.setPrice(30);
+
+    Charger charger = new Charger();
+    charger.setStation(station);
+    charger.setId(1L);
+    charger.setType("DC");
+
+    Booking booking = new Booking();
+    booking.setToken("VALIDTOKEN");
+    booking.setStartTime(LocalDateTime.now().minusMinutes(20));
+    booking.setEndTime(LocalDateTime.now().plusMinutes(20));
+    booking.setCharger(charger);
+
+    ChargingSession session = new ChargingSession();
+    session.setId(10L);
+    session.setStartTime(LocalDateTime.now().minusHours(1));
+    session.setSessionStatus("IN PROGRESS");
+    session.setBooking(booking);
+
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(15.5f, LocalDateTime.now());
+
+    when(chargingSessionRepository.findById(10L)).thenReturn(Optional.of(session));
+
+    chargerService.finishChargingSession(10L, dto);
+
+    assertThat(session.getEnergyConsumed()).isEqualTo(15.5f);
+    assertThat(session.getEndTime()).isEqualTo(dto.getEndTime());
+    assertThat(session.getSessionStatus()).isEqualTo("CONCLUDED");
+    assertEquals(session.getPrice(), 15.5f * station.getPrice());
+    verify(chargingSessionRepository).save(session);
+  }
+
+  @Test
+  @Requirement("SCRUM-27")
+  void finishChargingSession_invalidSessionId_throwsException() {
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
+
+    when(chargingSessionRepository.findById(999L)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> chargerService.finishChargingSession(999L, dto))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Charging session not found");
+  }
+
 }
