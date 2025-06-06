@@ -34,7 +34,8 @@ public class Booking {
   private int duration; // default to 20 minutes
 
   // Constructors
-  public Booking() {}
+  public Booking() {
+  }
 
   public Booking(Client user, Charger charger, LocalDateTime startTime, int duration) {
     this.user = user;
@@ -42,7 +43,7 @@ public class Booking {
     this.startTime = startTime;
     this.duration = duration;
     this.endTime = startTime.plusMinutes(this.duration);
-    this.token = generateRandomToken(duration);
+    this.token = generateRandomToken(6);
   }
 
   @PrePersist

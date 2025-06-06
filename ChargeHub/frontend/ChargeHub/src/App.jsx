@@ -9,6 +9,7 @@ import Layout from './Layout';
 import StationDetailsPage from './StationDetailsPage';
 import ChargerDetailsPage from './ChargerDetailsPage';
 import ClientBookingsPage from './ClientBookingsPage';
+import CancelPage from './components/CancelPage';
 
 
 export default function App() {
@@ -22,6 +23,17 @@ export default function App() {
           <ProtectedRoute requiredRole="EV_DRIVER">
             <Layout>
               <DriverPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/cancel" 
+        element={
+          <ProtectedRoute requiredRole="EV_DRIVER">
+            <Layout>
+              <CancelPage />
             </Layout>
           </ProtectedRoute>
         }
