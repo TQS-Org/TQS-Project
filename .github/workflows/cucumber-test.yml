@@ -84,7 +84,7 @@ jobs:
           jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
           spring.flyway.enabled=true
           spring.flyway.locations=classpath:db/migration
-          stripe.api-key=sk_test_51RWbhgRtNhCg2dwmJzylQDspUCHo6H5jy8bAHLnsEXuS55pY6HA9cruHFHWR94VchNoJ1cQyXFtMasBpzacsw9EX00RHh5bXai
+          stripe.api-key=${{ secrets.STRIPE_API }}
           EOF
 
       - name: Write main application.properties
@@ -107,7 +107,7 @@ jobs:
           jwt.secret=wBv3slbZ4PQNZQkRjrUQv9UVUKbLn7b/JchYmVK55LWVfFCkN2o1C0k9qigXHZCU4grZ7lj04qXw9Sx56Zay4ZQio8huHSHO8hdkusSHUsuu8232
           spring.flyway.enabled=true
           spring.flyway.locations=classpath:db/migration
-          stripe.api-key=sk_test_51RWbhgRtNhCg2dwmJzylQDspUCHo6H5jy8bAHLnsEXuS55pY6HA9cruHFHWR94VchNoJ1cQyXFtMasBpzacsw9EX00RHh5bXai
+          stripe.api-key=${{ secrets.STRIPE_API }}
           EOF
 
       - name: Cache Maven packages
