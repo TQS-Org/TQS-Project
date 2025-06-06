@@ -2,7 +2,6 @@ package TQS.project.backend.controller;
 
 import TQS.project.backend.dto.ChargerDTO;
 import TQS.project.backend.entity.Charger;
-import TQS.project.backend.entity.ChargingSession;
 import TQS.project.backend.service.ChargerService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,7 +88,8 @@ public class ChargerController {
     } catch (IllegalArgumentException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating charging session.");
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error updating charging session.");
     }
   }
 }

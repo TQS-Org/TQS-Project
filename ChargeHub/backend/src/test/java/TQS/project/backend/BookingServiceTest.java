@@ -43,7 +43,9 @@ public class BookingServiceTest {
     bookingRepository = mock(BookingRepository.class);
     chargerRepository = mock(ChargerRepository.class);
     chargingSessionRepository = mock(ChargingSessionRepository.class);
-    bookingService = new BookingService(clientRepository, bookingRepository, chargerRepository, chargingSessionRepository);
+    bookingService =
+        new BookingService(
+            clientRepository, bookingRepository, chargerRepository, chargingSessionRepository);
   }
 
   @Test

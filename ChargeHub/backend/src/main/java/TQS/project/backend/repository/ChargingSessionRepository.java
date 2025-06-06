@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChargingSessionRepository extends JpaRepository<ChargingSession, Long> {
   boolean existsByBooking(Booking booking);
+
   ChargingSession findByBookingId(Long bookingId);
 }

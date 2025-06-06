@@ -125,18 +125,20 @@ public class ChargerService {
 
     chargingSessionRepository.save(session);
 
-    System.out.println("Session Created: "+ session);
+    System.out.println("Session Created: " + session);
   }
 
   public void finishChargingSession(long chargingSessionId, FinishedChargingSessionDTO dto) {
-    ChargingSession session = chargingSessionRepository.findById(chargingSessionId)
-        .orElseThrow(() -> new IllegalArgumentException("Charging session not found"));
+    ChargingSession session =
+        chargingSessionRepository
+            .findById(chargingSessionId)
+            .orElseThrow(() -> new IllegalArgumentException("Charging session not found"));
 
     // Convert incoming endTime to Europe/Lisbon timezone
     ZonedDateTime endLisbon = dto.getEndTime().atZone(ZoneId.of("Europe/Lisbon"));
 
-    System.out.println("energy: "+dto.getEnergyConsumed());
-    System.out.println("Time: "+endLisbon);
+    System.out.println("energy: " + dto.getEnergyConsumed());
+    System.out.println("Time: " + endLisbon);
 
     session.setEndTime(endLisbon.toLocalDateTime()); // or change entity field to ZonedDateTime
     session.setEnergyConsumed(dto.getEnergyConsumed());
@@ -149,7 +151,7 @@ public class ChargerService {
     chargingSessionRepository.save(session);
   }
 
-  public Optional<ChargingSession> getChargingSessionById(long id){
+  public Optional<ChargingSession> getChargingSessionById(long id) {
     return chargingSessionRepository.findById(id);
   }
 }

@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -96,7 +95,8 @@ public class BookingController {
 
     if (session == null) {
       System.out.println("No session found for booking id: " + id);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No charging session found for this booking.");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body("No charging session found for this booking.");
     }
 
     System.out.println("Session found for booking id: " + id);

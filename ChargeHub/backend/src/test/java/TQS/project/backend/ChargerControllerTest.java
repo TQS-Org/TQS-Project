@@ -224,38 +224,39 @@ public class ChargerControllerTest {
   @Requirement("SCRUM-27")
   void finishChargingSession_validRequest_returnsOk() throws Exception {
     FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(20.0f, LocalDateTime.now());
-  
+
     ObjectMapper mapper = new ObjectMapper();
     mapper.findAndRegisterModules(); // handle JavaTime (LocalDateTime)
-  
+
     mockMvc
-        .perform(put("/api/charger/1/session/10")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(mapper.writeValueAsString(dto)))
+        .perform(
+            put("/api/charger/1/session/10")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)))
         .andExpect(status().isOk())
         .andExpect(content().string("Charging session successfully concluded."));
-  
+
     verify(chargerService).finishChargingSession(eq(10L), any(FinishedChargingSessionDTO.class));
   }
-  
+
   @Test
   @Requirement("SCRUM-27")
   void finishChargingSession_invalidSession_returnsNotFound() throws Exception {
     FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
-  
+
     doThrow(new IllegalArgumentException("Charging session not found"))
         .when(chargerService)
         .finishChargingSession(eq(999L), any(FinishedChargingSessionDTO.class));
-  
+
     ObjectMapper mapper = new ObjectMapper();
     mapper.findAndRegisterModules();
-  
+
     mockMvc
-        .perform(put("/api/charger/1/session/999")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(mapper.writeValueAsString(dto)))
+        .perform(
+            put("/api/charger/1/session/999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)))
         .andExpect(status().isNotFound())
         .andExpect(content().string("Charging session not found"));
   }
-
 }

@@ -352,5 +352,4 @@ public class ChargerServiceTest {
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("Charging session not found");
   }
-
 }

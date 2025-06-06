@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -134,8 +133,7 @@ public class BookingService {
     return chargingSessionRepository.findByBookingId(bookingId);
   }
 
-  public Booking getBookingById(long id){
+  public Booking getBookingById(long id) {
     return bookingRepository.findById(id).orElse(null);
   }
-
 }

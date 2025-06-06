@@ -317,12 +317,12 @@ public class ChargerIT {
 
     HttpEntity<FinishedChargingSessionDTO> entity = new HttpEntity<>(dto, headers);
 
-    ResponseEntity<String> response = restTemplate.exchange(
-        "/api/charger/" + chargerId + "/session/" + session.getId(),
-        HttpMethod.PUT,
-        entity,
-        String.class
-    );
+    ResponseEntity<String> response =
+        restTemplate.exchange(
+            "/api/charger/" + chargerId + "/session/" + session.getId(),
+            HttpMethod.PUT,
+            entity,
+            String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).contains("Charging session successfully concluded.");
@@ -330,10 +330,11 @@ public class ChargerIT {
     ChargingSession updated = chargingSessionRepository.findById(session.getId()).get();
     assertThat(updated.getEnergyConsumed()).isEqualTo(20.0f);
     assertThat(updated.getSessionStatus()).isEqualTo("CONCLUDED");
-    assertEquals(updated.getPrice(),20.0f*((float)session.getBooking().getCharger().getStation().getPrice())); // 20.0 * 0.25
+    assertEquals(
+        updated.getPrice(),
+        20.0f * ((float) session.getBooking().getCharger().getStation().getPrice())); // 20.0 * 0.25
     assertThat(updated.getEndTime().truncatedTo(ChronoUnit.MILLIS))
-    .isEqualTo(dto.getEndTime().truncatedTo(ChronoUnit.MILLIS));
-
+        .isEqualTo(dto.getEndTime().truncatedTo(ChronoUnit.MILLIS));
   }
 
   @Test
@@ -346,12 +347,9 @@ public class ChargerIT {
     FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
     HttpEntity<FinishedChargingSessionDTO> entity = new HttpEntity<>(dto, headers);
 
-    ResponseEntity<String> response = restTemplate.exchange(
-        "/api/charger/" + chargerId + "/session/99999",
-        HttpMethod.PUT,
-        entity,
-        String.class
-    );
+    ResponseEntity<String> response =
+        restTemplate.exchange(
+            "/api/charger/" + chargerId + "/session/99999", HttpMethod.PUT, entity, String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     assertThat(response.getBody()).contains("Charging session not found");
