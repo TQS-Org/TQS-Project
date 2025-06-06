@@ -116,6 +116,21 @@ public class ChargerController {
     }
   }
 
+  @Operation(summary = "Finish an ongoing charging session by providing energy and end time.")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "Charging session successfully concluded.",
+          content = @Content(schema = @Schema(example = "Charging session successfully concluded."))),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Charging session or charger not found.",
+          content = @Content(schema = @Schema(example = "Session not found."))),
+      @ApiResponse(
+          responseCode = "500",
+          description = "Unexpected error while updating the session.",
+          content = @Content(schema = @Schema(example = "Error updating charging session.")))
+  })
   @PutMapping("/{id}/session/{sessionId}")
   public ResponseEntity<?> finishChargingSession(
       @PathVariable Long id,

@@ -88,6 +88,18 @@ public class StaffController {
     return ResponseEntity.ok("Station assigned to operator successfully.");
   }
 
+  @Operation(summary = "Get the station assigned to the currently authenticated operator.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Station retrieved successfully.",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Station.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - missing or invalid token.",
+            content = @Content(schema = @Schema(example = "Unauthorized")))
+      })
   @GetMapping("/station")
   public ResponseEntity<Station> getMyStation(HttpServletRequest request) {
     String authHeader = request.getHeader("Authorization");
