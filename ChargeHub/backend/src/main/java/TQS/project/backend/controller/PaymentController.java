@@ -78,7 +78,7 @@ public class PaymentController {
             return ResponseEntity.ok(responseData);
 
         } catch (StripeException e) {
-            e.printStackTrace();
+            System.err.println(bookingToken + " - Error creating Stripe session: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage()));
         }
