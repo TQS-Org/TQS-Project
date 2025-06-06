@@ -1,20 +1,42 @@
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
-import logo from "./assets/logo.png"; // make sure the path is correct
+import logo from "./assets/logo.png";
 import { useEffect, useState } from "react";
+import CONFIG from "../config";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setLoggedIn(!!token);
+    if (token) {
+      setLoggedIn(true);
+
+      // Validate token and get user role
+      const fetchRole = async () => {
+        try {
+          const res = await fetch(`${CONFIG.API_URL}auth/validate`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setRole(data.role);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      fetchRole();
+    }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setLoggedIn(false);
+    setRole(null);
     navigate("/"); // redirect to home/login page
   };
 
@@ -30,9 +52,14 @@ export default function Navbar() {
         <div className="navbar-right">
           {loggedIn ? (
             <>
-              <button className="navbar-button" onClick={() => navigate("/client/bookings")}>
-                My Bookings
-              </button>
+              {role === "EV_DRIVER" && (
+                <button
+                  className="navbar-button"
+                  onClick={() => navigate("/client/bookings")}
+                >
+                  My Bookings
+                </button>
+              )}
               <button className="navbar-button" onClick={handleLogout}>
                 Logout
               </button>

@@ -30,13 +30,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ExtendWith(MockitoExtension.class)
 public class StaffServiceTest {
 
-  @Mock private StaffRepository staffRepository;
+  @Mock
+  private StaffRepository staffRepository;
 
-  @Mock private StationRepository stationRepository;
+  @Mock
+  private StationRepository stationRepository;
 
-  @Mock private PasswordEncoder passwordEncoder;
+  @Mock
+  private PasswordEncoder passwordEncoder;
 
-  @InjectMocks private StaffService staffService;
+  @InjectMocks
+  private StaffService staffService;
 
   @Test
   @Requirement("SCRUM-35")
@@ -57,12 +61,11 @@ public class StaffServiceTest {
     verify(staffRepository, times(1))
         .save(
             argThat(
-                staff ->
-                    staff.getName().equals(dto.getName())
-                        && staff.getMail().equals(dto.getMail())
-                        && staff.getPassword().equals("encodedpass")
-                        && staff.getRole() == Role.OPERATOR
-                        && staff.getStartDate().equals(LocalDate.now())));
+                staff -> staff.getName().equals(dto.getName())
+                    && staff.getMail().equals(dto.getMail())
+                    && staff.getPassword().equals("encodedpass")
+                    && staff.getRole() == Role.OPERATOR
+                    && staff.getStartDate().equals(LocalDate.now())));
   }
 
   @Test
@@ -73,12 +76,11 @@ public class StaffServiceTest {
 
     when(staffRepository.findByMail(dto.getMail())).thenReturn(Optional.of(new Staff()));
 
-    IllegalArgumentException thrown =
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> {
-              staffService.createOperator(dto);
-            });
+    IllegalArgumentException thrown = assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          staffService.createOperator(dto);
+        });
 
     assertEquals("Email already in use", thrown.getMessage());
     verify(staffRepository, never()).save(any());
@@ -135,8 +137,7 @@ public class StaffServiceTest {
 
     when(staffRepository.findById(1L)).thenReturn(Optional.empty());
 
-    RuntimeException thrown =
-        assertThrows(RuntimeException.class, () -> staffService.assignStationToOperator(dto));
+    RuntimeException thrown = assertThrows(RuntimeException.class, () -> staffService.assignStationToOperator(dto));
 
     assertEquals("Operator not found.", thrown.getMessage());
     verify(staffRepository, never()).save(any());
@@ -155,8 +156,7 @@ public class StaffServiceTest {
     when(staffRepository.findById(1L)).thenReturn(Optional.of(staff));
     when(stationRepository.findById(100L)).thenReturn(Optional.empty());
 
-    RuntimeException thrown =
-        assertThrows(RuntimeException.class, () -> staffService.assignStationToOperator(dto));
+    RuntimeException thrown = assertThrows(RuntimeException.class, () -> staffService.assignStationToOperator(dto));
 
     assertEquals("Station not found.", thrown.getMessage());
     verify(staffRepository, never()).save(any());
@@ -183,10 +183,61 @@ public class StaffServiceTest {
     when(stationRepository.findById(100L)).thenReturn(Optional.of(station));
     when(staffRepository.findByAssignedStationId(100L)).thenReturn(Optional.of(staff2));
 
-    IllegalStateException thrown =
-        assertThrows(IllegalStateException.class, () -> staffService.assignStationToOperator(dto));
+    IllegalStateException thrown = assertThrows(IllegalStateException.class,
+        () -> staffService.assignStationToOperator(dto));
 
     assertTrue(thrown.getMessage().contains("already assigned to another operator"));
     verify(staffRepository, never()).save(any());
+  }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void testGetStationForOperator_success() {
+    String email = "operator@mail.com";
+
+    Station station = new Station();
+    station.setId(100L);
+
+    Staff staff = new Staff();
+    staff.setMail(email);
+    staff.setAssignedStation(station);
+
+    when(staffRepository.findByMail(email)).thenReturn(Optional.of(staff));
+
+    Station result = staffService.getStationForOperator(email);
+
+    assertNotNull(result);
+    assertEquals(100L, result.getId());
+  }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void testGetStationForOperator_noOperatorFound() {
+    String email = "missing@mail.com";
+    when(staffRepository.findByMail(email)).thenReturn(Optional.empty());
+
+    RuntimeException thrown = assertThrows(
+        RuntimeException.class,
+        () -> staffService.getStationForOperator(email));
+
+    assertEquals("Operator not found with email: " + email, thrown.getMessage());
+  }
+
+  @Test
+  @Requirement("SCRUM-34")
+  void testGetStationForOperator_noStationAssigned() {
+    String email = "operator@mail.com";
+
+    Staff staff = new Staff();
+    staff.setMail(email);
+    staff.setAssignedStation(null);
+
+    when(staffRepository.findByMail(email)).thenReturn(Optional.of(staff));
+
+    RuntimeException thrown = assertThrows(
+        RuntimeException.class,
+        () -> staffService.getStationForOperator(email));
+
+    assertEquals("No station assigned to this operator.", thrown.getMessage());
   }
 }
