@@ -28,18 +28,20 @@ public class StationController {
   }
 
   @Operation(summary = "Create a new station.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Station created successfully.",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Station.class))
-      ),
-      @ApiResponse(
-          responseCode = "400",
-          description = "Invalid station data provided.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Station created successfully.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Station.class))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid station data provided.",
+            content = @Content)
+      })
   @PostMapping
   public ResponseEntity<Station> createStation(@Valid @RequestBody StationDTO stationDTO) {
     Station station = stationService.createStation(stationDTO);
@@ -125,23 +127,18 @@ public class StationController {
   }
 
   @Operation(summary = "Update an existing station by ID.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Station updated successfully.",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Station.class))
-      ),
-      @ApiResponse(
-          responseCode = "400",
-          description = "Invalid input data.",
-          content = @Content
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Station not found.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Station updated successfully.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Station.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid input data.", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Station not found.", content = @Content)
+      })
   @PutMapping("/{id}")
   public ResponseEntity<Station> updateStation(
       @PathVariable Long id, @Valid @RequestBody StationDTO dto) {

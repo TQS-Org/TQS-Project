@@ -37,28 +37,35 @@ public class PaymentController {
   }
 
   @Operation(summary = "Create a Stripe checkout session for a booking payment.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Stripe session created successfully. Contains sessionId and redirect URL.",
-          content = @Content(mediaType = "application/json", schema = @Schema(example = """
-              {
-                "sessionId": "cs_test_a1b2c3d4e5",
-                "url": "https://checkout.stripe.com/pay/cs_test_a1b2c3d4e5"
-              }
-              """))
-      ),
-      @ApiResponse(
-          responseCode = "400",
-          description = "Invalid booking token.",
-          content = @Content(schema = @Schema(example = "{ \"error\": \"Invalid booking token\" }"))
-      ),
-      @ApiResponse(
-          responseCode = "500",
-          description = "Stripe API error or server issue.",
-          content = @Content(schema = @Schema(example = "{ \"error\": \"StripeException message\" }"))
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description =
+                "Stripe session created successfully. Contains sessionId and redirect URL.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema =
+                        @Schema(
+                            example =
+                                """
+                                {
+                                  "sessionId": "cs_test_a1b2c3d4e5",
+                                  "url": "https://checkout.stripe.com/pay/cs_test_a1b2c3d4e5"
+                                }
+                                """))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid booking token.",
+            content =
+                @Content(schema = @Schema(example = "{ \"error\": \"Invalid booking token\" }"))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Stripe API error or server issue.",
+            content =
+                @Content(schema = @Schema(example = "{ \"error\": \"StripeException message\" }")))
+      })
   @PostMapping("/create-checkout-session")
   public ResponseEntity<Map<String, String>> createCheckoutSession(
       @RequestParam String bookingToken) {

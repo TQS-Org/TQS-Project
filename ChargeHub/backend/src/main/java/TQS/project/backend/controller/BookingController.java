@@ -105,10 +105,18 @@ public class BookingController {
 
   @Operation(summary = "Get the charging session associated with a booking.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Charging session retrieved successfully.",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChargingSession.class))),
-      @ApiResponse(responseCode = "404", description = "No charging session found for this booking.",
-          content = @Content(schema = @Schema(example = "No charging session found for this booking.")))
+    @ApiResponse(
+        responseCode = "200",
+        description = "Charging session retrieved successfully.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ChargingSession.class))),
+    @ApiResponse(
+        responseCode = "404",
+        description = "No charging session found for this booking.",
+        content =
+            @Content(schema = @Schema(example = "No charging session found for this booking.")))
   })
   @GetMapping("{id}/session")
   public ResponseEntity<?> getChargingSessionByBooking(@PathVariable("id") long id) {
@@ -124,10 +132,17 @@ public class BookingController {
 
   @Operation(summary = "Get a booking by its ID.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Booking retrieved successfully.",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Booking.class))),
-      @ApiResponse(responseCode = "404", description = "No booking found with the given ID.",
-          content = @Content(schema = @Schema(example = "No booking found for this booking.")))
+    @ApiResponse(
+        responseCode = "200",
+        description = "Booking retrieved successfully.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Booking.class))),
+    @ApiResponse(
+        responseCode = "404",
+        description = "No booking found with the given ID.",
+        content = @Content(schema = @Schema(example = "No booking found for this booking.")))
   })
   @GetMapping("{id}")
   public ResponseEntity<?> getByBookingId(@PathVariable("id") long id) {

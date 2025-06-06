@@ -29,18 +29,17 @@ public class ClientController {
   }
 
   @Operation(summary = "Retrieve client information by email.")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "Client found and returned.",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Client.class))
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Client not found.",
-          content = @Content
-      )
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Client found and returned.",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Client.class))),
+        @ApiResponse(responseCode = "404", description = "Client not found.", content = @Content)
+      })
   @GetMapping("/{mail}")
   public ResponseEntity<Client> getClientByMail(@PathVariable String mail) {
     Optional<Client> client = clientService.getClientByMail(mail);
