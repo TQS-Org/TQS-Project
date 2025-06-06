@@ -40,6 +40,30 @@
   background-color: #1976d2;
 }
 
+.view-charger-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #00c853;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.view-charger-button:hover {
+  background-color: #00e676;
+  transform: translateY(-1px);
+}
+
+.view-charger-button:active {
+  background-color: #00e676;
+  transform: translateY(0);
+}
+
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
   .booking-card {

@@ -3,6 +3,7 @@ package TQS.project.backend.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,12 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import TQS.project.backend.dto.AssignStationDTO;
 import TQS.project.backend.dto.CreateStaffDTO;
 import TQS.project.backend.entity.Staff;
+import TQS.project.backend.entity.Station;
 import TQS.project.backend.service.StaffService;
+import TQS.project.backend.security.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -26,6 +30,8 @@ import java.util.List;
 public class StaffController {
 
   @Autowired private StaffService staffService;
+
+  @Autowired private JwtProvider jwtProvider;
 
   @Operation(summary = "Create a new operator staff account.")
   @ApiResponses(
@@ -80,5 +86,21 @@ public class StaffController {
   public ResponseEntity<?> assignStationToOperator(@Valid @RequestBody AssignStationDTO dto) {
     staffService.assignStationToOperator(dto);
     return ResponseEntity.ok("Station assigned to operator successfully.");
+  }
+
+  @GetMapping("/station")
+  public ResponseEntity<Station> getMyStation(HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    String token = authHeader.substring(7);
+
+    // Use your JwtProvider to extract the email from the JWT
+    String email = jwtProvider.getEmailFromToken(token);
+
+    // Service call: use the email as a secure, verified source of identity
+    Station station = staffService.getStationForOperator(email);
+    return ResponseEntity.ok(station);
   }
 }

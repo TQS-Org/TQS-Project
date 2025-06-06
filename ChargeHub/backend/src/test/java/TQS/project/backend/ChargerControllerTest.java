@@ -28,15 +28,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import TQS.project.backend.dto.ChargerTokenDTO;
+import TQS.project.backend.dto.FinishedChargingSessionDTO;
+
 import org.springframework.http.MediaType;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @Import(TestSecurityConfig.class)
 @WebMvcTest(ChargerController.class)
@@ -208,5 +218,45 @@ public class ChargerControllerTest {
                     """))
         .andExpect(status().isBadRequest())
         .andExpect(content().string("No booking found for the given token."));
+  }
+
+  @Test
+  @Requirement("SCRUM-27")
+  void finishChargingSession_validRequest_returnsOk() throws Exception {
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(20.0f, LocalDateTime.now());
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.findAndRegisterModules(); // handle JavaTime (LocalDateTime)
+
+    mockMvc
+        .perform(
+            put("/api/charger/1/session/10")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Charging session successfully concluded."));
+
+    verify(chargerService).finishChargingSession(eq(10L), any(FinishedChargingSessionDTO.class));
+  }
+
+  @Test
+  @Requirement("SCRUM-27")
+  void finishChargingSession_invalidSession_returnsNotFound() throws Exception {
+    FinishedChargingSessionDTO dto = new FinishedChargingSessionDTO(10.0f, LocalDateTime.now());
+
+    doThrow(new IllegalArgumentException("Charging session not found"))
+        .when(chargerService)
+        .finishChargingSession(eq(999L), any(FinishedChargingSessionDTO.class));
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.findAndRegisterModules();
+
+    mockMvc
+        .perform(
+            put("/api/charger/1/session/999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)))
+        .andExpect(status().isNotFound())
+        .andExpect(content().string("Charging session not found"));
   }
 }

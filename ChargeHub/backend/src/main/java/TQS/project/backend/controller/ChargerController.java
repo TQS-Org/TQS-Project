@@ -10,11 +10,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 import TQS.project.backend.dto.ChargerTokenDTO;
+import TQS.project.backend.dto.FinishedChargingSessionDTO;
 
 @RestController
 @RequestMapping("/api/charger")
@@ -111,6 +113,22 @@ public class ChargerController {
       return ResponseEntity.ok("Charger unlocked successfully, charge session starting...");
     } catch (IllegalArgumentException | IllegalStateException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+  @PutMapping("/{id}/session/{sessionId}")
+  public ResponseEntity<?> finishChargingSession(
+      @PathVariable Long id,
+      @PathVariable Long sessionId,
+      @RequestBody FinishedChargingSessionDTO request) {
+    try {
+      chargerService.finishChargingSession(sessionId, request);
+      return ResponseEntity.ok("Charging session successfully concluded.");
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error updating charging session.");
     }
   }
 }

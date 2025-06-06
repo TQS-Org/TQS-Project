@@ -42,7 +42,7 @@ public class Booking {
     this.startTime = startTime;
     this.duration = duration;
     this.endTime = startTime.plusMinutes(this.duration);
-    this.token = generateRandomToken(duration);
+    this.token = generateRandomToken(6);
   }
 
   @PrePersist
