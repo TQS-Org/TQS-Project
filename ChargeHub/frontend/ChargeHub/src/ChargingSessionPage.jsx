@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import "./ChargingStatus.css";
+import CONFIG from "../config";
 
 export default function ChargingStatusPage() {
   const { id } = useParams();
@@ -16,7 +17,7 @@ export default function ChargingStatusPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const bookingRes = await fetch(`/api/booking/${id}`, {
+        const bookingRes = await fetch(`${CONFIG.API_URL}booking/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -26,7 +27,7 @@ export default function ChargingStatusPage() {
         const bookingData = await bookingRes.json();
         setBooking(bookingData);
 
-        const sessionRes = await fetch(`/api/booking/${id}/session`, {
+        const sessionRes = await fetch(`${CONFIG.API_URL}booking/${id}/session`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -55,7 +56,7 @@ export default function ChargingStatusPage() {
 
       try {
         const res = await fetch(
-          `/api/charger/${booking.charger.id}/session/${session.id}`,
+          `${CONFIG.API_URL}charger/${booking.charger.id}/session/${session.id}`,
           {
             method: "PUT",
             headers: {
@@ -71,7 +72,7 @@ export default function ChargingStatusPage() {
 
         if (!res.ok) throw new Error("Failed to stop session");
 
-        const updatedSessionRes = await fetch(`/api/booking/${id}/session`, {
+        const updatedSessionRes = await fetch(`${CONFIG.API_URL}booking/${id}/session`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

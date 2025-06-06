@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ClientBookingList from "./components/ClientBookingList";
 import "./ClientBookingsPage.css";
 import { useNavigate } from "react-router-dom";
+import CONFIG from "../config";
 
 export default function ClientBookingsPage() {
   const [clientId, setClientId] = useState(null);
@@ -20,7 +21,7 @@ export default function ClientBookingsPage() {
       }
 
       try {
-        const res = await fetch(`/api/client/${mail}`, {
+        const res = await fetch(`${CONFIG.API_URL}client/${mail}`, {
           headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'

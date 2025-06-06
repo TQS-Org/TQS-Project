@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate , Link} from "react-router-dom";
 import "../css/BookingCard.css";
+import CONFIG from "../../config";
 
 export default function ClientBookingCard({ booking }) {
   const user = booking.user || { name: "Unknown", mail: "Unknown" };
@@ -18,7 +19,7 @@ export default function ClientBookingCard({ booking }) {
     const checkChargingSession = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`/api/booking/${booking.id}/session`, {
+        const response = await fetch(`${CONFIG.API_URL}booking/${booking.id}/session`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
