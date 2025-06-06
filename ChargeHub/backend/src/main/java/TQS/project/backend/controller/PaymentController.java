@@ -31,7 +31,8 @@ public class PaymentController {
     }
 
     @PostMapping("/create-checkout-session")
-    public ResponseEntity<Map<String, String>> createCheckoutSession(@RequestParam String bookingToken) {
+    public ResponseEntity<Map<String, String>> createCheckoutSession(
+            @RequestParam String bookingToken) {
         // 1. Fetch booking
         Optional<Booking> bookingOpt = bookingRepository.findByToken(bookingToken);
         if (bookingOpt.isEmpty()) {
