@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../css/BookingCard.css";
 
 export default function ClientBookingCard({ booking }) {
@@ -19,6 +20,11 @@ export default function ClientBookingCard({ booking }) {
       <p>Station: {booking.charger.station.name}</p>
       <p>Charger: {booking.charger.id}</p>
       <p>Token: {booking.token}</p>
+
+      {/* View Charger Details button */}
+      <Link to={`/chargers/${booking.charger.id}`} className="view-charger-button">
+        Go to Charger
+      </Link>
     </div>
   );
 }

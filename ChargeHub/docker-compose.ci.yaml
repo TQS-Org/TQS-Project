@@ -54,7 +54,8 @@ services:
               "management.endpoint.prometheus.enabled": "true",
               "management.metrics.export.prometheus.enabled": "true",
               "springdoc.swagger-ui.path":"/swagger-ui-custom.html",
-              "springdoc.api-docs.path": "/api-docs"
+              "springdoc.api-docs.path": "/api-docs",
+              "stripe.api-key": "$STRIPE_API"
             }'
     networks:
       - chargehub-network
