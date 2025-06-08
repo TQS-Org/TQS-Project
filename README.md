@@ -5,7 +5,7 @@ Projeto de TQS 2024-2025 - ChargeHub
 
 This project was developed in the context of the Test and Quality Software (TQS) course, which emphasizes building robust, testable, and maintainable software systems. Throughout the project, we applied principles of agile development, user-centered design, and quality assurance.
 
-Our product, ChargeHub, is a digital platform designed to improve the experience of electric vehicle (EV) drivers and facilitate efficient management for station operators. It aims to simplify the process of discovering, reserving, and managing EV charging sessions, while also providing essential administrative tools. Bellow lies a comprehensive list of our core functionalities:
+Our product, ChargeHub, is a digital platform designed to improve the experience of electric vehicle (EV) drivers and facilitate efficient management for station operators. It aims to simplify the process of discovering, reserving, and managing EV charging sessions, while also providing essential administrative tools. Below lies a comprehensive list of our core functionalities:
 
 #### Station Discovery
 - Search for nearby charging stations based on location.
